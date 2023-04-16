@@ -6,7 +6,10 @@ namespace CarServices.Models.Entity
 {
     public class Role
     {
+        [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int role_id { get; set; }
+        [MaxLength(10)]
         public string role_name { get; set; }
 
         public virtual ICollection<User> Users { get; set; }

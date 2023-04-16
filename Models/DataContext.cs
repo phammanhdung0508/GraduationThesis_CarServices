@@ -6,13 +6,7 @@ namespace CarServices.Models
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-
-        }
-
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<BookingDetail> BookingDetails { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
@@ -27,5 +21,15 @@ namespace CarServices.Models
         public DbSet<ServiceBooking> ServiceBookings { get; set; }
         public DbSet<ServiceGarage> ServiceGarages { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

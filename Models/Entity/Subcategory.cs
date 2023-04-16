@@ -6,13 +6,16 @@ namespace CarServices.Models.Entity
 {
     public class Subcategory
     {
+        [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int subcategory_id { get; set; }
+        [MaxLength(20)]
         public string subcategory_name { get; set; }
         public bool subcategory_status { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
 
-        public int category_id { get; set; }
+        // public int category_id { get; set; }
         public virtual Category Category { get; set; }
 
         public virtual ICollection<Product> Products { get; set; }

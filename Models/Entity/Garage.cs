@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CarServices.Models.Entity
+namespace GraduationThesis_CarServices.Models.Entity
 {
     public class Garage
     {
@@ -18,11 +18,11 @@ namespace CarServices.Models.Entity
         [MaxLength(20)]
         public string garage_address { get; set; }
         [MaxLength(20)]
-        public string garage_city { get; set; }
+        public string garage_ward { get; set; }
         [MaxLength(20)]
         public string garage_district { get; set; }
         [MaxLength(20)]
-        public string garage_ward { get; set; }
+        public string garage_city { get; set; }
         [MaxLength(20)]
         public string from_to { get; set; }
         [MaxLength(6)]
@@ -35,7 +35,6 @@ namespace CarServices.Models.Entity
         public virtual User User { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
-        public virtual ICollection<Report> Reports { get; set; }
         public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
     }

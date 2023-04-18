@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CarServices.Encrypting
+namespace GraduationThesis_CarServices.Encrypting
 {
     public class EncryptConfiguration
     {

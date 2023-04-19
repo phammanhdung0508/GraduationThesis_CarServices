@@ -1,8 +1,8 @@
 #nullable disable
-using CarServices.Models.Entity;
+using GraduationThesis_CarServices.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarServices.Models
+namespace GraduationThesis_CarServices.Models
 {
     public class DataContext : DbContext
     {
@@ -30,6 +30,11 @@ namespace CarServices.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Booking>()
+            .HasOne(b => b.Report).WithOne(r => r.Booking)
+            .HasForeignKey<Report>(e => e.report_id)
+            //.OnDelete(DeleteBehavior.Cascade)
+            ;
         }
     }
 }

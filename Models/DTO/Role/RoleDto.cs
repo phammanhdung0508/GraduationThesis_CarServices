@@ -1,5 +1,5 @@
 #nullable disable
-namespace CarServices.Models.DTO
+namespace GraduationThesis_CarServices.Models.DTO.Role
 {
     public class RoleDto
     {

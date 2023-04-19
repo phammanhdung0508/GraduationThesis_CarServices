@@ -1,6 +1,6 @@
 #nullable disable
 
-namespace CarServices.Models.DTO
+namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class CreateUserDto
     {

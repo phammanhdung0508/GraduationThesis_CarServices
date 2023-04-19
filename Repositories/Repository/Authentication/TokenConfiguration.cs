@@ -2,10 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using CarServices.Models.DTO;
+using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Models.DTO.Authentication;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CarServices.Repositories.Repository.Authentication
+namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 {
     public class TokenConfiguration
     {

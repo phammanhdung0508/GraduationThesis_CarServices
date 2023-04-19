@@ -1,28 +1,26 @@
-using GraduationThesis_CarServices.Models.DTO.Coupon;
-using Microsoft.AspNetCore.Mvc;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CouponController : ControllerBase
+    public class UserController : ControllerBase
     {
-
-        public readonly ICouponService couponService;
-
-        public CouponController(ICouponService couponService)
+        private readonly IUserService userService;
+        public UserController(IUserService userService)
         {
-            this.couponService = couponService;
+            this.userService = userService;
         }
 
-        [HttpPost("view-all-coupon")]
-        public async Task<ActionResult<List<CouponDto>>> ViewCoupon(PageDto page)
+        [HttpPost("view-all-user")]
+        public async Task<ActionResult<List<UserDto>>> ViewCoupon(PageDto page)
         {
             try
             {
-                var list = await couponService.View(page)!;
+                var list = await userService.View(page)!;
                 return Ok(list);
             }
             catch (Exception e)
@@ -37,13 +35,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-coupon/{id}")]
-        public async Task<ActionResult<CouponDto>> DetailCoupon(int id)
+        [HttpGet("detail-user/{id}")]
+        public async Task<ActionResult<UserDto>> DetailCoupon(int id)
         {
             try
             {
-                var coupon = await couponService.Detail(id);
-                return Ok(coupon);
+                var user = await userService.Detail(id);
+                return Ok(user);
             }
             catch (Exception e)
             {
@@ -57,12 +55,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-coupon")]
-        public async Task<ActionResult<bool>> CreateCoupon(CreateCouponDto couponDto)
+        [HttpPost("create-user")]
+        public async Task<ActionResult<bool>> CreateCoupon(CreateUserDto userDto)
         {
             try
             {
-                if (await couponService.Create(couponDto))
+                if (await userService.Create(userDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -80,12 +78,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-coupon")]
-        public async Task<ActionResult<bool>> UpdateCoupon(UpdateCouponDto couponDto)
+        [HttpPut("update-user")]
+        public async Task<ActionResult<bool>> UpdateCoupon(UpdateUserDto userDto)
         {
             try
             {
-                if (await couponService.Update(couponDto))
+                if (await userService.Update(userDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -103,12 +101,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-coupon")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteCouponDto couponDto)
+        [HttpPut("delete-user")]
+        public async Task<ActionResult<bool>> DeleteCoupon(DeleteUserDto userDto)
         {
             try
             {
-                if (await couponService.Delete(couponDto))
+                if (await userService.Delete(userDto))
                 {
                     return Ok("Successfully!");
                 }

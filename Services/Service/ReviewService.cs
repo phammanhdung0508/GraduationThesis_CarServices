@@ -1,27 +1,26 @@
 using AutoMapper;
-using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
-    public class GarageService : IGarageService
+    public class ReviewService : IReviewService
     {
         private readonly IMapper mapper;
-        private readonly IGarageRepository garageRepository;
-        public GarageService(IMapper mapper, IGarageRepository garageRepository)
-        {
-            this.garageRepository = garageRepository;
+        private readonly IReviewRepository reviewRepository;
+        public ReviewService(IMapper mapper, IReviewRepository reviewRepository){
+            this.reviewRepository = reviewRepository;
             this.mapper = mapper;
         }
 
-        public async Task<List<GarageDto>?> View(PageDto page)
+        public async Task<List<ReviewDto>?> View(PageDto page)
         {
 
             try
             {
-                List<GarageDto>? list = await garageRepository.View(page);
+                List<ReviewDto>? list = await reviewRepository.View(page);
                 return list;
             }
             catch (Exception)
@@ -30,12 +29,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<GarageDto?> Detail(int id)
+        public async Task<ReviewDto?> Detail(int id)
         {
             try
             {
-                GarageDto? garage = mapper.Map<GarageDto>(await garageRepository.Detail(id));
-                return garage;
+                ReviewDto? review = mapper.Map<ReviewDto>(await reviewRepository.Detail(id));
+                return review;
             }
             catch (Exception)
             {
@@ -43,11 +42,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateGarageDto createGarageDto)
+        public async Task<bool> Create(CreateReviewDto createReviewDto)
         {
             try
             {
-                await garageRepository.Create(createGarageDto);
+                await reviewRepository.Create(createReviewDto);
                 return true;
             }
             catch (Exception)
@@ -56,11 +55,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateGarageDto updateGarageDto)
+        public async Task<bool> Update(UpdateReviewDto updateReviewDto)
         {
             try
             {
-                await garageRepository.Update(updateGarageDto);
+                await reviewRepository.Update(updateReviewDto);
                 return true;
             }
             catch (Exception)
@@ -69,11 +68,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Delete(DeleteGarageDto deleteGarageDto)
+        public async Task<bool> Delete(DeleteReviewDto deleteReviewDto)
         {
             try
             {
-                await garageRepository.Delete(deleteGarageDto);
+                await reviewRepository.Delete(deleteReviewDto);
                 return true;
             }
             catch (Exception)

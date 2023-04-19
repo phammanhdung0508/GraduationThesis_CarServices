@@ -1,8 +1,10 @@
 #nullable disable
+
 namespace GraduationThesis_CarServices.Models.DTO.User
 {
-    public class UserDto
+    public class UpdateUserDto
     {
+        public int user_id { get; set; }
         public string user_first_name { get; set; }
         public string user_last_name { get; set; }
         public string full_name { get; set; }

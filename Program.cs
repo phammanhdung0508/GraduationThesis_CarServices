@@ -71,9 +71,15 @@ builder.Services.AddSingleton<EncryptConfiguration>();
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IGarageRepository, GarageRepository>();
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IGarageService, GarageService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 

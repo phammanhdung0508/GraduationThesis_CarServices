@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        private static UserDto? user;
+        private static UserLoginDto? user;
         private readonly DataContext context;
         private readonly IAuthenticationRepository authenticationRepository;
         public AuthenticationController(DataContext context, IAuthenticationRepository authenticationRepository){
@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
         
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto request)
+        public async Task<ActionResult<UserLoginDto>> Login(LoginDto request)
         {
             try
             {
@@ -30,7 +30,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
@@ -66,7 +72,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
@@ -79,7 +91,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 

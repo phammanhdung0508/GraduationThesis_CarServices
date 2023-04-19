@@ -1,28 +1,30 @@
-using GraduationThesis_CarServices.Models.DTO.Coupon;
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CouponController : ControllerBase
+    public class ReviewController : ControllerBase
     {
-
-        public readonly ICouponService couponService;
-
-        public CouponController(ICouponService couponService)
+        private readonly IReviewService reviewService;
+        public ReviewController(IReviewService reviewService)
         {
-            this.couponService = couponService;
+            this.reviewService = reviewService;
         }
 
-        [HttpPost("view-all-coupon")]
-        public async Task<ActionResult<List<CouponDto>>> ViewCoupon(PageDto page)
+        [HttpPost("view-all-review")]
+        public async Task<ActionResult<List<ReviewDto>>> ViewReview(PageDto page)
         {
             try
             {
-                var list = await couponService.View(page)!;
+                var list = await reviewService.View(page)!;
                 return Ok(list);
             }
             catch (Exception e)
@@ -37,13 +39,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-coupon/{id}")]
-        public async Task<ActionResult<CouponDto>> DetailCoupon(int id)
+        [HttpGet("detail-review/{id}")]
+        public async Task<ActionResult<ReviewDto>> DetailReview(int id)
         {
             try
             {
-                var coupon = await couponService.Detail(id);
-                return Ok(coupon);
+                var review = await reviewService.Detail(id);
+                return Ok(review);
             }
             catch (Exception e)
             {
@@ -57,12 +59,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-coupon")]
-        public async Task<ActionResult<bool>> CreateCoupon(CreateCouponDto couponDto)
+        [HttpPost("create-review")]
+        public async Task<ActionResult<bool>> CreateReview(CreateReviewDto reviewDto)
         {
             try
             {
-                if (await couponService.Create(couponDto))
+                if (await reviewService.Create(reviewDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -80,12 +82,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-coupon")]
-        public async Task<ActionResult<bool>> UpdateCoupon(UpdateCouponDto couponDto)
+        [HttpPut("update-review")]
+        public async Task<ActionResult<bool>> UpdateReview(UpdateReviewDto reviewDto)
         {
             try
             {
-                if (await couponService.Update(couponDto))
+                if (await reviewService.Update(reviewDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -103,12 +105,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-coupon")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteCouponDto couponDto)
+        [HttpPut("delete-review")]
+        public async Task<ActionResult<bool>> DeleteReview(DeleteReviewDto reviewDto)
         {
             try
             {
-                if (await couponService.Delete(couponDto))
+                if (await reviewService.Delete(reviewDto))
                 {
                     return Ok("Successfully!");
                 }

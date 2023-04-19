@@ -25,11 +25,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             this.mapper = mapper;
         }
 
-        public async Task<UserDto?> CheckLogin(LoginDto login)
+        public async Task<UserLoginDto?> CheckLogin(LoginDto login)
         {
             try
             {
-                UserDto? user = null;
+                UserLoginDto? user = null;
                 bool check = true;
                 // string email = _encryptConfiguration.Base64Decode(login.user_email);
                 string email = login.user_email;
@@ -54,7 +54,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 }
                 if (check == true)
                 {
-                    user = mapper.Map<UserDto>(_user);
+                    user = mapper.Map<UserLoginDto>(_user);
                     //check
                     Console.WriteLine(user.roleDto.role_name);
 
@@ -63,9 +63,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     return user;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
             return null;
         }
@@ -77,11 +77,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 var refreshToken = tokenConfiguration.GenerateRefreshToken();
                 return refreshToken;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task CreateUser(CreateUserDto _user)
@@ -98,9 +97,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
     }

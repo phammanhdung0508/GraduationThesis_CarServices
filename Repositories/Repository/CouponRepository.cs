@@ -27,11 +27,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 List<Coupon> list = await PagingConfiguration<Coupon>.Create(context.Coupons, page);
                 return mapper.Map<List<CouponDto>>(list);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<CouponDto?> Detail(int id)
@@ -41,11 +40,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 CouponDto coupon = mapper.Map<CouponDto>(await context.Coupons.FirstOrDefaultAsync(c => c.coupon_id == id));
                 return coupon;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task Create(CreateCouponDto couponDto)
@@ -56,9 +54,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Coupons.Add(coupon);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -71,9 +69,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Coupons.Update(coupon);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -86,9 +84,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Coupons.Update(coupon);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
     }

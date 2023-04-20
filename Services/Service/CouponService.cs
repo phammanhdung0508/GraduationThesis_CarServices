@@ -1,7 +1,6 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -24,11 +23,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 List<CouponDto>? list = await couponRepository.View(page);
                 return list;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<CouponDto?> Detail(int id)
@@ -38,11 +36,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 CouponDto? _coupon = mapper.Map<CouponDto>(await couponRepository.Detail(id));
                 return _coupon;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<bool> Create(CreateCouponDto createCouponDto)
@@ -52,11 +49,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await couponRepository.Create(createCouponDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Update(UpdateCouponDto updateCouponDto)
@@ -66,11 +62,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await couponRepository.Update(updateCouponDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Delete(DeleteCouponDto deleteCouponDto)
@@ -80,11 +75,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await couponRepository.Delete(deleteCouponDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
     }
 }

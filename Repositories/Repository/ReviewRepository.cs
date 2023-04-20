@@ -1,7 +1,7 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -9,23 +9,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
-    public class GarageRepository : IGarageRepository
+    public class ReviewRepository : IReviewRepository
     {
         private readonly DataContext context;
         private readonly IMapper mapper;
-        public GarageRepository(DataContext context, IMapper mapper)
+        public ReviewRepository(IMapper mapper, DataContext context)
         {
-            this.context = context;
             this.mapper = mapper;
+            this.context = context;
         }
 
-
-        public async Task<List<GarageDto>?> View(PageDto page)
+        public async Task<List<ReviewDto>?> View(PageDto page)
         {
             try
             {
-                List<Garage> list = await PagingConfiguration<Garage>.Create(context.Garages, page);
-                return mapper.Map<List<GarageDto>>(list);
+                List<Review> list = await PagingConfiguration<Review>.Create(context.Reviews, page);
+                return mapper.Map<List<ReviewDto>>(list);
             }
             catch (Exception)
             {
@@ -33,12 +32,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<GarageDto?> Detail(int id)
+        public async Task<ReviewDto?> Detail(int id)
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.garage_id == id));
-                return garage;
+                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews.FirstOrDefaultAsync(r => r.review_id == id));
+                return review;
             }
             catch (Exception)
             {
@@ -46,12 +45,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateGarageDto garageDto)
+        public async Task Create(CreateReviewDto reviewDto)
         {
             try
             {
-                Garage garage = mapper.Map<Garage>(garageDto);
-                context.Garages.Add(garage);
+                Review Review = mapper.Map<Review>(reviewDto);
+                context.Reviews.Add(Review);
                 await context.SaveChangesAsync();
             }
             catch (Exception)
@@ -60,13 +59,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateGarageDto garageDto)
+        public async Task Update(UpdateReviewDto reviewDto)
         {
             try
             {
-                var garage = context.Garages.FirstOrDefault(g => g.garage_id == garageDto.garage_id)!;
-                mapper.Map<UpdateGarageDto, Garage?>(garageDto, garage);
-                context.Garages.Update(garage);
+                var review = context.Reviews.FirstOrDefault(g => g.review_id == reviewDto.review_id)!;
+                mapper.Map<UpdateReviewDto, Review?>(reviewDto, review);
+                context.Reviews.Update(review);
                 await context.SaveChangesAsync();
             }
             catch (Exception)
@@ -75,13 +74,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Delete(DeleteGarageDto garageDto)
+        public async Task Delete(DeleteReviewDto reviewDto)
         {
             try
             {
-                var garage = context.Garages.FirstOrDefault(g => g.garage_id == garageDto.garage_id)!;
-                mapper.Map<DeleteGarageDto, Garage?>(garageDto, garage);
-                context.Garages.Update(garage);
+                var review = context.Reviews.FirstOrDefault(g => g.review_id == reviewDto.review_id)!;
+                mapper.Map<DeleteReviewDto, Review?>(reviewDto, review);
+                context.Reviews.Update(review);
                 await context.SaveChangesAsync();
             }
             catch (Exception)

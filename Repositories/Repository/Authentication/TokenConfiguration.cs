@@ -15,7 +15,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             _configuration = configuration;
         }
 
-        public string CreateToken(UserDto user)
+        public string CreateToken(UserLoginDto user)
         {
 
 

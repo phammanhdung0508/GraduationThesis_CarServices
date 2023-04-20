@@ -1,4 +1,3 @@
-
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
@@ -21,16 +20,22 @@ namespace GraduationThesis_CarServices.Controllers
         {
             try
             {
-                var garageList = await garageService.View(page)!;
-                return Ok(garageList);
+                var list = await garageService.View(page)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
-        [HttpGet("detail-garage")]
+        [HttpGet("detail-garage/{id}")]
         public async Task<ActionResult<GarageDto>> DetailGarage(int id)
         {
             try
@@ -40,16 +45,22 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
         [HttpPost("create-garage")]
-        public async Task<ActionResult<bool>> CreateGarage(CreateGarageDto garage)
+        public async Task<ActionResult<bool>> CreateGarage(CreateGarageDto garageDto)
         {
             try
             {
-                if (await garageService.Create(garage))
+                if (await garageService.Create(garageDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -57,16 +68,22 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
         [HttpPut("update-garage")]
-        public async Task<ActionResult<bool>> UpdateGarage(UpdateGarageDto garage)
+        public async Task<ActionResult<bool>> UpdateGarage(UpdateGarageDto garageDto)
         {
             try
             {
-                if (await garageService.Update(garage))
+                if (await garageService.Update(garageDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -74,16 +91,22 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
         [HttpPut("delete-garage")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteGarageDto garage)
+        public async Task<ActionResult<bool>> DeleteCoupon(DeleteGarageDto garageDto)
         {
             try
             {
-                if (await garageService.Delete(garage))
+                if (await garageService.Delete(garageDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -91,7 +114,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
     }

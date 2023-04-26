@@ -9,15 +9,15 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ServiceId { get; set; }
-        [MaxLength(20)]
+        [MaxLength(100)]
         public string ServiceName { get; set; }
         [MaxLength(1024)]
         public string ServiceImage { get; set; }
         [MaxLength(200)]
         public string ServiceDetailDescription { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float ProductPrice { get; set; }
-        [MaxLength(6)]
+        public float ServicePrice { get; set; }
+        [MaxLength(20)]
         public string ServiceDuration { get; set; }
         [Column(TypeName = "tinyint")]
         public int ServiceStatus {get; set;}

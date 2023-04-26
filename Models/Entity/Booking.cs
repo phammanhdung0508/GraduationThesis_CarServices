@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -13,9 +14,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
         public Nullable<DateTime> CanceledAt { get; set; }
-        public Nullable<DateTime> CompletedAt { get; set; }
         [Column(TypeName = "tinyint")]
-        public int BookingStatus { get; set; }
+        public BookingStatus BookingStatus { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float TotalCost { get; set; }
         

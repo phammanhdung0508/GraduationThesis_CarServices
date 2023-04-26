@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -12,7 +13,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Range(0, 100, ErrorMessage = "")]
         public int LotNumber { get; set; }
         [Column(TypeName = "tinyint")]
-        public int LotStatus { get; set; }
+        public LotStatus LotStatus { get; set; }
 
         /*-------------------------------------------------*/
         public int GarageId { get; set; }

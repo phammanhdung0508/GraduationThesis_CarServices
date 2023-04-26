@@ -28,9 +28,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserAddress { get; set; }
         [MaxLength(20)]
         public string UserCity { get; set; }
-        [MaxLength(20)]
+        [MaxLength(30)]
         public string UserDistrict { get; set; }
-        [MaxLength(20)]
+        [MaxLength(40)]
         public string UserWard { get; set; }
         [MaxLength(12)]
         public string UserPhone { get; set; }
@@ -43,7 +43,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(1024)]
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
-        public int UserStatus { get; set; }
+        public UserStatus UserStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
         [MaxLength(1024)]

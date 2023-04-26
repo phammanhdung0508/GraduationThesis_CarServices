@@ -9,7 +9,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ProductId { get; set; }
-        [MaxLength(20)]
+        [MaxLength(100)]
         public string ProductName { get; set; }
         [MaxLength(200)]
         public string ProductDetailDescription { get; set; }
@@ -17,8 +17,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public float ProductPrice { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "")]
         public int ProductQuantity { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "")]
-        public int ProductSold { get; set; }
+        // [Range(0, int.MaxValue, ErrorMessage = "")]
+        // public int ProductSold { get; set; }
         [Column(TypeName = "tinyint")]
         public int ProductStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }

@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ReviewId { get; set; }
         [Range(0, 5, ErrorMessage = "")]
         public int Rating { get; set; }
-        [MaxLength(100)]
+        [MaxLength(1200)]
         public string Content { get; set; }
         [Column(TypeName = "tinyint")]
         public int ReviewStatus {get; set;}

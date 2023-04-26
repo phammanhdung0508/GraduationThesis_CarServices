@@ -15,13 +15,13 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string GarageImage { get; set; }
         [MaxLength(20)]
         public string GarageContactInformation { get; set; }
-        [MaxLength(100)]
+        [MaxLength(500)]
         public string GarageAbout { get; set; }
-        [MaxLength(20)]
+        [MaxLength(50)]
         public string GarageAddress { get; set; }
-        [MaxLength(20)]
+        [MaxLength(50)]
         public string GarageWard { get; set; }
-        [MaxLength(20)]
+        [MaxLength(30)]
         public string GarageDistrict { get; set; }
         [MaxLength(20)]
         public string GarageCity { get; set; }

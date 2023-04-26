@@ -32,8 +32,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 UserLoginDto? user = null;
                 bool check = true;
                 // string email = _encryptConfiguration.Base64Decode(login.user_email);
-                string email = login.user_email;
-                var _user = await context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.user_email == email);
+                string email = login.Email;
+                var _user = await context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.UserEmail == email);
                 if (_user == null)
                 {
                     check = false;
@@ -41,13 +41,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 }
                 else
                 {
-                    if (!encryptConfiguration.VerifyPasswordHash(login.user_password, _user.password_hash, _user.password_salt))
+                    if (!encryptConfiguration.VerifyPasswordHash(login.Password, _user.PasswordHash, _user.PasswordSalt))
                     {
                         check = false;
                         //throw 404
                     }
                 }
-                if (_user?.user_status == false)
+                if (_user?.UserStatus == 0)
                 {
                     check = false;
                     //throw 404
@@ -56,10 +56,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 {
                     user = mapper.Map<UserLoginDto>(_user);
                     //check
-                    Console.WriteLine(user.roleDto.role_name);
+                    Console.WriteLine(user.RoleDto.RoleName);
 
                     string token = tokenConfiguration.CreateToken(user);
-                    user.user_token = token;
+                    user.UserToken = token;
                     return user;
                 }
             }
@@ -90,9 +90,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 encryptConfiguration.CreatePasswordHash(_user.user_password, out byte[] password_hash, out byte[] password_salt);
                 User user = new User
                 {
-                    user_email = _user.user_email,
-                    password_hash = password_hash,
-                    password_salt = password_salt
+                    UserEmail = _user.user_email,
+                    PasswordHash = password_hash,
+                    PasswordSalt = password_salt
                 };
                 context.Users.Add(user);
                 await context.SaveChangesAsync();

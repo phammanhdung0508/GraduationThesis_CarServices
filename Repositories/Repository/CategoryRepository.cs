@@ -26,25 +26,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 List<Category> list = await PagingConfiguration<Category>.Create(context.Categories, page);
                 return mapper.Map<List<CategoryDto>>(list);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<CategoryDto?> Detail(int id)
         {
             try
             {
-                CategoryDto category = mapper.Map<CategoryDto>(await context.Categories.FirstOrDefaultAsync(c => c.category_id == id));
+                CategoryDto category = mapper.Map<CategoryDto>(await context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id));
                 return category;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task Create(CreateCategoryDto categoryDto)
@@ -55,9 +53,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Categories.Add(category);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -65,14 +63,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var category = context.Categories.FirstOrDefault(c => c.category_id == categoryDto.category_id)!;
+                var category = context.Categories.FirstOrDefault(c => c.CategoryId == categoryDto.CategoryId)!;
                 mapper.Map<UpdateCategoryDto, Category?>(categoryDto, category);
                 context.Categories.Update(category);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -80,14 +78,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var category = context.Categories.FirstOrDefault(c => c.category_id == categoryDto.category_id)!;
+                var category = context.Categories.FirstOrDefault(c => c.CategoryId == categoryDto.CategoryId)!;
                 mapper.Map<DeleteCategoryDto, Category?>(categoryDto, category);
                 context.Categories.Update(category);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
     }

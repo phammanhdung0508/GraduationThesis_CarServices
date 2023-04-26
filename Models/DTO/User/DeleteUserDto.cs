@@ -4,8 +4,8 @@ namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class DeleteUserDto
     {
-        public int user_id { get; set; }
+        public int UserId { get; set; }
         [DefaultValue("false")]
-        public bool user_status { get; set; }
+        public bool UserStatus { get; set; }
     }
 }

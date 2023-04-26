@@ -23,11 +23,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 List<ServiceDto>? list = await serviceRepository.View(page);
                 return list;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<ServiceDto?> Detail(int id)
@@ -37,11 +36,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 ServiceDto? _service = mapper.Map<ServiceDto>(await serviceRepository.Detail(id));
                 return _service;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<bool> Create(CreateServiceDto createServiceDto)
@@ -51,11 +49,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await serviceRepository.Create(createServiceDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Update(UpdateServiceDto updateServiceDto)
@@ -65,11 +62,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await serviceRepository.Update(updateServiceDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         //Temporary don't make delete function because there's no service status

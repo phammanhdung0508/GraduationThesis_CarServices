@@ -15,35 +15,35 @@ namespace GraduationThesis_CarServices.Mapping
         public AutoMapperConfiguration()
         {
             CreateMap<User, LoginDto>();
-            CreateMap<User, UserLoginDto>().ForMember(des => des.user_full_name,
-                obj => obj.MapFrom(src => src.user_first_name + src.user_last_name))
-                .ForMember(des => des.roleDto, obj => obj.MapFrom(src => src.Role));
+            CreateMap<User, UserLoginDto>().ForMember(des => des.UserFullName,
+                obj => obj.MapFrom(src => src.UserFirstName + src.UserLastName))
+                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
                 
             CreateMap<Role, RoleDto>();
 
             CreateMap<Coupon, CouponDto>().ReverseMap();
             CreateMap<Coupon, CreateCouponDto>().ReverseMap();
-            CreateMap<Coupon, UpdateCouponDto>().ForMember(des => des.coupon_id, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Coupon, UpdateCouponDto>().ForMember(des => des.CouponId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Coupon, DeleteCouponDto>().ReverseMap();
 
             CreateMap<Garage, GarageDto>().ReverseMap();
             CreateMap<Garage, CreateGarageDto>().ReverseMap();
-            CreateMap<Garage, UpdateGarageDto>().ForMember(des => des.garage_id, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Garage, UpdateGarageDto>().ForMember(des => des.GarageId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Garage, DeleteGarageDto>().ReverseMap();
 
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
-            CreateMap<User, UpdateUserDto>().ForMember(des => des.user_id, obj => obj.Ignore()).ReverseMap();
+            CreateMap<User, UpdateUserDto>().ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
             CreateMap<User, DeleteUserDto>().ReverseMap();
 
             CreateMap<Review, ReviewDto>().ReverseMap();
             CreateMap<Review, CreateReviewDto>().ReverseMap();
-            CreateMap<Review, UpdateReviewDto>().ForMember(des => des.review_id, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Review, UpdateReviewDto>().ForMember(des => des.ReviewId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Review, DeleteReviewDto>().ReverseMap();
 
             CreateMap<Report, ReportDto>().ReverseMap();
             CreateMap<Report, CreateReportDto>().ReverseMap();
-            CreateMap<Report, UpdateReportDto>().ForMember(des => des.report_id, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Report, UpdateReportDto>().ForMember(des => des.ReportId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Report, DeleteReportDto>().ReverseMap();
         }
     }

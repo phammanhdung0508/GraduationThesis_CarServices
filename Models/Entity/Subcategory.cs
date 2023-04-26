@@ -8,16 +8,18 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int subcategory_id { get; set; }
+        public int SubcategoryId { get; set; }
         [MaxLength(20)]
-        public string subcategory_name { get; set; }
-        public bool subcategory_status { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
+        public string SubcategoryName { get; set; }
+        public bool SubcategoryStatus { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
 
-        // public int category_id { get; set; }
+        /*-------------------------------------------------*/
+        public int CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Product> Products { get; set; }
     }
 }

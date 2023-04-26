@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -8,45 +9,50 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int user_id { get; set; }
+        public int UserId { get; set; }
         [MaxLength(20)]
-        public string user_first_name { get; set; }
+        public string UserFirstName { get; set; }
         [MaxLength(20)]
-        public string user_last_name { get; set; }
-        [MaxLength(30)]
-        public string user_email { get; set; }
+        public string UserLastName { get; set; }
+        [MaxLength(50)]
+        public string UserEmail { get; set; }
         [MaxLength(1024)]
         [Required]
         [Column(TypeName = "varbinary(1024)")]
-        public byte[] password_hash { get; set; }
+        public byte[] PasswordHash { get; set; }
         [MaxLength(1024)]
         [Required]
         [Column(TypeName = "varbinary(1024)")]
-        public byte[] password_salt { get; set; }
+        public byte[] PasswordSalt { get; set; }
         [MaxLength(30)]
-        public string user_address { get; set; }
+        public string UserAddress { get; set; }
         [MaxLength(20)]
-        public string user_city { get; set; }
+        public string UserCity { get; set; }
         [MaxLength(20)]
-        public string user_district { get; set; }
+        public string UserDistrict { get; set; }
         [MaxLength(20)]
-        public string user_ward { get; set; }
+        public string UserWard { get; set; }
         [MaxLength(12)]
-        public string user_phone { get; set; }
-        public bool user_gender { get; set; }
-        [Column(TypeName="Date")]
-        public DateTime user_date_of_birth { get; set; }
+        public string UserPhone { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public Gender UserGender { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime UserDateOfBirth { get; set; }
         [MaxLength(1024)]
-        public string user_image { get; set; }
-        public bool user_status { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
+        public string UserImage { get; set; }
         [MaxLength(1024)]
-        public string user_bio { get; set; }
+        public string UserBio { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int UserStatus { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
+        [MaxLength(1024)]
 
-        // public int role_id { get; set; }
+        /*-------------------------------------------------*/
+        public int RoleId { get; set; }
         public virtual Role Role { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Car> Cars { get; set; }
         public virtual ICollection<Garage> Garages { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }

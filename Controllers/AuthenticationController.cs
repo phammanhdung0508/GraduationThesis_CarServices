@@ -46,11 +46,11 @@ namespace GraduationThesis_CarServices.Controllers
             try
             {
                 var refreshToken = Request.Cookies["refreshtoken"];
-                if (user!.refresh_token.Equals(refreshToken))
+                if (user!.RefreshToken.Equals(refreshToken))
                 {
                     return Unauthorized("Invalid refresh token.");
                 }
-                else if (user.token_expires < DateTime.Now)
+                else if (user.TokenExpires < DateTime.Now)
                 {
                     return Unauthorized("Token expired.");
                 }
@@ -64,9 +64,9 @@ namespace GraduationThesis_CarServices.Controllers
                 };
                 Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
 
-                user.refresh_token = newRefreshToken.Token;
-                user.token_created = newRefreshToken.Created;
-                user.token_expires = newRefreshToken.Expires;
+                user.RefreshToken = newRefreshToken.Token;
+                user.TokenCreated = newRefreshToken.Created;
+                user.TokenExpires = newRefreshToken.Expires;
 
                 return Ok(user);
             }
@@ -107,7 +107,7 @@ namespace GraduationThesis_CarServices.Controllers
             try
             {
                 await authenticationRepository.CreateUser(request);
-                return Ok(context.Users.FirstOrDefault(u => u.user_email == request.user_email));
+                return Ok(context.Users.FirstOrDefault(u => u.UserEmail == request.user_email));
             }
             catch (Exception e)
             {

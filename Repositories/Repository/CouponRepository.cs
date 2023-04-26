@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                CouponDto coupon = mapper.Map<CouponDto>(await context.Coupons.FirstOrDefaultAsync(c => c.coupon_id == id));
+                CouponDto coupon = mapper.Map<CouponDto>(await context.Coupons.FirstOrDefaultAsync(c => c.CouponId == id));
                 return coupon;
             }
             catch (Exception)
@@ -64,7 +64,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var coupon = context.Coupons.FirstOrDefault(c => c.coupon_id == couponDto.coupon_id)!;
+                var coupon = context.Coupons.FirstOrDefault(c => c.CouponId == couponDto.CouponId)!;
                 mapper.Map<UpdateCouponDto, Coupon?>(couponDto, coupon);
                 context.Coupons.Update(coupon);
                 await context.SaveChangesAsync();
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var coupon = context.Coupons.FirstOrDefault(c => c.coupon_id == couponDto.coupon_id)!;
+                var coupon = context.Coupons.FirstOrDefault(c => c.CouponId == couponDto.CouponId)!;
                 mapper.Map<DeleteCouponDto, Coupon?>(couponDto, coupon);
                 context.Coupons.Update(coupon);
                 await context.SaveChangesAsync();

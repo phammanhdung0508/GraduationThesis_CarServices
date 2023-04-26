@@ -8,32 +8,36 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int garage_id { get; set; }
+        public int GarageId { get; set; }
         [MaxLength(20)]
-        public string garage_name { get; set; }
+        public string GarageName { get; set; }
         [MaxLength(20)]
-        public string garage_contact_information { get; set; }
+        public string GarageContactInformation { get; set; }
         [MaxLength(100)]
-        public string garage_about { get; set; }
+        public string GarageAbout { get; set; }
         [MaxLength(20)]
-        public string garage_address { get; set; }
+        public string GarageAddress { get; set; }
         [MaxLength(20)]
-        public string garage_ward { get; set; }
+        public string GarageWard { get; set; }
         [MaxLength(20)]
-        public string garage_district { get; set; }
+        public string GarageDistrict { get; set; }
         [MaxLength(20)]
-        public string garage_city { get; set; }
+        public string GarageCity { get; set; }
         [MaxLength(20)]
-        public string from_to { get; set; }
+        public string FromTo { get; set; }
         [MaxLength(6)]
-        public string open_at { get; set; }
+        public string OpenAt { get; set; }
         [MaxLength(6)]
-        public string close_at { get; set; }
-        public bool garage_status { get; set; }
+        public string CloseAt { get; set; }
+        public bool GarageStatus { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
 
-        // public int user_id { get; set; }
+        /*-------------------------------------------------*/
+        public int UserId { get; set; }
         public virtual User User { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }

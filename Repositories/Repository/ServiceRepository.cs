@@ -27,25 +27,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 List<Service> list = await PagingConfiguration<Service>.Create(context.Services, page);
                 return mapper.Map<List<ServiceDto>>(list);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<ServiceDto?> Detail(int id)
         {
             try
             {
-                ServiceDto service = mapper.Map<ServiceDto>(await context.Services.FirstOrDefaultAsync(c => c.service_id == id));
+                ServiceDto service = mapper.Map<ServiceDto>(await context.Services.FirstOrDefaultAsync(c => c.ServiceId == id));
                 return service;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task Create(CreateServiceDto serviceDto)
@@ -56,9 +54,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Services.Add(service);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -66,14 +64,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var service = context.Services.FirstOrDefault(c => c.service_id == serviceDto.service_id)!;
+                var service = context.Services.FirstOrDefault(c => c.ServiceId == serviceDto.ServiceId)!;
                 mapper.Map<UpdateServiceDto, Service?>(serviceDto, service);
                 context.Services.Update(service);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 

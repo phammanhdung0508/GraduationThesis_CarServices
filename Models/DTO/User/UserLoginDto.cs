@@ -6,15 +6,15 @@ namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class UserLoginDto
     {
-        public string user_token { get; set; }
-        public string user_first_name { get; set; }
-        public string user_last_name { get; set; }
-        public string user_full_name { get; set; }
-        public string user_email { get; set; }
-        public string user_image { get; set; }
-        public string refresh_token { get; set; }
-        public DateTime token_created { get; set; }
-        public DateTime token_expires { get; set; }
-        public RoleDto roleDto { get; set; }
+        public string UserToken { get; set; }
+        public string UserFirstName { get; set; }
+        public string UserLastName { get; set; }
+        public string UserFullName { get; set; }
+        public string UserEmail { get; set; }
+        public string UserImage { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime TokenCreated { get; set; }
+        public DateTime TokenExpires { get; set; }
+        public RoleDto RoleDto { get; set; }
     }
 }

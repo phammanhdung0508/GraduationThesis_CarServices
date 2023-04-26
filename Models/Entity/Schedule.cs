@@ -8,15 +8,17 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int schedule_id { get; set; }
-        public DateTime booking_time { get; set; }
+        public int ScheduleId { get; set; }
+        public DateTime BookingTime { get; set; }
         [MaxLength(100)]
-        public string work_description { get; set; }
-        public bool schedule_status { get; set; }
+        public string WorkDescription { get; set; }
+        public bool ScheduleStatus { get; set; }
 
-        // public int user_id { get; set; }
+        /*-------------------------------------------------*/
+        public int UserId { get; set; }
         public virtual User User { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

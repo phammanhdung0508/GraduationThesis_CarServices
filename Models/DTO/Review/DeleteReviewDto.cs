@@ -7,6 +7,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Review
 {
     public class DeleteReviewDto
     {
-        public int review_id { get; set; }
+        public int ReviewId { get; set; }
     }
 }

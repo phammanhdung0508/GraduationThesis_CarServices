@@ -4,8 +4,8 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
 {
     public class DeleteGarageDto
     {
-        public int garage_id { get; set; }
+        public int GarageId { get; set; }
         [DefaultValue("false")]
-        public bool garage_status { get; set; }
+        public bool GarageStatus { get; set; }
     }
 }

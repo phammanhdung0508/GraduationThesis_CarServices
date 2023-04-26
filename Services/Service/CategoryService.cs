@@ -23,11 +23,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 List<CategoryDto>? list = await categoryRepository.View(page);
                 return list;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<CategoryDto?> Detail(int id)
@@ -37,11 +36,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 CategoryDto? _category = mapper.Map<CategoryDto>(await categoryRepository.Detail(id));
                 return _category;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<bool> Create(CreateCategoryDto createCategoryDto)
@@ -51,11 +49,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await categoryRepository.Create(createCategoryDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Update(UpdateCategoryDto updateCategoryDto)
@@ -65,11 +62,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await categoryRepository.Update(updateCategoryDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Delete(DeleteCategoryDto deleteCategoryDto)
@@ -79,11 +75,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await categoryRepository.Delete(deleteCategoryDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
     }
 }

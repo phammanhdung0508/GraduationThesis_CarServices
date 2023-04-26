@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.garage_id == id));
+                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id));
                 return garage;
             }
             catch (Exception)
@@ -64,7 +64,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var garage = context.Garages.FirstOrDefault(g => g.garage_id == garageDto.garage_id)!;
+                var garage = context.Garages.FirstOrDefault(g => g.GarageId == garageDto.GarageId)!;
                 mapper.Map<UpdateGarageDto, Garage?>(garageDto, garage);
                 context.Garages.Update(garage);
                 await context.SaveChangesAsync();
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var garage = context.Garages.FirstOrDefault(g => g.garage_id == garageDto.garage_id)!;
+                var garage = context.Garages.FirstOrDefault(g => g.GarageId == garageDto.GarageId)!;
                 mapper.Map<DeleteGarageDto, Garage?>(garageDto, garage);
                 context.Garages.Update(garage);
                 await context.SaveChangesAsync();

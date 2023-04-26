@@ -23,11 +23,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 List<ProductDto>? list = await productRepository.View(page);
                 return list;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<ProductDto?> Detail(int id)
@@ -37,11 +36,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 ProductDto? _product = mapper.Map<ProductDto>(await productRepository.Detail(id));
                 return _product;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<bool> Create(CreateProductDto createProductDto)
@@ -51,11 +49,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await productRepository.Create(createProductDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Update(UpdateProductDto updateProductDto)
@@ -65,11 +62,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await productRepository.Update(updateProductDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
 
         public async Task<bool> Delete(DeleteProductDto deleteProductDto)
@@ -79,11 +75,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 await productRepository.Delete(deleteProductDto);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return false;
         }
     }
 }

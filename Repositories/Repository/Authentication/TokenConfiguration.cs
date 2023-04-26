@@ -20,9 +20,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
 
             List<Claim> claims = new List<Claim>{
-            new Claim(ClaimTypes.Name, user.user_first_name + user.user_last_name),
-            new Claim(ClaimTypes.Email, user.user_email),
-            new Claim(ClaimTypes.Role, user.roleDto.role_name)
+            new Claim(ClaimTypes.Name, user.UserFirstName + user.UserLastName),
+            new Claim(ClaimTypes.Email, user.UserEmail),
+            new Claim(ClaimTypes.Role, user.RoleDto.RoleName)
 
         };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:TokenSecret").Value!));

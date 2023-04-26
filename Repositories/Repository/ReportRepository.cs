@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                ReportDto report = mapper.Map<ReportDto>(await context.Coupons.FirstOrDefaultAsync(c => c.coupon_id == id));
+                ReportDto report = mapper.Map<ReportDto>(await context.Reports.FirstOrDefaultAsync(c => c.ReportId == id));
                 return report;
             }
             catch (Exception)
@@ -63,7 +63,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var report = context.Reports.FirstOrDefault(r => r.report_id == reportDto.report_id)!;
+                var report = context.Reports.FirstOrDefault(r => r.ReportId == reportDto.ReportId)!;
                 mapper.Map<UpdateReportDto, Report?>(reportDto, report);
                 context.Reports.Update(report);
                 await context.SaveChangesAsync();
@@ -78,7 +78,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var report = context.Reports.FirstOrDefault(r => r.report_id == reportDto.report_id)!;
+                var report = context.Reports.FirstOrDefault(r => r.ReportId == reportDto.ReportId)!;
                 mapper.Map<DeleteReportDto, Report?>(reportDto, report);
                 context.Reports.Update(report);
                 await context.SaveChangesAsync();

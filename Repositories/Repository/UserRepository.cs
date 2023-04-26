@@ -35,7 +35,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                UserDto user = mapper.Map<UserDto>(await context.Users.FirstOrDefaultAsync(g => g.user_id == id));
+                UserDto user = mapper.Map<UserDto>(await context.Users.FirstOrDefaultAsync(g => g.UserId == id));
                 return user;
             }
             catch (Exception)
@@ -62,7 +62,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var user = context.Users.FirstOrDefault(g => g.user_id == userDto.user_id)!;
+                var user = context.Users.FirstOrDefault(g => g.UserId == userDto.UserId)!;
                 mapper.Map<UpdateUserDto, User?>(userDto, user);
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
@@ -77,7 +77,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var user = context.Users.FirstOrDefault(g => g.user_id == userDto.user_id)!;
+                var user = context.Users.FirstOrDefault(g => g.UserId == userDto.UserId)!;
                 mapper.Map<DeleteUserDto, User?>(userDto, user);
                 context.Users.Update(user);
                 await context.SaveChangesAsync();

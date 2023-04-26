@@ -8,18 +8,21 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int review_id { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
+        public int ReviewId { get; set; }
         [Range(0, 5, ErrorMessage = "")]
-        public int rating { get; set; }
-        [MaxLength(100)]
-        public string content { get; set; }
-        public bool is_approved { get; set; }
+        public int Rating { get; set; }
+        [MaxLength(1200)]
+        public string Content { get; set; }
+        [Column(TypeName = "tinyint")]
+        public int ReviewStatus {get; set;}
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
+        public bool IsApproved { get; set; }
 
-        // public int user_id { get; set; }
+        /*-------------------------------------------------*/
+        public int UserId { get; set; }
         public virtual User User { get; set; }
-        // public int garage_id { get; set; }
+        public int GarageId { get; set; }
         public virtual Garage Garage { get; set; }
     }
 }

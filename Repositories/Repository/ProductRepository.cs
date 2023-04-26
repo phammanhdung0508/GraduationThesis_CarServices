@@ -27,25 +27,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 List<Product> list = await PagingConfiguration<Product>.Create(context.Products, page);
                 return mapper.Map<List<ProductDto>>(list);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task<ProductDto?> Detail(int id)
         {
             try
             {
-                ProductDto product = mapper.Map<ProductDto>(await context.Products.FirstOrDefaultAsync(c => c.product_id == id));
+                ProductDto product = mapper.Map<ProductDto>(await context.Products.FirstOrDefaultAsync(c => c.ProductId == id));
                 return product;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
-            return null;
         }
 
         public async Task Create(CreateProductDto productDto)
@@ -56,9 +54,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Products.Add(product);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -66,14 +64,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var product = context.Products.FirstOrDefault(c => c.product_id == productDto.product_id)!;
+                var product = context.Products.FirstOrDefault(c => c.ProductId == productDto.ProductId)!;
                 mapper.Map<UpdateProductDto, Product?>(productDto, product);
                 context.Products.Update(product);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -81,14 +79,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var product = context.Products.FirstOrDefault(c => c.product_id == productDto.product_id)!;
+                var product = context.Products.FirstOrDefault(c => c.ProductId == productDto.ProductId)!;
                 mapper.Map<DeleteProductDto, Product?>(productDto, product);
                 context.Products.Update(product);
                 await context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
     }

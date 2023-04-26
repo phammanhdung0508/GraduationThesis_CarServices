@@ -3,9 +3,9 @@ namespace GraduationThesis_CarServices.Models.DTO.Service
 {
     public class ServiceDto
     {
-        public string service_name { get; set; }
-        public string service_detail_description { get; set; }
-        public float product_price { get; set; }
-        public string service_duration { get; set; }
+        public string ServiceName { get; set; }
+        public string ServiceDetailDescription { get; set; }
+        public float ProductPrice { get; set; }
+        public string serviceDuration { get; set; }
     }
 }

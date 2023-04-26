@@ -8,23 +8,29 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int car_id { get; set; }
+        public int CarId { get; set; }
         [MaxLength(20)]
-        public string car_model { get; set; }
+        public string CarModel { get; set; }
         [MaxLength(20)]
-        public string car_brand { get; set; }
-        [MaxLength(5)]
-        public string car_license_plate { get; set; }
-        [Column(TypeName="Date")]
-        public DateTime car_year { get; set; }
+        public string CarBrand { get; set; }
+        [MaxLength(10)]
+        public string CarLicensePlate { get; set; }
+        [Column(TypeName = "smallint")]
+        public int CarYear { get; set; }
         [MaxLength(20)]
-        public string car_body_type { get; set; }
+        public string CarBodyType { get; set; }
         [MaxLength(20)]
-        public string car_fuel_type { get; set; }
+        public string CarFuelType { get; set; }
+        [Column(TypeName = "tinyint")]
+        public int CarStatus {get; set;}
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
 
-        // public int user_id { get; set; }
+        /*-------------------------------------------------*/
+        public int UserId { get; set; }
         public virtual User User { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

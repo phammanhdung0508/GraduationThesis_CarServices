@@ -4,8 +4,8 @@ namespace GraduationThesis_CarServices.Models.DTO.Category
 {
     public class DeleteCategoryDto
     {
-        public int category_id { get; set; }
+        public int CategoryId { get; set; }
         [DefaultValue("false")]
-        public bool category_status { get; set; }
+        public bool CategoryStatus { get; set; }
     }
 }

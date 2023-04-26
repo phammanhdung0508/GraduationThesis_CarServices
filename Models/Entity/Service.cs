@@ -8,18 +8,23 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int service_id { get; set; }
-        [MaxLength(20)]
-        public string service_name { get; set; }
+        public int ServiceId { get; set; }
+        [MaxLength(100)]
+        public string ServiceName { get; set; }
+        [MaxLength(1024)]
+        public string ServiceImage { get; set; }
         [MaxLength(200)]
-        public string service_detail_description { get; set; }
+        public string ServiceDetailDescription { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float product_price { get; set; }
-        [MaxLength(6)]
-        public string service_duration { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
+        public float ServicePrice { get; set; }
+        [MaxLength(20)]
+        public string ServiceDuration { get; set; }
+        [Column(TypeName = "tinyint")]
+        public int ServiceStatus {get; set;}
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<ServiceBooking> ServiceBookings { get; set; }
         public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }

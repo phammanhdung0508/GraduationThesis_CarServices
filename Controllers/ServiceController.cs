@@ -25,7 +25,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
@@ -39,7 +45,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
@@ -56,7 +68,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 
@@ -73,7 +91,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
 

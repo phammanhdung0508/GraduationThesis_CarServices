@@ -4,15 +4,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
-    public class Role
+    public class ProductMediaFile
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int RoleId { get; set; }
-        [MaxLength(10)]
-        public string RoleName { get; set; }
+        public int ProductMediaFileId { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<User> Users { get; set; }
+        public int ProductId { get; set; }
+        public virtual Product Product { get; set; }
+        public int MediaFileId { get; set; }
+        public virtual MediaFile MediaFile { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews.FirstOrDefaultAsync(r => r.review_id == id));
+                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews.FirstOrDefaultAsync(r => r.ReviewId == id));
                 return review;
             }
             catch (Exception)
@@ -63,7 +63,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var review = context.Reviews.FirstOrDefault(g => g.review_id == reviewDto.review_id)!;
+                var review = context.Reviews.FirstOrDefault(g => g.ReviewId == reviewDto.ReviewId)!;
                 mapper.Map<UpdateReviewDto, Review?>(reviewDto, review);
                 context.Reviews.Update(review);
                 await context.SaveChangesAsync();
@@ -78,7 +78,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var review = context.Reviews.FirstOrDefault(g => g.review_id == reviewDto.review_id)!;
+                var review = context.Reviews.FirstOrDefault(g => g.ReviewId == reviewDto.ReviewId)!;
                 mapper.Map<DeleteReviewDto, Review?>(reviewDto, review);
                 context.Reviews.Update(review);
                 await context.SaveChangesAsync();

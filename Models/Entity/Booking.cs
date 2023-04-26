@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -8,29 +9,31 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int booking_id { get; set; }
-        public DateTime booking_time { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
-        public DateTime canceled_at { get; set; }
-        public DateTime completed_at { get; set; }
-        public bool booking_status { get; set; }
+        public int BookingId { get; set; }
+        public DateTime BookingTime { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
+        public Nullable<DateTime> CanceledAt { get; set; }
+        [Column(TypeName = "tinyint")]
+        public BookingStatus BookingStatus { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float total_cost { get; set; }
-
-        // public int car_id { get; set; }
+        public float TotalCost { get; set; }
+        
+        /*-------------------------------------------------*/
+        public int CarId { get; set; }
         public virtual Car Car { get; set; }
-        // public int payment_id { get; set; }
+        public int PaymentId { get; set; }
         public virtual Payment Payment { get; set; }
-        // public int coupon_id { get; set; }
+        public int CouponId { get; set; }
         public virtual Coupon Coupon { get; set; }
-        // public int schedule_id { get; set; }
+        public int ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
-        // public int garage_id { get; set; }
+        public int GarageId { get; set; }
         public virtual Garage Garage { get; set; }
-        // public int report_id { get; set; }
+        public int ReportId { get; set; }
         public virtual Report Report { get; set; }
 
+        /*-------------------------------------------------*/
         public virtual ICollection<ServiceBooking> ServiceBookings { get; set; }
     }
 }

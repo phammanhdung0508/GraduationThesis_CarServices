@@ -19,7 +19,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ProductQuantity { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "")]
         public int ProductSold { get; set; }
-        public string ProductStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int ProductStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

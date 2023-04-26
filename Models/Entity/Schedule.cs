@@ -12,7 +12,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public DateTime BookingTime { get; set; }
         [MaxLength(100)]
         public string WorkDescription { get; set; }
-        public bool ScheduleStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int ScheduleStatus { get; set; }
 
         /*-------------------------------------------------*/
         public int UserId { get; set; }

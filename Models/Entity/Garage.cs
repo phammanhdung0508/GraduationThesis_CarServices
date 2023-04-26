@@ -11,6 +11,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int GarageId { get; set; }
         [MaxLength(20)]
         public string GarageName { get; set; }
+        [MaxLength(1024)]
+        public string GarageImage { get; set; }
         [MaxLength(20)]
         public string GarageContactInformation { get; set; }
         [MaxLength(100)]
@@ -29,7 +31,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string OpenAt { get; set; }
         [MaxLength(6)]
         public string CloseAt { get; set; }
-        public bool GarageStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int GarageStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

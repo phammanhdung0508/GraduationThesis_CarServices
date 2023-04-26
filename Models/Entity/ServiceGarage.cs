@@ -11,7 +11,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ServiceGaragesId { get; set; }
         [Range(0, 100, ErrorMessage = "")]
         public int LotNumber { get; set; }
-        public bool LotStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int LotStatus { get; set; }
 
         /*-------------------------------------------------*/
         public int GarageId { get; set; }

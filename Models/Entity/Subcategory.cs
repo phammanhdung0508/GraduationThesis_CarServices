@@ -11,7 +11,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int SubcategoryId { get; set; }
         [MaxLength(20)]
         public string SubcategoryName { get; set; }
-        public bool SubcategoryStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int SubcategoryStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

@@ -15,12 +15,14 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CarBrand { get; set; }
         [MaxLength(5)]
         public string CarLicensePlate { get; set; }
-        [Column(TypeName = "Date")]
-        public DateTime CarYear { get; set; }
+        [Column(TypeName = "smallint(4)")]
+        public int CarYear { get; set; }
         [MaxLength(20)]
         public string CarBodyType { get; set; }
         [MaxLength(20)]
         public string CarFuelType { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int CarStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

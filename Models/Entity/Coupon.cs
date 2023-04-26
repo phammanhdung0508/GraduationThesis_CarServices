@@ -15,9 +15,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CouponType { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float CouponValue { get; set; }
-        [Column(TypeName = "Date")]
+        [Column(TypeName = "date")]
         public DateTime CouponStartDate { get; set; }
-        [Column(TypeName = "Date")]
+        [Column(TypeName = "date")]
         public DateTime CouponEndDate { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float CouponMinSpend { get; set; }
@@ -25,7 +25,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public float CouponMaxSpend { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "")]
         public int NumberOfTimesToUse { get; set; }
-        public bool CouponStatus { get; set; }
+        [Column(TypeName = "tinyint(1)")]
+        public int CouponStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

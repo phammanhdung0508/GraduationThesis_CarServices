@@ -34,7 +34,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserWard { get; set; }
         [MaxLength(12)]
         public string UserPhone { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }
         [Column(TypeName = "date")]
         public DateTime UserDateOfBirth { get; set; }
@@ -42,7 +42,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserImage { get; set; }
         [MaxLength(1024)]
         public string UserBio { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int UserStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
@@ -56,5 +56,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public virtual ICollection<Car> Cars { get; set; }
         public virtual ICollection<Garage> Garages { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
     }
 }

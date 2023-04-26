@@ -13,7 +13,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int Rating { get; set; }
         [MaxLength(100)]
         public string Content { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int ReviewStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

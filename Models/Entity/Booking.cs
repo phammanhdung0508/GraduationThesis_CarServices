@@ -14,7 +14,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
         public Nullable<DateTime> CanceledAt { get; set; }
         public Nullable<DateTime> CompletedAt { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int BookingStatus { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float TotalCost { get; set; }

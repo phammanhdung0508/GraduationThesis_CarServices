@@ -19,7 +19,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public float ProductPrice { get; set; }
         [MaxLength(6)]
         public string ServiceDuration { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int ServiceStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

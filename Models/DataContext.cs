@@ -26,6 +26,8 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<ServiceGarage> ServiceGarages { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<MediaFile> MediaFiles { get; set; }
+        public DbSet<ProductMediaFile> ProductMediaFiles { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -35,12 +37,12 @@ namespace GraduationThesis_CarServices.Models
         {
             base.OnModelCreating(modelBuilder);
             this.OneToOneRelationship(modelBuilder);
+            this.MultipleCascadePathFix(modelBuilder);
             this.SeedRandomData(modelBuilder);
         }
 
         private void OneToOneRelationship(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Booking>()
             .HasOne(b => b.Report).WithOne(r => r.Booking)
             .HasForeignKey<Report>(e => e.ReportId)
@@ -54,9 +56,25 @@ namespace GraduationThesis_CarServices.Models
             ;
         }
 
+        private void MultipleCascadePathFix(ModelBuilder modelBuilder){
+
+            //path from User to Review
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.Garages)
+            .WithOne(u => u.User)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            //path from User to Booking
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.Cars)
+            .WithOne(u => u.User)
+            .OnDelete(DeleteBehavior.Restrict);
+        }
+
         private void SeedRandomData(ModelBuilder modelBuilder)
         {
-            Faker<User> faker;
+            Faker<User> userFaker;
+            Faker<Car> carfaker;
 
             Randomizer.Seed = new Random(200);
 
@@ -74,7 +92,7 @@ namespace GraduationThesis_CarServices.Models
 
             for (int i = 1; i <= 5; i++)
             {
-                faker = new Faker<User>()
+                userFaker = new Faker<User>()
                 .RuleFor(u => u.UserId, i)
                 .RuleFor(u => u.UserFirstName, f => f.Name.FirstName())
                 .RuleFor(u => u.UserLastName, f => f.Name.LastName())
@@ -90,9 +108,25 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Paragraphs())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4));
+                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
+                .RuleFor(u => u.UserStatus, 1);
 
-                modelBuilder.Entity<User>().HasData(faker.Generate());
+                modelBuilder.Entity<User>().HasData(userFaker.Generate());
+            }
+
+            for (int i = 1; i <= 5; i++){
+                carfaker = new Faker<Car>()
+                .RuleFor(c => c.CarId, i)
+                .RuleFor(c => c.CarModel, f => f.Vehicle.Model())
+                .RuleFor(c => c.CarBrand, f => f.Vehicle.Manufacturer())
+                .RuleFor(c => c.CarLicensePlate, f => f.Random.Replace("##?-###.##"))
+                .RuleFor(c => c.CarYear, f => f.Random.Int(1935, 2023))
+                .RuleFor(c => c.CarBodyType, f => f.Vehicle.Type())
+                .RuleFor(c => c.CarFuelType, f => f.Vehicle.Fuel())
+                .RuleFor(c => c.UserId, f => f.Random.Int(1, 5))
+                .RuleFor(u => u.CarStatus, 1);
+
+                modelBuilder.Entity<Car>().HasData(carfaker.Generate());
             }
         }
     }

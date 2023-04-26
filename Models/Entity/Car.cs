@@ -13,15 +13,15 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CarModel { get; set; }
         [MaxLength(20)]
         public string CarBrand { get; set; }
-        [MaxLength(5)]
+        [MaxLength(10)]
         public string CarLicensePlate { get; set; }
-        [Column(TypeName = "smallint(4)")]
+        [Column(TypeName = "smallint")]
         public int CarYear { get; set; }
         [MaxLength(20)]
         public string CarBodyType { get; set; }
         [MaxLength(20)]
         public string CarFuelType { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int CarStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

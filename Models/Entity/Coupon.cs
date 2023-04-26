@@ -25,7 +25,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public float CouponMaxSpend { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "")]
         public int NumberOfTimesToUse { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int CouponStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

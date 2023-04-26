@@ -31,7 +31,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string OpenAt { get; set; }
         [MaxLength(6)]
         public string CloseAt { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int GarageStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int CategoryId { get; set; }
         [MaxLength(20)]
         public string CategoryName { get; set; }
-        [Column(TypeName = "tinyint(1)")]
+        [Column(TypeName = "tinyint")]
         public int CategoryStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

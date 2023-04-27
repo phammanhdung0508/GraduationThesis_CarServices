@@ -9,7 +9,7 @@ namespace GraduationThesis_CarServices.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        public IProductService productService { get; }
+        public readonly IProductService productService;
 
         public ProductController(IProductService productService)
         {

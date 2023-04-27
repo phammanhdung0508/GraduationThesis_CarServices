@@ -1,28 +1,28 @@
-﻿using GraduationThesis_CarServices.Models.DTO.Category;
+using GraduationThesis_CarServices.Models.DTO.Car;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    [Route("api/[controller]")]
+    public class CarController : ControllerBase
     {
-        public readonly ICategoryService categoryService;
-        public CategoryController(ICategoryService categoryService)
-        {
-            this.categoryService = categoryService;
+        public readonly ICarService carService;
 
+        public CarController(ICarService carService)
+        {
+            this.carService = carService;
         }
 
-        [HttpPost("view-all-category")]
-        public async Task<ActionResult<List<CategoryDto>>> ViewCategory(PageDto page)
+        [HttpPost("view-all-car")]
+        public async Task<ActionResult<List<CarDto>>> ViewCategory(PageDto page)
         {
             try
             {
-                var categoryList = await categoryService.View(page)!;
-                return Ok(categoryList);
+                var list = await carService.View(page)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
@@ -36,13 +36,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-category")]
-        public async Task<ActionResult<CategoryDto>> DetailCategory(int id)
+        [HttpGet("detail-car")]
+        public async Task<ActionResult<CarDto>> DetailCategory(int id)
         {
             try
             {
-                var category = await categoryService.Detail(id);
-                return Ok(category);
+                var car = await carService.Detail(id);
+                return Ok(car);
             }
             catch (Exception e)
             {
@@ -56,12 +56,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-category")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateCategoryDto category)
+        [HttpPost("create-car")]
+        public async Task<ActionResult<bool>> CreateCategory(CreateCarDto carDto)
         {
             try
             {
-                if (await categoryService.Create(category))
+                if (await carService.Create(carDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -79,12 +79,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-category")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateCategoryDto category)
+        [HttpPut("update-car")]
+        public async Task<ActionResult<bool>> UpdateCategory(UpdateCarDto carDto)
         {
             try
             {
-                if (await categoryService.Update(category))
+                if (await carService.Update(carDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -103,11 +103,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("delete-category")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteCategoryDto category)
+        public async Task<ActionResult<bool>> DeleteCategory(DeleteCarDto carDto)
         {
             try
             {
-                if (await categoryService.Delete(category))
+                if (await carService.Delete(carDto))
                 {
                     return Ok("Successfully!");
                 }

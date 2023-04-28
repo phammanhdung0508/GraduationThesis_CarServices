@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Schedule> list = await PagingConfiguration<Schedule>.Create(context.Schedules, page);
+                List<Schedule> list = await PagingConfiguration<Schedule>.Get(context.Schedules, page);
                 return mapper.Map<List<ScheduleDto>>(list);
             }
             catch (Exception)

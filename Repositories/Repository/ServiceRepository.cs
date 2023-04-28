@@ -24,7 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Service> list = await PagingConfiguration<Service>.Create(context.Services, page);
+                List<Service> list = await PagingConfiguration<Service>.Get(context.Services, page);
                 return mapper.Map<List<ServiceDto>>(list);
             }
             catch (Exception)

@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.scheduleService = scheduleService;
         }
 
-        [HttpPost("view-all-car")]
+        [HttpPost("view-all-schedule")]
         public async Task<ActionResult<List<ScheduleDto>>> ViewCategory(PageDto page)
         {
             try
@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-car")]
+        [HttpGet("detail-schedule/{id}")]
         public async Task<ActionResult<ScheduleDto>> DetailCategory(int id)
         {
             try
@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-car")]
+        [HttpPost("create-schedule")]
         public async Task<ActionResult<bool>> CreateCategory(CreateScheduleDto ScheduleDto)
         {
             try
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-car")]
+        [HttpPut("update-schedule")]
         public async Task<ActionResult<bool>> UpdateCategory(UpdateScheduleDto ScheduleDto)
         {
             try
@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
+        [HttpPut("delete-schedule")]
         public async Task<ActionResult<bool>> DeleteCategory(DeleteScheduleDto ScheduleDto)
         {
             try

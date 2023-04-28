@@ -22,7 +22,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<User> list = await PagingConfiguration<User>.Create(context.Users, page);
+                var list = await PagingConfiguration<User>.Get(context.Users.Include(u => u.Role), page);
                 return mapper.Map<List<UserDto>>(list);
             }
             catch (Exception)
@@ -35,7 +35,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                UserDto user = mapper.Map<UserDto>(await context.Users.FirstOrDefaultAsync(g => g.UserId == id));
+                UserDto user = mapper.Map<UserDto>(await context.Users.Include(u => u.Role).FirstOrDefaultAsync(g => g.UserId == id));
                 return user;
             }
             catch (Exception)

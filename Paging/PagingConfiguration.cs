@@ -10,15 +10,16 @@ namespace GraduationThesis_CarServices.Paging
         public PagingConfiguration(List<T> list, int count, PageDto page)
         {
             PageIndex = page.PageIndex;
-            PageTotal = (int) Math.Ceiling(count/(double)page.PageSize);
+            PageTotal = (int)Math.Ceiling(count / (double)page.PageSize);
             this.AddRange(list);
         }
 
         public bool HasPreviousPage => PageIndex > 1;
         public bool HasNextPage => PageIndex < PageTotal;
 
-        public static async Task<PagingConfiguration<T>> Create (DbSet<T> srouce, PageDto page){
-            var myTask = Task.Run(() => srouce.Skip((page.PageIndex - 1)*page.PageSize).Take(page.PageSize).ToList());
+        public static async Task<PagingConfiguration<T>> Get(IQueryable<T> srouce, PageDto page)
+        {
+            var myTask = Task.Run(() => srouce.Skip((page.PageIndex - 1) * page.PageSize).Take(page.PageSize).ToList());
             var list = await myTask;
             var count = list.Count;
             return new PagingConfiguration<T>(list, count, page);

@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-car")]
+        [HttpGet("detail-car/{id}")]
         public async Task<ActionResult<CarDto>> DetailCategory(int id)
         {
             try
@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
+        [HttpPut("delete-car")]
         public async Task<ActionResult<bool>> DeleteCategory(DeleteCarDto carDto)
         {
             try

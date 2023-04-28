@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.subcategoryService = subcategoryService;
         }
 
-        [HttpPost("view-all-car")]
+        [HttpPost("view-all-subcategory")]
         public async Task<ActionResult<List<SubcategoryDto>>> ViewCategory(PageDto page)
         {
             try
@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-car")]
+        [HttpGet("detail-subcategory/{id}")]
         public async Task<ActionResult<SubcategoryDto>> DetailCategory(int id)
         {
             try
@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-car")]
+        [HttpPost("create-subcategory")]
         public async Task<ActionResult<bool>> CreateCategory(CreateSubcategoryDto SubcategoryDto)
         {
             try
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-car")]
+        [HttpPut("update-subcategory")]
         public async Task<ActionResult<bool>> UpdateCategory(UpdateSubcategoryDto SubcategoryDto)
         {
             try
@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
+        [HttpPut("delete-subcategory")]
         public async Task<ActionResult<bool>> DeleteCategory(DeleteSubcategoryDto SubcategoryDto)
         {
             try

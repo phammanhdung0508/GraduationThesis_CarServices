@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Subcategory> list = await PagingConfiguration<Subcategory>.Create(context.Subcategories, page);
+                List<Subcategory> list = await PagingConfiguration<Subcategory>.Get(context.Subcategories, page);
                 return mapper.Map<List<SubcategoryDto>>(list);
             }
             catch (Exception)

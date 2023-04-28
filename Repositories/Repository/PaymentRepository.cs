@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Payment> list = await PagingConfiguration<Payment>.Create(context.Payments, page);
+                List<Payment> list = await PagingConfiguration<Payment>.Get(context.Payments, page);
                 return mapper.Map<List<PaymentDto>>(list);
             }
             catch (Exception)

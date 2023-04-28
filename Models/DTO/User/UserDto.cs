@@ -1,4 +1,7 @@
 #nullable disable
+using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Role;
+
 namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class UserDto
@@ -12,9 +15,11 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserDistrict { get; set; }
         public string UserWard { get; set; }
         public string UserPhone { get; set; }
-        public bool UserGender { get; set; }
+        public Gender UserGender { get; set; }
         public DateTime UserDateOfBirth { get; set; }
         public string UserImage { get; set; }
         public string UserBio { get; set; }
+        public UserStatus UserStatus { get; set; }
+        public RoleDto RoleDto { get; set; }
     }
 }

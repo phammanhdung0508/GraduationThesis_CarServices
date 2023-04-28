@@ -16,7 +16,7 @@ namespace GraduationThesis_paymentServices.Controllers
             this.paymentService = paymentService;
         }
 
-        [HttpPost("view-all-car")]
+        [HttpPost("view-all-payment")]
         public async Task<ActionResult<List<PaymentDto>>> ViewCategory(PageDto page)
         {
             try
@@ -36,7 +36,7 @@ namespace GraduationThesis_paymentServices.Controllers
             }
         }
 
-        [HttpGet("detail-car")]
+        [HttpGet("detail-payment/{id}")]
         public async Task<ActionResult<PaymentDto>> DetailCategory(int id)
         {
             try
@@ -56,7 +56,7 @@ namespace GraduationThesis_paymentServices.Controllers
             }
         }
 
-        [HttpPost("create-car")]
+        [HttpPost("create-payment")]
         public async Task<ActionResult<bool>> CreateCategory(CreatePaymentDto PaymentDto)
         {
             try
@@ -79,7 +79,7 @@ namespace GraduationThesis_paymentServices.Controllers
             }
         }
 
-        [HttpPut("update-car")]
+        [HttpPut("update-payment")]
         public async Task<ActionResult<bool>> UpdateCategory(UpdatePaymentDto PaymentDto)
         {
             try
@@ -102,7 +102,7 @@ namespace GraduationThesis_paymentServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
+        [HttpPut("delete-payment")]
         public async Task<ActionResult<bool>> DeleteCategory(DeletePaymentDto PaymentDto)
         {
             try

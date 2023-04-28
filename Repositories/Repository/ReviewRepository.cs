@@ -23,7 +23,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Review> list = await PagingConfiguration<Review>.Create(context.Reviews, page);
+                List<Review> list = await PagingConfiguration<Review>.Get(context.Reviews, page);
                 return mapper.Map<List<ReviewDto>>(list);
             }
             catch (Exception)

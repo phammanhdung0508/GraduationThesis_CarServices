@@ -23,7 +23,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Category> list = await PagingConfiguration<Category>.Create(context.Categories, page);
+                List<Category> list = await PagingConfiguration<Category>.Get(context.Categories, page);
                 return mapper.Map<List<CategoryDto>>(list);
             }
             catch (Exception)

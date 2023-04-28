@@ -24,7 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Coupon> list = await PagingConfiguration<Coupon>.Create(context.Coupons, page);
+                List<Coupon> list = await PagingConfiguration<Coupon>.Get(context.Coupons, page);
                 return mapper.Map<List<CouponDto>>(list);
             }
             catch (Exception)

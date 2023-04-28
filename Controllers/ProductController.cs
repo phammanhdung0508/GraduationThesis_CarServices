@@ -9,7 +9,7 @@ namespace GraduationThesis_CarServices.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        public IProductService productService { get; }
+        public readonly IProductService productService;
 
         public ProductController(IProductService productService)
         {
@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-product")]
+        [HttpGet("detail-product/{id}")]
         public async Task<ActionResult<ProductDto>> DetailProduct(int id)
         {
             try

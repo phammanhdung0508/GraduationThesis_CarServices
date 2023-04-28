@@ -1,28 +1,32 @@
-﻿using GraduationThesis_CarServices.Models.DTO.Category;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GraduationThesis_CarServices.Controllers
+namespace GraduationThesis_bookingServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    [Route("api/[controller]")]
+    public class BookingController : ControllerBase
     {
-        public readonly ICategoryService categoryService;
-        public CategoryController(ICategoryService categoryService)
-        {
-            this.categoryService = categoryService;
+        public readonly IBookingService bookingService;
 
+        public BookingController(IBookingService bookingService)
+        {
+            this.bookingService = bookingService;
         }
 
-        [HttpPost("view-all-category")]
-        public async Task<ActionResult<List<CategoryDto>>> ViewCategory(PageDto page)
+        [HttpPost("view-all-booking")]
+        public async Task<ActionResult<List<BookingDto>>> ViewCategory(PageDto page)
         {
             try
             {
-                var categoryList = await categoryService.View(page)!;
-                return Ok(categoryList);
+                var list = await bookingService.View(page)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
@@ -36,13 +40,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-category/{id}")]
-        public async Task<ActionResult<CategoryDto>> DetailCategory(int id)
+        [HttpGet("detail-booking/{id}")]
+        public async Task<ActionResult<BookingDto>> DetailCategory(int id)
         {
             try
             {
-                var category = await categoryService.Detail(id);
-                return Ok(category);
+                var car = await bookingService.Detail(id);
+                return Ok(car);
             }
             catch (Exception e)
             {
@@ -56,12 +60,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-category")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateCategoryDto category)
+        [HttpPost("create-booking")]
+        public async Task<ActionResult<bool>> CreateCategory(CreateBookingDto BookingDto)
         {
             try
             {
-                if (await categoryService.Create(category))
+                if (await bookingService.Create(BookingDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -79,12 +83,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-category")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateCategoryDto category)
+        [HttpPut("update-booking")]
+        public async Task<ActionResult<bool>> UpdateCategory(UpdateBookingDto BookingDto)
         {
             try
             {
-                if (await categoryService.Update(category))
+                if (await bookingService.Update(BookingDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -102,12 +106,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteCategoryDto category)
+        [HttpPut("delete-booking")]
+        public async Task<ActionResult<bool>> DeleteCategory(DeleteBookingDto BookingDto)
         {
             try
             {
-                if (await categoryService.Delete(category))
+                if (await bookingService.Delete(BookingDto))
                 {
                     return Ok("Successfully!");
                 }

@@ -1,28 +1,28 @@
-﻿using GraduationThesis_CarServices.Models.DTO.Category;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Schedule;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    [Route("api/[controller]")]
+    public class ScheduleController : ControllerBase
     {
-        public readonly ICategoryService categoryService;
-        public CategoryController(ICategoryService categoryService)
-        {
-            this.categoryService = categoryService;
+        public readonly IScheduleService scheduleService;
 
+        public ScheduleController(IScheduleService scheduleService)
+        {
+            this.scheduleService = scheduleService;
         }
 
-        [HttpPost("view-all-category")]
-        public async Task<ActionResult<List<CategoryDto>>> ViewCategory(PageDto page)
+        [HttpPost("view-all-schedule")]
+        public async Task<ActionResult<List<ScheduleDto>>> ViewCategory(PageDto page)
         {
             try
             {
-                var categoryList = await categoryService.View(page)!;
-                return Ok(categoryList);
+                var list = await scheduleService.View(page)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
@@ -36,13 +36,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-category/{id}")]
-        public async Task<ActionResult<CategoryDto>> DetailCategory(int id)
+        [HttpGet("detail-schedule/{id}")]
+        public async Task<ActionResult<ScheduleDto>> DetailCategory(int id)
         {
             try
             {
-                var category = await categoryService.Detail(id);
-                return Ok(category);
+                var schedule = await scheduleService.Detail(id);
+                return Ok(schedule);
             }
             catch (Exception e)
             {
@@ -56,12 +56,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-category")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateCategoryDto category)
+        [HttpPost("create-schedule")]
+        public async Task<ActionResult<bool>> CreateCategory(CreateScheduleDto ScheduleDto)
         {
             try
             {
-                if (await categoryService.Create(category))
+                if (await scheduleService.Create(ScheduleDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -79,12 +79,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-category")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateCategoryDto category)
+        [HttpPut("update-schedule")]
+        public async Task<ActionResult<bool>> UpdateCategory(UpdateScheduleDto ScheduleDto)
         {
             try
             {
-                if (await categoryService.Update(category))
+                if (await scheduleService.Update(ScheduleDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -102,12 +102,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-category")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteCategoryDto category)
+        [HttpPut("delete-schedule")]
+        public async Task<ActionResult<bool>> DeleteCategory(DeleteScheduleDto ScheduleDto)
         {
             try
             {
-                if (await categoryService.Delete(category))
+                if (await scheduleService.Delete(ScheduleDto))
                 {
                     return Ok("Successfully!");
                 }

@@ -4,7 +4,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Coupon
     public class UpdateCouponDto
     {
         public int CouponId { get; set; }
-          public string CouponCode { get; set; }
+        public string CouponCode { get; set; }
         public string CouponType { get; set; }
         public float CouponValue { get; set; }
         public DateTime CouponStartDate { get; set; }

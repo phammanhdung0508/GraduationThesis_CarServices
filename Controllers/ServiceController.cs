@@ -35,7 +35,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-service")]
+        [HttpGet("detail-service/{id}")]
         public async Task<ActionResult<ServiceDto>> DetailService(int id)
         {
             try

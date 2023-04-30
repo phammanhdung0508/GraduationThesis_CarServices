@@ -9,7 +9,8 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<UserDetailResponseDto?> Detail(int id);
         Task<bool> Create(UserCreateRequestDto createUserDto);
         Task<bool> Update(UserUpdateRequestDto updateUserDto);
-        Task<bool> UpdateRole(UserUpdateRoleRequestDto requestDto);
-        Task<bool> UpdateStatus(UserUpdateStatusRequestDto requestDto);
+        Task<bool> UpdateRole(UserRoleRequestDto requestDto);
+        Task<bool> UpdateStatus(UserStatusRequestDto requestDto);
+        Task<bool> UpdateLocation(UserLocationRequestDto requestDto);
     }
 }

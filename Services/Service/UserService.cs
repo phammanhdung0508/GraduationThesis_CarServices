@@ -95,12 +95,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> UpdateRole(UserUpdateRoleRequestDto requestDto)
+        public async Task<bool> UpdateRole(UserRoleRequestDto requestDto)
         {
             try
             {
                 var u = await userRepository.Detail(requestDto.UserId);
-                var user = mapper.Map<UserUpdateRoleRequestDto, User>(requestDto, u!);
+                var user = mapper.Map<UserRoleRequestDto, User>(requestDto, u!);
                 await userRepository.Update(user);
                 return true;
             }
@@ -110,12 +110,27 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> UpdateStatus(UserUpdateStatusRequestDto requestDto)
+        public async Task<bool> UpdateStatus(UserStatusRequestDto requestDto)
         {
             try
             {
                 var u = await userRepository.Detail(requestDto.UserId);
-                var user = mapper.Map<UserUpdateStatusRequestDto, User>(requestDto, u!);
+                var user = mapper.Map<UserStatusRequestDto, User>(requestDto, u!);
+                await userRepository.Update(user);
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> UpdateLocation(UserLocationRequestDto requestDto)
+        {
+            try
+            {
+                var u = await userRepository.Detail(requestDto.UserId);
+                var user = mapper.Map<UserLocationRequestDto, User>(requestDto, u!);
                 await userRepository.Update(user);
                 return true;
             }

@@ -7,5 +7,6 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserCity { get; set; }
         public string UserDistrict { get; set; }
         public string UserWard { get; set; }
+        public string UserAddress { get; set; }
     }
 }

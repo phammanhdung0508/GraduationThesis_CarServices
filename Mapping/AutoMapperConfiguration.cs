@@ -52,9 +52,11 @@ namespace GraduationThesis_CarServices.Mapping
             .ForMember(des => des.PasswordConfirm, obj => obj.Ignore()).ReverseMap();
             CreateMap<User, UserUpdateRequestDto>()
             .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
-            CreateMap<User, UserUpdateStatusRequestDto>()
+            CreateMap<User, UserStatusRequestDto>()
             .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
-            CreateMap<User, UserUpdateRoleRequestDto>()
+            CreateMap<User, UserRoleRequestDto>()
+            .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
+            CreateMap<User, UserLocationRequestDto>()
             .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
 
             CreateMap<Review, ReviewDto>().ReverseMap();

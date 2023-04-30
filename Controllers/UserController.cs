@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-user")]
-        public async Task<ActionResult<bool>> CreateUser(UserCreateRequestDto userCreateRequestDto)
+        public async Task<ActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-user")]
-        public async Task<ActionResult<bool>> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
+        public async Task<ActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
         {
             try
             {
@@ -102,11 +102,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-role")]
-        public async Task<ActionResult<bool>> UpdateRole(UserUpdateRoleRequestDto userUpdateRoleRequestDto)
+        public async Task<ActionResult> UpdateRole(UserRoleRequestDto userRoleRequestDto)
         {
             try
             {
-                if (await userService.UpdateRole(userUpdateRoleRequestDto))
+                if (await userService.UpdateRole(userRoleRequestDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -125,11 +125,34 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-status")]
-        public async Task<ActionResult<bool>> UpdateStatus(UserUpdateStatusRequestDto userUpdateStatusRequestDto)
+        public async Task<ActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
         {
             try
             {
-                if (await userService.UpdateStatus(userUpdateStatusRequestDto))
+                if (await userService.UpdateStatus(userStatusRequestDto))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPut("update-location")]
+        public async Task<ActionResult> UpdateLocation(UserLocationRequestDto userLocationRequestDto)
+        {
+            try
+            {
+                if (await userService.UpdateLocation(userLocationRequestDto))
                 {
                     return Ok("Successfully!");
                 }

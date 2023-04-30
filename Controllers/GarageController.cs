@@ -1,5 +1,6 @@
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,26 @@ namespace GraduationThesis_CarServices.Controllers
             try
             {
                 var list = await garageService.View(page)!;
+                return Ok(list);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPost("get-garage-near-user")]
+        public async Task<ActionResult<List<GarageDto>>> GetGarageNearUser(UserLocationRequestDto user)
+        {
+            try
+            {
+                var list = await garageService.GetGarageNearUser(user)!;
                 return Ok(list);
             }
             catch (Exception e)

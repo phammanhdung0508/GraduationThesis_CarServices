@@ -4,8 +4,9 @@ using GraduationThesis_CarServices.Models.DTO.Role;
 
 namespace GraduationThesis_CarServices.Models.DTO.User
 {
-    public class UserDto
+    public class UserListResponseDto
     {
+        public int UserId { get; set; }
         public string UserFirstName { get; set; }
         public string UserLastName { get; set; }
         public string FullName { get; set; }
@@ -16,10 +17,12 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserWard { get; set; }
         public string UserPhone { get; set; }
         public Gender UserGender { get; set; }
-        public DateTime UserDateOfBirth { get; set; }
+        public Nullable<DateTime> UserDateOfBirth { get; set; }
         public string UserImage { get; set; }
         public string UserBio { get; set; }
         public UserStatus UserStatus { get; set; }
         public RoleDto RoleDto { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
     }
 }

@@ -18,19 +18,19 @@ namespace GraduationThesis_CarServices.Models.Entity
         public BookingStatus BookingStatus { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float TotalCost { get; set; }
-        
+
         /*-------------------------------------------------*/
-        public int CarId { get; set; }
+        // public Nullable<int> PaymentId { get; set; }
+        // public virtual Payment Payment { get; set; }
+        public Nullable<int> CarId { get; set; }
         public virtual Car Car { get; set; }
-        public int PaymentId { get; set; }
-        public virtual Payment Payment { get; set; }
-        public int CouponId { get; set; }
+        public Nullable<int> CouponId { get; set; }
         public virtual Coupon Coupon { get; set; }
-        public int ScheduleId { get; set; }
+        public Nullable<int> ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
-        public int GarageId { get; set; }
+        public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
-        public int ReportId { get; set; }
+        public Nullable<int> ReportId { get; set; }
         public virtual Report Report { get; set; }
 
         /*-------------------------------------------------*/

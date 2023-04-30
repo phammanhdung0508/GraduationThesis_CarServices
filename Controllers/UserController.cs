@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-user")]
-        public async Task<ActionResult<List<UserDto>>> ViewCoupon(PageDto page)
+        public async Task<ActionResult> ViewUser(PageDto page)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-user/{id}")]
-        public async Task<ActionResult<UserDto>> DetailCoupon(int id)
+        public async Task<ActionResult> DetailUser(int id)
         {
             try
             {
@@ -56,11 +56,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-user")]
-        public async Task<ActionResult<bool>> CreateCoupon(CreateUserDto userDto)
+        public async Task<ActionResult<bool>> CreateUser(UserCreateRequestDto userCreateRequestDto)
         {
             try
             {
-                if (await userService.Create(userDto))
+                if (await userService.Create(userCreateRequestDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -79,11 +79,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-user")]
-        public async Task<ActionResult<bool>> UpdateCoupon(UpdateUserDto userDto)
+        public async Task<ActionResult<bool>> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
         {
             try
             {
-                if (await userService.Update(userDto))
+                if (await userService.Update(userUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -101,12 +101,35 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-user")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteUserDto userDto)
+        [HttpPut("update-role")]
+        public async Task<ActionResult<bool>> UpdateRole(UserUpdateRoleRequestDto userUpdateRoleRequestDto)
         {
             try
             {
-                if (await userService.Delete(userDto))
+                if (await userService.UpdateRole(userUpdateRoleRequestDto))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPut("update-status")]
+        public async Task<ActionResult<bool>> UpdateStatus(UserUpdateStatusRequestDto userUpdateStatusRequestDto)
+        {
+            try
+            {
+                if (await userService.UpdateStatus(userUpdateStatusRequestDto))
                 {
                     return Ok("Successfully!");
                 }

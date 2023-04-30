@@ -19,16 +19,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.mapper = mapper;
         }
 
-        public async Task<List<BookingDto>?> View(PageDto page)
+        public async Task<List<BookingResponseDto>?> View(PageDto page)
         {
             try
             {
                 List<Booking> list = await PagingConfiguration<Booking>
                 .Get(context.Bookings.Include(b => b.Car)
-                .Include(b => b.Coupon).Include(b => b.Payment)
+                // .Include(b => b.Coupon).Include(b => b.Payment)
                 .Include(b => b.Report).Include(b => b.Garage)
                 .Include(b => b.Schedule), page);
-                return mapper.Map<List<BookingDto>>(list);
+                return mapper.Map<List<BookingResponseDto>>(list);
             }
             catch (Exception)
             {
@@ -36,12 +36,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<BookingDto?> Detail(int id)
+        public async Task<BookingResponseDto?> Detail(int id)
         {
             try
             {
-                BookingDto booking = mapper.Map<BookingDto>(await context.Bookings.Include(b => b.Car)
-                .Include(b => b.Coupon).Include(b => b.Payment)
+                BookingResponseDto booking = mapper.Map<BookingResponseDto>(await context.Bookings.Include(b => b.Car)
+                // .Include(b => b.Coupon).Include(b => b.Payment)
                 .Include(b => b.Report).Include(b => b.Garage)
                 .Include(b => b.Schedule).FirstOrDefaultAsync(c => c.BookingId == id));
                 return booking;
@@ -52,11 +52,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateBookingDto bookingDto)
+        public async Task Create(Booking booking)
         {
             try
             {
-                Booking booking = mapper.Map<Booking>(bookingDto);
                 context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
             }

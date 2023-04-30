@@ -1,6 +1,9 @@
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Schedule;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -9,26 +12,26 @@ namespace GraduationThesis_CarServices.Services.Service
     public class BookingService : IBookingService
     {
         private readonly IBookingRepository bookingRepository;
-        private readonly ICouponRepository couponRepository;
+        private readonly IScheduleRepository scheduleRepository;
+        private readonly IServiceGarageRepository serviceGarageRepository;
         private readonly ICarRepository carRepository;
-        private readonly IGarageRepository garageRepository;
         private readonly IMapper mapper;
-        public BookingService(IBookingRepository bookingRepository, 
-        IMapper mapper, ICarRepository carRepository, ICouponRepository couponRepository,
-        IGarageRepository garageRepository)
+        public BookingService(IBookingRepository bookingRepository,
+        IMapper mapper, ICarRepository carRepository, IScheduleRepository scheduleRepository,
+        IServiceGarageRepository serviceGarageRepository)
         {
             this.mapper = mapper;
             this.bookingRepository = bookingRepository;
             this.carRepository = carRepository;
-            this.couponRepository = couponRepository;
-            this.garageRepository = garageRepository;
+            this.scheduleRepository = scheduleRepository;
+            this.serviceGarageRepository = serviceGarageRepository;
         }
 
-        public async Task<List<BookingDto>?> View(PageDto page)
+        public async Task<List<BookingResponseDto>?> View(PageDto page)
         {
             try
             {
-                List<BookingDto>? list = await bookingRepository.View(page);
+                List<BookingResponseDto>? list = await bookingRepository.View(page);
                 return list;
             }
             catch (Exception)
@@ -37,11 +40,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<BookingDto?> Detail(int id)
+        public async Task<BookingResponseDto?> Detail(int id)
         {
             try
             {
-                BookingDto? car = await bookingRepository.Detail(id);
+                BookingResponseDto? car = await bookingRepository.Detail(id);
                 return car;
             }
             catch (Exception)
@@ -50,15 +53,50 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateBookingDto createBookingDto)
+        public async Task<bool> CheckBooking(CreateRequestBookingDto requestDto)
         {
             try
             {
-                await carRepository.Detail(createBookingDto.CarId);
-                await couponRepository.Detail(createBookingDto.CouponId);
-                await couponRepository.Detail(createBookingDto.GarageId);
-                
-                await bookingRepository.Create(createBookingDto);
+                ServiceGarage? serviceGarage = await serviceGarageRepository.Detail(requestDto.GarageId);
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> Create(CreateRequestBookingDto requestDto)
+        {
+            try
+            {
+                DateTime bookingTime = DateOnly.Parse(requestDto.DateSelected).ToDateTime(TimeOnly.Parse(requestDto.TimeSelected));
+                ScheduleDto scheduleDto = new ScheduleDto
+                {
+                    WorkDescription = "",
+                    ScheduleStatus = 0
+                };
+                Schedule schedule = mapper.Map<ScheduleDto, Schedule>(scheduleDto,
+                opt => opt.AfterMap((src, des) => des.BookingTime = bookingTime));
+                await scheduleRepository.Create(schedule);
+
+                Booking booking = mapper.Map<CreateRequestBookingDto, Booking>(requestDto,
+                opt => opt.AfterMap((src, des) =>
+                {
+                    DateTime now = DateTime.Now;
+                    des.BookingTime = bookingTime;
+                    des.CreatedAt = now;
+                    if (bookingTime.Date < now.Date)
+                    {
+                        des.BookingStatus = BookingStatus.NotStart;
+                    }
+                    else
+                    {
+                        des.BookingStatus = BookingStatus.AppointmentDay;
+                    }
+                    des.ScheduleId = schedule.ScheduleId;
+                }));
+                await bookingRepository.Create(booking);
                 return true;
             }
             catch (Exception)

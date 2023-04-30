@@ -15,7 +15,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Garage> Garages { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        // public DbSet<Payment> Payments { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -49,11 +49,11 @@ namespace GraduationThesis_CarServices.Models
             //.OnDelete(DeleteBehavior.Cascade)
             ;
 
-            modelBuilder.Entity<Booking>()
-            .HasOne(b => b.Payment).WithOne(r => r.Booking)
-            .HasForeignKey<Payment>(e => e.PaymentId)
-            //.OnDelete(DeleteBehavior.Cascade)
-            ;
+            // modelBuilder.Entity<Booking>()
+            // .HasOne(b => b.Payment).WithOne(r => r.Booking)
+            // .HasForeignKey<Payment>(e => e.PaymentId)
+            // //.OnDelete(DeleteBehavior.Cascade)
+            // ;
         }
 
         private void MultipleCascadePathFix(ModelBuilder modelBuilder)
@@ -80,7 +80,7 @@ namespace GraduationThesis_CarServices.Models
             Faker<Review> reveiwFaker;
             Faker<Coupon> couponFaker;
             Faker<Report> reportFaker;
-            Faker<Payment> paymentFaker;
+            // Faker<Payment> paymentFaker;
             Faker<Booking> bookingFaker;
             Faker<Product> productFaker;
             Faker<ServiceBooking> serviceBookingFaker;
@@ -185,7 +185,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                 .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
@@ -211,7 +211,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                 .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
@@ -237,7 +237,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                 .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
@@ -329,19 +329,19 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
             }
 
-            for (int i = 1; i <= 5; i++)
-            {
-                paymentFaker = new Faker<Payment>()
-                .RuleFor(p => p.PaymentId, i)
-                .RuleFor(p => p.PaymentMethod, f => f.PickRandom(RandomConfiguration.Paymethod))
-                .RuleFor(p => p.PaymentMessage, f => f.Lorem.Sentence())
-                .RuleFor(p => p.Currency, "VND")
-                .RuleFor(p => p.PaymentStatus, f => f.PickRandom<PaymentStatus>())
-                .RuleFor(p => p.BookingId, f => f.Random.Int(1, 5))
-                .RuleFor(p => p.CreatedAt, now);
+            // for (int i = 1; i <= 5; i++)
+            // {
+            //     paymentFaker = new Faker<Payment>()
+            //     .RuleFor(p => p.PaymentId, i)
+            //     .RuleFor(p => p.PaymentMethod, f => f.PickRandom(RandomConfiguration.Paymethod))
+            //     .RuleFor(p => p.PaymentMessage, f => f.Lorem.Sentence())
+            //     .RuleFor(p => p.Currency, "VND")
+            //     .RuleFor(p => p.PaymentStatus, f => f.PickRandom<PaymentStatus>())
+            //     .RuleFor(p => p.BookingId, f => f.Random.Int(1, 5))
+            //     .RuleFor(p => p.CreatedAt, now);
 
-                modelBuilder.Entity<Payment>().HasData(paymentFaker.Generate());
-            }
+            //     modelBuilder.Entity<Payment>().HasData(paymentFaker.Generate());
+            // }
 
             for (int i = 1; i <= 5; i++)
             {
@@ -351,7 +351,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                 .RuleFor(b => b.CarId, f => f.Random.Int(1, 15))
                 .RuleFor(b => b.TotalCost, f => f.Random.Float(50, 200))
-                .RuleFor(b => b.PaymentId, f => f.Random.Int(1, 5))
+                // .RuleFor(b => b.PaymentId, f => f.Random.Int(1, 5))
                 .RuleFor(b => b.CouponId, f => f.Random.Int(1, 20))
                 .RuleFor(b => b.GarageId, f => f.Random.Int(1, 10))
                 .RuleFor(b => b.ReportId, f => f.Random.Int(1, 5))

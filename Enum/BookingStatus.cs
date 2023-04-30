@@ -3,7 +3,7 @@ namespace GraduationThesis_CarServices.Enum
     public enum BookingStatus
     {
         NotStart,
-        AppointmentRemind,
+        AppointmentDay,
         Processing,
         Wait,
         Complete

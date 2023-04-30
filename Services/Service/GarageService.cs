@@ -1,6 +1,8 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -22,6 +24,20 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 List<GarageDto>? list = await garageRepository.View(page);
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GarageDto>> GetGarageNearUser(UserLocationRequestDto requestDto)
+        {
+            try
+            {
+                User user = mapper.Map<User>(requestDto);
+                List<GarageDto>? list = mapper.Map<List<GarageDto>>(await garageRepository.GetGarageNearUser(user));
                 return list;
             }
             catch (Exception)

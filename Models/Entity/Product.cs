@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         /*-------------------------------------------------*/
         public int SubcategoryId { get; set; }
         public virtual Subcategory Subcategory { get; set; }
-        public int ServiceId { get; set; }
+        public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }
 
         /*-------------------------------------------------*/

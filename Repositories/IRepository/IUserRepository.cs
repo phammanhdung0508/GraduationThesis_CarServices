@@ -1,14 +1,14 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IUserRepository
     {
-        Task<List<UserDto>?> View(PageDto page);
-        Task<UserDto?> Detail(int id);
-        Task Create(CreateUserDto userDto);
-        Task Update(UpdateUserDto userDto);
-        Task Delete(DeleteUserDto userDto);
+        Task<List<User>?> View(PageDto page);
+        Task<User?> Detail(int id);
+        Task Create(User user);
+        Task Update(User user);
     }
 }

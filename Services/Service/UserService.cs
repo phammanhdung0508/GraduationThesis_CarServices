@@ -1,6 +1,9 @@
 using AutoMapper;
+using GraduationThesis_CarServices.Encrypting;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -10,18 +13,20 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IUserRepository userRepository;
-        public UserService(IMapper mapper, IUserRepository userRepository)
+        private readonly EncryptConfiguration encryptConfiguration;
+        public UserService(IMapper mapper, IUserRepository userRepository, EncryptConfiguration encryptConfiguration)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
+            this.encryptConfiguration = encryptConfiguration;
         }
 
-        public async Task<List<UserDto>?> View(PageDto page)
+        public async Task<List<UserListResponseDto>?> View(PageDto page)
         {
 
             try
             {
-                List<UserDto>? list = await userRepository.View(page);
+                List<UserListResponseDto>? list = mapper.Map<List<UserListResponseDto>>(await userRepository.View(page));
                 return list;
             }
             catch (Exception)
@@ -30,11 +35,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<UserDto?> Detail(int id)
+        public async Task<UserDetailResponseDto?> Detail(int id)
         {
             try
             {
-                UserDto? user = mapper.Map<UserDto>(await userRepository.Detail(id));
+                UserDetailResponseDto? user = mapper.Map<UserDetailResponseDto>(await userRepository.Detail(id));
                 return user;
             }
             catch (Exception)
@@ -43,11 +48,45 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateUserDto createUserDto)
+        public async Task<bool> Create(UserCreateRequestDto requestDto)
         {
             try
             {
-                await userRepository.Create(createUserDto);
+                if (requestDto.UserPassword.Equals(requestDto.PasswordConfirm))
+                {
+                    encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
+                    var user = mapper.Map<UserCreateRequestDto, User>(requestDto,
+                    opt => opt.AfterMap((src, des) =>
+                    {
+                        des.PasswordHash = password_hash;
+                        des.PasswordSalt = password_salt;
+                        des.UserGender = Gender.Male;
+                        des.UserStatus = UserStatus.Activate;
+                        des.CreatedAt = DateTime.Now;
+                        des.RoleId = 2;
+                    }));
+                    await userRepository.Create(user);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> Update(UserUpdateRequestDto requestDto)
+        {
+            try
+            {
+                var u = await userRepository.Detail(requestDto.UserId);
+                var user = mapper.Map<UserUpdateRequestDto, User>(requestDto, u!,
+                opt => opt.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await userRepository.Update(user);
                 return true;
             }
             catch (Exception)
@@ -56,11 +95,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateUserDto updateUserDto)
+        public async Task<bool> UpdateRole(UserUpdateRoleRequestDto requestDto)
         {
             try
             {
-                await userRepository.Update(updateUserDto);
+                var u = await userRepository.Detail(requestDto.UserId);
+                var user = mapper.Map<UserUpdateRoleRequestDto, User>(requestDto, u!);
+                await userRepository.Update(user);
                 return true;
             }
             catch (Exception)
@@ -69,11 +110,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Delete(DeleteUserDto deleteUserDto)
+        public async Task<bool> UpdateStatus(UserUpdateStatusRequestDto requestDto)
         {
             try
             {
-                await userRepository.Delete(deleteUserDto);
+                var u = await userRepository.Detail(requestDto.UserId);
+                var user = mapper.Map<UserUpdateStatusRequestDto, User>(requestDto, u!);
+                await userRepository.Update(user);
                 return true;
             }
             catch (Exception)

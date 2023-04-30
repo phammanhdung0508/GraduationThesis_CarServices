@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ScheduleStatus { get; set; }
 
         /*-------------------------------------------------*/
-        public int UserId { get; set; }
+        public Nullable<int> UserId { get; set; }
         public virtual User User { get; set; }
 
         /*-------------------------------------------------*/

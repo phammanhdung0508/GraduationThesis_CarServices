@@ -82,25 +82,5 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 throw;
             }
         }
-
-        public async Task CreateUser(CreateUserDto _user)
-        {
-            try
-            {
-                encryptConfiguration.CreatePasswordHash(_user.user_password, out byte[] password_hash, out byte[] password_salt);
-                User user = new User
-                {
-                    UserEmail = _user.user_email,
-                    PasswordHash = password_hash,
-                    PasswordSalt = password_salt
-                };
-                context.Users.Add(user);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
     }
 }

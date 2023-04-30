@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Schedule;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
@@ -11,7 +12,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     {
         Task<List<ScheduleDto>?> View(PageDto page);
         Task<ScheduleDto?> Detail(int id);
-        Task Create(CreateScheduleDto scheduleDto);
+        Task Create(Schedule schedule);
         Task Update(UpdateScheduleDto scheduleDto);
         Task Delete(DeleteScheduleDto scheduleDto);
     }

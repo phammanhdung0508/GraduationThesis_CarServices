@@ -15,9 +15,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public float ServiceCost { get; set; }
 
         /*-------------------------------------------------*/
-        public int BookingId { get; set; }
+        public Nullable<int> BookingId { get; set; }
         public virtual Booking Booking { get; set; }
-        public int ServiceId { get; set; }
+        public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }
     }
 }

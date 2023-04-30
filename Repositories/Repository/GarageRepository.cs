@@ -33,11 +33,28 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<GarageDto?> Detail(int id)
+        public async Task<List<Garage>> GetGarageNearUser(User user)
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id));
+                List<Garage> list = await context.Garages.Where(g => 
+                    g.GarageCity.Contains(user.UserCity) &&
+                    g.GarageDistrict.Contains(user.UserDistrict) &&
+                    g.GarageWard.Contains(user.UserWard)
+                ).OrderBy(g => g.GarageName).ToListAsync();
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Garage?> Detail(int id)
+        {
+            try
+            {
+                Garage? garage = await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id);
                 return garage;
             }
             catch (Exception)

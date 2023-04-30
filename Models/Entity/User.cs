@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }
         [Column(TypeName = "date")]
-        public DateTime UserDateOfBirth { get; set; }
+        public Nullable<DateTime> UserDateOfBirth { get; set; }
         [MaxLength(1024)]
         public string UserImage { get; set; }
         [MaxLength(1024)]

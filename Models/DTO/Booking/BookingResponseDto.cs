@@ -1,5 +1,4 @@
 #nullable disable
-using System.ComponentModel;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Car;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
@@ -10,14 +9,16 @@ using GraduationThesis_CarServices.Models.DTO.Schedule;
 
 namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
-    public class CreateBookingDto
+    public class BookingResponseDto
     {
         public DateTime BookingTime { get; set; }
-        [DefaultValue(BookingStatus.NotStart)]
         public BookingStatus BookingStatus { get; set; }
-        
-        public int CarId {get; set;}
-        public int CouponId { get; set; }
-        public int GarageId { get; set; }
+
+        public CarDto CarDto {get; set;}
+        public PaymentDto PaymentDto {get; set;}
+        public CouponDto CouponDto {get; set;}
+        public ScheduleDto ScheduleDto {get; set;}
+        public GarageDto GarageDto {get; set;}
+        public ReportDto ReportDto {get; set;}
     }
 }

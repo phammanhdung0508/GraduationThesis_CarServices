@@ -5,6 +5,5 @@ namespace GraduationThesis_CarServices.Repositories.IRepository{
     public interface IAuthenticationRepository{
         Task<UserLoginDto?> CheckLogin(LoginDto login);
         RefreshTokenDto? RefreshToken();
-        Task CreateUser(CreateUserDto _user);
     }
 }

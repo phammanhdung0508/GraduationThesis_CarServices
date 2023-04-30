@@ -1,4 +1,3 @@
-
 using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.DTO.User

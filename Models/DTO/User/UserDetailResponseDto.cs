@@ -1,5 +1,4 @@
 #nullable disable
-
 using GraduationThesis_CarServices.Models.DTO.Role;
 using static Bogus.DataSets.Name;
 

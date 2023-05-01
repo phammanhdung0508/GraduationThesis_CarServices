@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("delete-garage")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteGarageDto garageDto)
+        public async Task<ActionResult<bool>> DeleteGarage(DeleteGarageDto garageDto)
         {
             try
             {

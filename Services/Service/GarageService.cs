@@ -10,10 +10,13 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IGarageRepository garageRepository;
-        public GarageService(IMapper mapper, IGarageRepository garageRepository)
+        private readonly IUserRepository userRepository;
+
+        public GarageService(IMapper mapper, IGarageRepository garageRepository, IUserRepository userRepository)
         {
-            this.garageRepository = garageRepository;
             this.mapper = mapper;
+            this.garageRepository = garageRepository;
+            this.userRepository = userRepository;
         }
 
         public async Task<List<GarageDto>?> View(PageDto page)
@@ -34,7 +37,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                GarageDto? garage = mapper.Map<GarageDto>(await garageRepository.Detail(id));
+                GarageDto? garage = await garageRepository.Detail(id);
                 return garage;
             }
             catch (Exception)
@@ -47,6 +50,8 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                await userRepository.Detail(createGarageDto.UserId);
+
                 await garageRepository.Create(createGarageDto);
                 return true;
             }

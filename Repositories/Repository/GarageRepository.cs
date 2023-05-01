@@ -24,7 +24,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Garage> list = await PagingConfiguration<Garage>.Get(context.Garages, page);
+                List<Garage> list = await PagingConfiguration<Garage>
+                .Get(context.Garages.Include(g => g.User), page);
                 return mapper.Map<List<GarageDto>>(list);
             }
             catch (Exception)
@@ -37,7 +38,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id));
+                GarageDto garage = mapper.Map<GarageDto>(await context.Garages
+                .Include(g => g.User).FirstOrDefaultAsync(g => g.GarageId == id));
                 return garage;
             }
             catch (Exception)

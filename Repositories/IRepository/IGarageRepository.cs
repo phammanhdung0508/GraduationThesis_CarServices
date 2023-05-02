@@ -4,11 +4,10 @@ using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository{
     public interface IGarageRepository{
-        Task<List<GarageDto>?> View(PageDto page);
-        Task<List<Garage>> GetGarageNearUser(User user);
+        Task<List<Garage>?> View(PageDto page);
+        Task<List<Garage>?> GetAll();
         Task<Garage?> Detail(int id);
-        Task Create(CreateGarageDto couponDto);
-        Task Update(UpdateGarageDto couponDto);
-        Task Delete(DeleteGarageDto couponDto);
+        Task Create(Garage garage);
+        Task Update(Garage garage);
     }
 }

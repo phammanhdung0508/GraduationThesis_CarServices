@@ -1,6 +1,5 @@
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +15,28 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageService = garageService;
         }
 
+        [HttpPost("get-nearby-garage-location")]
+        public async Task<ActionResult> GetNearbyGarageLocation(LocationRequestDto locationRequestDto)
+        {
+            try
+            {
+                var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
+                return Ok(list);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
         [HttpPost("view-all-garage")]
-        public async Task<ActionResult<List<GarageDto>>> ViewGarage(PageDto page)
+        public async Task<ActionResult> ViewGarage(PageDto page)
         {
             try
             {
@@ -36,28 +55,8 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("get-garage-near-user")]
-        public async Task<ActionResult<List<GarageDto>>> GetGarageNearUser(UserLocationRequestDto user)
-        {
-            try
-            {
-                var list = await garageService.GetGarageNearUser(user)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
         [HttpGet("detail-garage/{id}")]
-        public async Task<ActionResult<GarageDto>> DetailGarage(int id)
+        public async Task<ActionResult> DetailGarage(int id)
         {
             try
             {
@@ -77,11 +76,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-garage")]
-        public async Task<ActionResult<bool>> CreateGarage(CreateGarageDto garageDto)
+        public async Task<ActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
             try
             {
-                if (await garageService.Create(garageDto))
+                if (await garageService.Create(garageCreateRequestDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -100,11 +99,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-garage")]
-        public async Task<ActionResult<bool>> UpdateGarage(UpdateGarageDto garageDto)
+        public async Task<ActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
             try
             {
-                if (await garageService.Update(garageDto))
+                if (await garageService.Update(garageUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -122,12 +121,35 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-garage")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteGarageDto garageDto)
+        [HttpPut("update-status")]
+        public async Task<ActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
             try
             {
-                if (await garageService.Delete(garageDto))
+                if (await garageService.UpdateStatus(garageStatusRequestDto))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPut("update-location")]
+        public async Task<ActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto )
+        {
+            try
+            {
+                if (await garageService.UpdateLocation(locationUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }

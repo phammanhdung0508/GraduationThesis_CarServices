@@ -6,11 +6,12 @@ namespace GraduationThesis_CarServices.Services.IService
 {
     public interface IGarageService
     {
-       Task<List<GarageDto>?> View(PageDto page);
-       Task<List<GarageDto>> GetGarageNearUser(UserLocationRequestDto requestDto);
-       Task<GarageDto?> Detail(int id);
-       Task<bool> Create(CreateGarageDto createGarageDto);
-       Task<bool> Update(UpdateGarageDto updateGarageDto);
-       Task<bool> Delete(DeleteGarageDto deleteGarageDto); 
+       Task<List<GarageListResponseDto>?> View(PageDto page);
+       Task<GarageDetailResponseDto?> Detail(int id);
+       Task<bool> Create(GarageCreateRequestDto requestDto);
+       Task<bool> Update(GarageUpdateRequestDto requestDto);
+       Task<bool> UpdateStatus(GarageStatusRequestDto requestDto);
+       Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto);
+       Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
     }
 }

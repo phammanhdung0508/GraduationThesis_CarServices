@@ -1,6 +1,7 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Models.Entity;
@@ -14,11 +15,14 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMapper mapper;
         private readonly IUserRepository userRepository;
         private readonly EncryptConfiguration encryptConfiguration;
-        public UserService(IMapper mapper, IUserRepository userRepository, EncryptConfiguration encryptConfiguration)
+        private readonly GeocoderConfiguration geocoderConfiguration;
+        public UserService(IMapper mapper, IUserRepository userRepository, 
+        EncryptConfiguration encryptConfiguration, GeocoderConfiguration geocoderConfiguration)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.encryptConfiguration = encryptConfiguration;
+            this.geocoderConfiguration = geocoderConfiguration;
         }
 
         public async Task<List<UserListResponseDto>?> View(PageDto page)
@@ -129,8 +133,16 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                (double Latitude, double Longitude) = await geocoderConfiguration
+                .GeocodeAsync(requestDto.UserAddress, requestDto.UserCity, requestDto.UserDistrict, requestDto.UserWard);
                 var u = await userRepository.Detail(requestDto.UserId);
-                var user = mapper.Map<UserLocationRequestDto, User>(requestDto, u!);
+                var user = mapper.Map<UserLocationRequestDto, User>(requestDto, u!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                    des.Latitude = Latitude;
+                    des.Longitude = Longitude;
+                }));
                 await userRepository.Update(user);
                 return true;
             }

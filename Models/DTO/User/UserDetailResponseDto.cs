@@ -1,6 +1,6 @@
 #nullable disable
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Role;
-using static Bogus.DataSets.Name;
 
 namespace GraduationThesis_CarServices.Models.DTO.User
 {

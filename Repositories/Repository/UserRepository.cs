@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -10,11 +9,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly IMapper mapper;
         public readonly DataContext context;
-        public UserRepository(IMapper mapper, DataContext context){
+        public UserRepository(DataContext context){
             this.context = context;
-            this.mapper = mapper;
         }
 
         public async Task<List<User>?> View(PageDto page)

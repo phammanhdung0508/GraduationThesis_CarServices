@@ -99,5 +99,39 @@ namespace GraduationThesis_CarServices.Randomly
                     return null;
             }
         }
+
+        public class Coordinates{
+            public double Latitude {get; set;}
+            public double Longitude { get; set; }
+        }
+
+        public static List<Coordinates> Location = new List<Coordinates>{
+            new Coordinates{Latitude=10.763931646166899, Longitude=106.69564615504434},
+            new Coordinates{Latitude=10.765357983335225, Longitude=106.67540191456098},
+            new Coordinates{Latitude=10.745556918903318, Longitude=106.68952712823149},
+            new Coordinates{Latitude=10.753202537046564, Longitude=106.71243370657636},
+            new Coordinates{Latitude=10.770846334985222, Longitude=106.67838516123628},
+            new Coordinates{Latitude=10.758837040486794, Longitude=106.67807461014627},
+            new Coordinates{Latitude=10.771472907894179, Longitude=106.68604786007458},
+            new Coordinates{Latitude=10.75664665679407, Longitude=106.70010757315116},
+            new Coordinates{Latitude=10.753192970720434, Longitude=106.71245825706636},
+            new Coordinates{Latitude=10.754790795344721, Longitude=106.66072405510118},
+            new Coordinates{Latitude=10.754372579836698, Longitude=106.6738731901177},
+            new Coordinates{Latitude=10.75887258385469, Longitude=106.67805637713498},
+            new Coordinates{Latitude=10.76068396559795, Longitude=106.6827757752482},
+            new Coordinates{Latitude=10.764712983167666, Longitude=106.68116218105035},
+            new Coordinates{Latitude=10.745572022846487, Longitude=106.6270524477263},
+            new Coordinates{Latitude=10.739311649701769, Longitude=106.62344204785116},
+            new Coordinates{Latitude=10.732255336778813, Longitude=106.62501618972078},
+            new Coordinates{Latitude=10.745749183168783, Longitude=106.62491780586315},
+            new Coordinates{Latitude=10.756668659179981, Longitude=106.62503962906366},
+            new Coordinates{Latitude=10.73132027408366, Longitude=106.70024536416858},
+            new Coordinates{Latitude=10.738295740959048, Longitude=106.72743149396123},
+            new Coordinates{Latitude=10.727699818257554, Longitude=106.73705857706113},
+            new Coordinates{Latitude=10.713318564751694, Longitude=106.74350818181838},
+            new Coordinates{Latitude=10.841384334152652, Longitude=106.65709150138284},
+            new Coordinates{Latitude=10.82631923315733, Longitude=106.73578317034169},
+            new Coordinates{Latitude=10.763931646166899, Longitude=106.69564615504434}
+        };
     }
 }

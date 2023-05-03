@@ -163,7 +163,7 @@ namespace GraduationThesis_CarServices.Models
                 ServiceDuration="10 tiếng", ServiceStatus=1, CreatedAt=now},
             });
 
-            //Tác giả code như cức.
+            //sunflower-cmd code như cức.
 
             //Customer
             for (int i = 1; i <= 10; i++)
@@ -184,7 +184,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
+                .RuleFor(u => u.RoleId, f => 4)
                 .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
@@ -210,7 +210,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
+                .RuleFor(u => u.RoleId, f => 3)
                 .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
@@ -218,7 +218,7 @@ namespace GraduationThesis_CarServices.Models
             }
 
             //Owner
-            for (int i = 16; i <= 20; i++)
+            for (int i = 16; i <= 30; i++)
             {
                 userFaker = new Faker<User>()
                 .RuleFor(u => u.UserId, i)
@@ -236,14 +236,14 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
+                .RuleFor(u => u.RoleId, f => 2)
                 .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
             }
 
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 20; i++)
             {
                 carFaker = new Faker<Car>()
                 .RuleFor(c => c.CarId, i)
@@ -260,7 +260,7 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Car>().HasData(carFaker.Generate());
             }
 
-            for (int i = 1; i <= 10; i++)
+            for (int i = 1; i <= 25; i++)
             {
                 garageFaker = new Faker<Garage>()
                 .RuleFor(g => g.GarageId, i)
@@ -271,14 +271,16 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
                 .RuleFor(g => g.GarageCity, "Ho Chi Minh")
                 .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))
-                .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict)); })
+                .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict));})
+                .RuleFor(g => g.Latitude, RandomConfiguration.Location[i].Latitude)
+                .RuleFor(g => g.Longitude, RandomConfiguration.Location[i].Longitude)
                 .RuleFor(g => g.FromTo, "Monday -> Saturday")
                 .RuleFor(g => g.OpenAt, "8AM")
                 .RuleFor(g => g.CloseAt, "5PM")
                 .RuleFor(g => g.GarageStatus, 1)
                 .RuleFor(g => g.UserId, f => f.Random.Int(16, 20))
                 .RuleFor(g => g.CreatedAt, now);
-
+                
                 modelBuilder.Entity<Garage>().HasData(garageFaker.Generate());
             }
 

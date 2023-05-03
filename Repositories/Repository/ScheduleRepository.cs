@@ -48,12 +48,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-
-        public async Task Create(CreateScheduleDto scheduleDto)
+        
+        public async Task Create(Schedule schedule)
         {
             try
             {
-                Schedule schedule = mapper.Map<Schedule>(scheduleDto);
                 context.Schedules.Add(schedule);
                 await context.SaveChangesAsync();
             }

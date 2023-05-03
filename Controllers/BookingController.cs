@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
@@ -21,7 +17,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("view-all-booking")]
-        public async Task<ActionResult<List<BookingDto>>> ViewCategory(PageDto page)
+        public async Task<ActionResult<List<BookingResponseDto>>> ViewCategory(PageDto page)
         {
             try
             {
@@ -41,7 +37,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpGet("detail-booking/{id}")]
-        public async Task<ActionResult<BookingDto>> DetailCategory(int id)
+        public async Task<ActionResult<BookingResponseDto>> DetailCategory(int id)
         {
             try
             {
@@ -61,7 +57,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("create-booking")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateBookingDto BookingDto)
+        public async Task<ActionResult<bool>> CreateCategory(CreateRequestBookingDto BookingDto)
         {
             try
             {

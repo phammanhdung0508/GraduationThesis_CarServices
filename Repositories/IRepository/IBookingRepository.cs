@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IBookingRepository
     {
-        Task<List<BookingDto>?> View(PageDto page);
-        Task<BookingDto?> Detail(int id);
-        Task Create(CreateBookingDto bookingDto);
+        Task<List<BookingResponseDto>?> View(PageDto page);
+        Task<BookingResponseDto?> Detail(int id);
+        Task Create(Booking booking);
         Task Update(UpdateBookingDto bookingDto);
         Task Delete(DeleteBookingDto bookingDto);
     }

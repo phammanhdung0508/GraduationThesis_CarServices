@@ -12,7 +12,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ReportId { get; set; }
         [Column(TypeName = "date")]
         public DateTime Date { get; set; }
-        [MaxLength(200)]
+        [MaxLength(800)]
         public string Notes { get; set; }
         [MaxLength(1200)]
         public string Description { get; set; }

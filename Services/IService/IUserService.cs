@@ -5,10 +5,12 @@ namespace GraduationThesis_CarServices.Services.IService
 {
     public interface IUserService
     {
-        Task<List<UserDto>?> View(PageDto page);
-        Task<UserDto?> Detail(int id);
-        Task<bool> Create(CreateUserDto createUserDto);
-        Task<bool> Update(UpdateUserDto updateUserDto);
-        Task<bool> Delete(DeleteUserDto deleteUserDto);
+        Task<List<UserListResponseDto>?> View(PageDto page);
+        Task<UserDetailResponseDto?> Detail(int id);
+        Task<bool> Create(UserCreateRequestDto createUserDto);
+        Task<bool> Update(UserUpdateRequestDto updateUserDto);
+        Task<bool> UpdateRole(UserRoleRequestDto requestDto);
+        Task<bool> UpdateStatus(UserStatusRequestDto requestDto);
+        Task<bool> UpdateLocation(UserLocationRequestDto requestDto);
     }
 }

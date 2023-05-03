@@ -1,7 +1,5 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -11,19 +9,18 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly IMapper mapper;
         public readonly DataContext context;
-        public UserRepository(IMapper mapper, DataContext context){
+        public UserRepository(DataContext context){
             this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<List<UserDto>?> View(PageDto page)
+        public async Task<List<User>?> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<User>.Get(context.Users.Include(u => u.Role), page);
-                return mapper.Map<List<UserDto>>(list);
+                var list = await PagingConfiguration<User>
+                .Get(context.Users.Include(u => u.Role), page);
+                return list;
             }
             catch (Exception)
             {
@@ -31,11 +28,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<UserDto?> Detail(int id)
+        public async Task<User?> Detail(int id)
         {
             try
             {
-                UserDto user = mapper.Map<UserDto>(await context.Users.Include(u => u.Role).FirstOrDefaultAsync(g => g.UserId == id));
+                var user = await context.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(g => g.UserId == id);
                 return user;
             }
             catch (Exception)
@@ -44,11 +42,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateUserDto userDto)
+        public async Task Create(User user)
         {
             try
             {
-                User user = mapper.Map<User>(userDto);
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
             }
@@ -58,27 +55,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateUserDto userDto)
+        public async Task Update(User user)
         {
             try
             {
-                var user = context.Users.FirstOrDefault(g => g.UserId == userDto.UserId)!;
-                mapper.Map<UpdateUserDto, User?>(userDto, user);
-                context.Users.Update(user);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteUserDto userDto)
-        {
-            try
-            {
-                var user = context.Users.FirstOrDefault(g => g.UserId == userDto.UserId)!;
-                mapper.Map<DeleteUserDto, User?>(userDto, user);
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
             }

@@ -15,7 +15,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Garage> Garages { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        // public DbSet<Payment> Payments { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -49,11 +49,11 @@ namespace GraduationThesis_CarServices.Models
             //.OnDelete(DeleteBehavior.Cascade)
             ;
 
-            modelBuilder.Entity<Booking>()
-            .HasOne(b => b.Payment).WithOne(r => r.Booking)
-            .HasForeignKey<Payment>(e => e.PaymentId)
-            //.OnDelete(DeleteBehavior.Cascade)
-            ;
+            // modelBuilder.Entity<Booking>()
+            // .HasOne(b => b.Payment).WithOne(r => r.Booking)
+            // .HasForeignKey<Payment>(e => e.PaymentId)
+            // //.OnDelete(DeleteBehavior.Cascade)
+            // ;
         }
 
         private void MultipleCascadePathFix(ModelBuilder modelBuilder)
@@ -80,7 +80,7 @@ namespace GraduationThesis_CarServices.Models
             Faker<Review> reveiwFaker;
             Faker<Coupon> couponFaker;
             Faker<Report> reportFaker;
-            Faker<Payment> paymentFaker;
+            // Faker<Payment> paymentFaker;
             Faker<Booking> bookingFaker;
             Faker<Product> productFaker;
             Faker<ServiceBooking> serviceBookingFaker;
@@ -163,7 +163,7 @@ namespace GraduationThesis_CarServices.Models
                 ServiceDuration="10 tiếng", ServiceStatus=1, CreatedAt=now},
             });
 
-            //Tác giả code như cức.
+            //sunflower-cmd code như cức.
 
             //Customer
             for (int i = 1; i <= 10; i++)
@@ -184,8 +184,8 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.RoleId, f => 4)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
@@ -210,15 +210,15 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.RoleId, f => 3)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
             }
 
             //Owner
-            for (int i = 16; i <= 20; i++)
+            for (int i = 16; i <= 30; i++)
             {
                 userFaker = new Faker<User>()
                 .RuleFor(u => u.UserId, i)
@@ -236,14 +236,14 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                 .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
                 .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1, 4))
-                .RuleFor(u => u.UserStatus, UserStatus.Active)
+                .RuleFor(u => u.RoleId, f => 2)
+                .RuleFor(u => u.UserStatus, UserStatus.Activate)
                 .RuleFor(u => u.CreatedAt, now);
 
                 modelBuilder.Entity<User>().HasData(userFaker.Generate());
             }
 
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 20; i++)
             {
                 carFaker = new Faker<Car>()
                 .RuleFor(c => c.CarId, i)
@@ -260,7 +260,7 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Car>().HasData(carFaker.Generate());
             }
 
-            for (int i = 1; i <= 10; i++)
+            for (int i = 1; i <= 25; i++)
             {
                 garageFaker = new Faker<Garage>()
                 .RuleFor(g => g.GarageId, i)
@@ -271,18 +271,20 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
                 .RuleFor(g => g.GarageCity, "Ho Chi Minh")
                 .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))
-                .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict)); })
+                .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict));})
+                .RuleFor(g => g.Latitude, RandomConfiguration.Location[i].Latitude)
+                .RuleFor(g => g.Longitude, RandomConfiguration.Location[i].Longitude)
                 .RuleFor(g => g.FromTo, "Monday -> Saturday")
                 .RuleFor(g => g.OpenAt, "8AM")
                 .RuleFor(g => g.CloseAt, "5PM")
                 .RuleFor(g => g.GarageStatus, 1)
                 .RuleFor(g => g.UserId, f => f.Random.Int(16, 20))
                 .RuleFor(g => g.CreatedAt, now);
-
+                
                 modelBuilder.Entity<Garage>().HasData(garageFaker.Generate());
             }
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 40; i++)
             {
                 reveiwFaker = new Faker<Review>()
                 .RuleFor(r => r.ReviewId, i)
@@ -297,7 +299,7 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Review>().HasData(reveiwFaker.Generate());
             }
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 30; i++)
             {
                 couponFaker = new Faker<Coupon>()
                 .RuleFor(c => c.CouponId, i)
@@ -310,6 +312,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(c => c.CouponMaxSpend, f => f.Random.Float(60, 100))
                 .RuleFor(c => c.NumberOfTimesToUse, f => f.Random.Int(1, 10))
                 .RuleFor(c => c.CouponStatus, f => f.PickRandom<CouponStatus>())
+                .RuleFor(c => c.GarageId, f => f.Random.Int(1, 25))
                 .RuleFor(c => c.CreatedAt, now);
 
                 modelBuilder.Entity<Coupon>().HasData(couponFaker.Generate());
@@ -329,19 +332,19 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
             }
 
-            for (int i = 1; i <= 5; i++)
-            {
-                paymentFaker = new Faker<Payment>()
-                .RuleFor(p => p.PaymentId, i)
-                .RuleFor(p => p.PaymentMethod, f => f.PickRandom(RandomConfiguration.Paymethod))
-                .RuleFor(p => p.PaymentMessage, f => f.Lorem.Sentence())
-                .RuleFor(p => p.Currency, "VND")
-                .RuleFor(p => p.PaymentStatus, f => f.PickRandom<PaymentStatus>())
-                .RuleFor(p => p.BookingId, f => f.Random.Int(1, 5))
-                .RuleFor(p => p.CreatedAt, now);
+            // for (int i = 1; i <= 5; i++)
+            // {
+            //     paymentFaker = new Faker<Payment>()
+            //     .RuleFor(p => p.PaymentId, i)
+            //     .RuleFor(p => p.PaymentMethod, f => f.PickRandom(RandomConfiguration.Paymethod))
+            //     .RuleFor(p => p.PaymentMessage, f => f.Lorem.Sentence())
+            //     .RuleFor(p => p.Currency, "VND")
+            //     .RuleFor(p => p.PaymentStatus, f => f.PickRandom<PaymentStatus>())
+            //     .RuleFor(p => p.BookingId, f => f.Random.Int(1, 5))
+            //     .RuleFor(p => p.CreatedAt, now);
 
-                modelBuilder.Entity<Payment>().HasData(paymentFaker.Generate());
-            }
+            //     modelBuilder.Entity<Payment>().HasData(paymentFaker.Generate());
+            // }
 
             for (int i = 1; i <= 5; i++)
             {
@@ -351,8 +354,8 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                 .RuleFor(b => b.CarId, f => f.Random.Int(1, 15))
                 .RuleFor(b => b.TotalCost, f => f.Random.Float(50, 200))
-                .RuleFor(b => b.PaymentId, f => f.Random.Int(1, 5))
-                .RuleFor(b => b.CouponId, f => f.Random.Int(1, 20))
+                // .RuleFor(b => b.PaymentId, f => f.Random.Int(1, 5))
+                // .RuleFor(b => b.CouponId, f => f.Random.Int(1, 20))
                 .RuleFor(b => b.GarageId, f => f.Random.Int(1, 10))
                 .RuleFor(b => b.ReportId, f => f.Random.Int(1, 5))
                 .RuleFor(b => b.ScheduleId, f => f.Random.Int(1, 5))

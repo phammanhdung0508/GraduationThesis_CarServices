@@ -1,6 +1,4 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
@@ -12,20 +10,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class GarageRepository : IGarageRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public GarageRepository(DataContext context, IMapper mapper)
+        public GarageRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
 
-        public async Task<List<GarageDto>?> View(PageDto page)
+        public async Task<List<Garage>?> View(PageDto page)
         {
             try
             {
-                List<Garage> list = await PagingConfiguration<Garage>.Get(context.Garages, page);
-                return mapper.Map<List<GarageDto>>(list);
+                var list = await PagingConfiguration<Garage>
+                .Get(context.Garages.Include(g => g.User)
+                .ThenInclude(u => u.Role), page);
+                return list;
             }
             catch (Exception)
             {
@@ -33,11 +31,47 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<GarageDto?> Detail(int id)
+        public async Task<List<Garage>?> GetAll()
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id));
+                var list = await context.Garages
+                .Include(g => g.Reviews).ToListAsync();
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Garage>?> FilterCoupon(PageDto page)
+        {
+            try
+            {
+                var list = await PagingConfiguration<Garage>.Get(context.Garages
+                .Where(g => g.Coupons.Count > 0)
+                .Include(g => g.Reviews), page);
+                
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Garage?> Detail(int id)
+        {
+            try
+            {
+                var garage = await context.Garages
+                .Where(g => g.GarageId == id)
+                .Include(g => g.User).ThenInclude(u => u.Role)
+                .Include(g => g.Reviews)
+                .FirstOrDefaultAsync();
+
                 return garage;
             }
             catch (Exception)
@@ -46,11 +80,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateGarageDto garageDto)
+        public async Task Create(Garage garage)
         {
             try
             {
-                Garage garage = mapper.Map<Garage>(garageDto);
                 context.Garages.Add(garage);
                 await context.SaveChangesAsync();
             }
@@ -60,27 +93,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateGarageDto garageDto)
+        public async Task Update(Garage garage)
         {
             try
             {
-                var garage = context.Garages.FirstOrDefault(g => g.GarageId == garageDto.GarageId)!;
-                mapper.Map<UpdateGarageDto, Garage?>(garageDto, garage);
-                context.Garages.Update(garage);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteGarageDto garageDto)
-        {
-            try
-            {
-                var garage = context.Garages.FirstOrDefault(g => g.GarageId == garageDto.GarageId)!;
-                mapper.Map<DeleteGarageDto, Garage?>(garageDto, garage);
                 context.Garages.Update(garage);
                 await context.SaveChangesAsync();
             }

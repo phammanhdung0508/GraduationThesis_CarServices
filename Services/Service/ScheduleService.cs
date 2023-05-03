@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Schedule;
@@ -50,7 +46,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                await scheduleRepository.Create(createScheduleDto);
+                // await scheduleRepository.Create(createScheduleDto);
                 return true;
             }
             catch (Exception)

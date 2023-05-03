@@ -11,9 +11,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ProductMediaFileId { get; set; }
 
         /*-------------------------------------------------*/
-        public int ProductId { get; set; }
+        public Nullable<int> ProductId { get; set; }
         public virtual Product Product { get; set; }
-        public int MediaFileId { get; set; }
+        public Nullable<int> MediaFileId { get; set; }
         public virtual MediaFile MediaFile { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text;
 using GraduationThesis_CarServices.Encrypting;
+using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Repositories.Repository;
@@ -67,6 +68,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddSingleton<TokenConfiguration>();
 builder.Services.AddSingleton<EncryptConfiguration>();
+builder.Services.AddSingleton<GeocoderConfiguration>();
 
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IGarageRepository, GarageRepository>();
@@ -80,8 +82,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+// builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IServiceGarageRepository, ServiceGarageRepository>();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IGarageService, GarageService>();

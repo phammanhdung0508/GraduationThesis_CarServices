@@ -32,7 +32,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                User? user = await context.Users.Include(u => u.Role)
+                var user = await context.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(g => g.UserId == id);
                 return user;
             }

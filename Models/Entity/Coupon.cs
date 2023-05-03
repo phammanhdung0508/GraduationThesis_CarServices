@@ -32,6 +32,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<Booking> Bookings { get; set; }
+        public Nullable<int> GarageId { get; set; }
+        public virtual Garage Garage { get; set; }
     }
 }

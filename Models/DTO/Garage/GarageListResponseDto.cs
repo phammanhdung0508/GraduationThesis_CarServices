@@ -12,6 +12,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
         public string GarageDistrict { get; set; }
         public string GarageCity { get; set; }
         public int GarageStatus { get; set; }
+        public double Rating {get; set;}
 
         public UserGarageDto UserGarageDto {get; set;}
     }

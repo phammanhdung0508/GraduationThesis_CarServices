@@ -284,7 +284,7 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Garage>().HasData(garageFaker.Generate());
             }
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 40; i++)
             {
                 reveiwFaker = new Faker<Review>()
                 .RuleFor(r => r.ReviewId, i)
@@ -299,7 +299,7 @@ namespace GraduationThesis_CarServices.Models
                 modelBuilder.Entity<Review>().HasData(reveiwFaker.Generate());
             }
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 30; i++)
             {
                 couponFaker = new Faker<Coupon>()
                 .RuleFor(c => c.CouponId, i)
@@ -312,6 +312,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(c => c.CouponMaxSpend, f => f.Random.Float(60, 100))
                 .RuleFor(c => c.NumberOfTimesToUse, f => f.Random.Int(1, 10))
                 .RuleFor(c => c.CouponStatus, f => f.PickRandom<CouponStatus>())
+                .RuleFor(c => c.GarageId, f => f.Random.Int(1, 25))
                 .RuleFor(c => c.CreatedAt, now);
 
                 modelBuilder.Entity<Coupon>().HasData(couponFaker.Generate());
@@ -354,7 +355,7 @@ namespace GraduationThesis_CarServices.Models
                 .RuleFor(b => b.CarId, f => f.Random.Int(1, 15))
                 .RuleFor(b => b.TotalCost, f => f.Random.Float(50, 200))
                 // .RuleFor(b => b.PaymentId, f => f.Random.Int(1, 5))
-                .RuleFor(b => b.CouponId, f => f.Random.Int(1, 20))
+                // .RuleFor(b => b.CouponId, f => f.Random.Int(1, 20))
                 .RuleFor(b => b.GarageId, f => f.Random.Int(1, 10))
                 .RuleFor(b => b.ReportId, f => f.Random.Int(1, 5))
                 .RuleFor(b => b.ScheduleId, f => f.Random.Int(1, 5))

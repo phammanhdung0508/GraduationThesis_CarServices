@@ -154,12 +154,38 @@ namespace GraduationThesis_CarServices.Services.Service
                         filteredGarages.Add(garage);
                     }
                 }
-                return mapper.Map<List<GarageListResponseDto>>(filteredGarages);
+                return mapper.Map<List<GarageListResponseDto>>
+                (filteredGarages, opt => opt.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < filteredGarages.Count; i++)
+                    {
+                        if (filteredGarages[i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = filteredGarages[i].Reviews.Sum(r => r.Rating) / filteredGarages[i].Reviews.Count;
+                        }
+                    }
+                }));
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page)
+        {
+            var list = await garageRepository.FilterCoupon(page);
+            return mapper.Map<List<GarageListResponseDto>>
+                (list, opt => opt.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < list?.Count; i++)
+                    {
+                        if (list[i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                        }
+                    }
+                }));
         }
     }
 }

@@ -24,8 +24,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         // public virtual Payment Payment { get; set; }
         public Nullable<int> CarId { get; set; }
         public virtual Car Car { get; set; }
-        public Nullable<int> CouponId { get; set; }
-        public virtual Coupon Coupon { get; set; }
         public Nullable<int> ScheduleId { get; set; }
         public virtual Schedule Schedule { get; set; }
         public Nullable<int> GarageId { get; set; }

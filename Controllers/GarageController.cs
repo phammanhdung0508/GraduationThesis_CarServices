@@ -15,12 +15,32 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageService = garageService;
         }
 
-        [HttpPost("get-nearby-garage-location")]
-        public async Task<ActionResult> GetNearbyGarageLocation(LocationRequestDto locationRequestDto)
+        [HttpPost("get-nearby-garages-location")]
+        public async Task<ActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
             try
             {
                 var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
+                return Ok(list);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPost("get-garages-with-coupon")]
+        public async Task<ActionResult> FilterGaragesWithCoupon(PageDto page)
+        {
+            try
+            {
+                var list = await garageService.FilterGaragesWithCoupon(page);
                 return Ok(list);
             }
             catch (Exception e)
@@ -145,7 +165,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-location")]
-        public async Task<ActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto )
+        public async Task<ActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {
             try
             {

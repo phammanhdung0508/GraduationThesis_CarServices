@@ -13,5 +13,6 @@ namespace GraduationThesis_CarServices.Services.IService
        Task<bool> UpdateStatus(GarageStatusRequestDto requestDto);
        Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto);
        Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
+       Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page);
     }
 }

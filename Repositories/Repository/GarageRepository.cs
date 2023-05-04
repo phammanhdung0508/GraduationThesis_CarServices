@@ -37,8 +37,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                GarageDto garage = mapper.Map<GarageDto>(await context.Garages
-                .Include(g => g.User).FirstOrDefaultAsync(g => g.GarageId == id));
+                GarageDto garage = mapper.Map<GarageDto>(await context.Garages.FirstOrDefaultAsync(g => g.GarageId == id));
                 return garage;
             }
             catch (Exception)

@@ -24,7 +24,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Product> list = await PagingConfiguration<Product>.Get(context.Products, page);
+                List<Product> list = await PagingConfiguration<Product>
+                .Get(context.Products
+                .Include(p => p.Subcategory)
+                .Include(p => p.Service), page);
                 return mapper.Map<List<ProductDto>>(list);
             }
             catch (Exception)
@@ -37,7 +40,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                ProductDto product = mapper.Map<ProductDto>(await context.Products.FirstOrDefaultAsync(c => c.ProductId == id));
+                ProductDto product = mapper.Map<ProductDto>(await context.Products
+                .Include(p => p.Subcategory)
+                .Include(p => p.Service).FirstOrDefaultAsync(c => c.ProductId == id));
                 return product;
             }
             catch (Exception)

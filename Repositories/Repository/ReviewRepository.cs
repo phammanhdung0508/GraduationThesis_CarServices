@@ -23,7 +23,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Review> list = await PagingConfiguration<Review>.Get(context.Reviews, page);
+                List<Review> list = await PagingConfiguration<Review>
+                .Get(context.Reviews
+                .Include(r => r.User)
+                .Include(r => r.Garage), page);
                 return mapper.Map<List<ReviewDto>>(list);
             }
             catch (Exception)
@@ -36,7 +39,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews.FirstOrDefaultAsync(r => r.ReviewId == id));
+                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews
+                .Include(r => r.User).Include(r => r.Garage)
+                .FirstOrDefaultAsync(r => r.ReviewId == id));
                 return review;
             }
             catch (Exception)

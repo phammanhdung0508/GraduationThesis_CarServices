@@ -172,9 +172,9 @@ namespace GraduationThesis_CarServices.Controllers
                 if (await garageService.UpdateLocation(locationUpdateRequestDto))
                 {
                     return Ok("Successfully!");
-                }
+    }
                 return BadRequest("Fail!");
-            }
+}
             catch (Exception e)
             {
                 var inner = e.InnerException;

@@ -8,6 +8,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
         public string ProductDetailDescription { get; set; }
         public float ProductPrice { get; set; }
         public int ProductQuantity { get; set; }
-        public int ProductSold { get; set; }
+        public int ProductStatus { get; set; }
     }
 }

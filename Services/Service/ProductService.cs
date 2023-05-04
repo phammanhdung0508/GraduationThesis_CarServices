@@ -9,11 +9,16 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository productRepository;
+        private readonly ISubcategoryRepository subcategoryRepository;
+        private readonly IServiceRepository serviceRepository;
+        
         private readonly IMapper mapper;
-        public ProductService(IProductRepository productRepository, IMapper mapper)
+        public ProductService(IMapper mapper, IProductRepository productRepository, ISubcategoryRepository subcategoryRepository, IServiceRepository serviceRepository)
         {
             this.mapper = mapper;
             this.productRepository = productRepository;
+            this.subcategoryRepository = subcategoryRepository;
+            this.serviceRepository = serviceRepository;
         }
 
         public async Task<List<ProductDto>?> View(PageDto page)
@@ -46,6 +51,9 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                await subcategoryRepository.Detail(createProductDto.SubcategoryId);
+                await serviceRepository.Detail(createProductDto.ServiceId);
+                
                 await productRepository.Create(createProductDto);
                 return true;
             }

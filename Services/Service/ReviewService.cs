@@ -10,9 +10,14 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IReviewRepository reviewRepository;
-        public ReviewService(IMapper mapper, IReviewRepository reviewRepository){
-            this.reviewRepository = reviewRepository;
+        private readonly IUserService userRepository;
+        private readonly IGarageService garageRepository;
+
+        public ReviewService(IMapper mapper, IReviewRepository reviewRepository, IUserService userRepository, IGarageService garageRepository){
             this.mapper = mapper;
+            this.reviewRepository = reviewRepository;
+            this.userRepository = userRepository;
+            this.garageRepository = garageRepository;
         }
 
         public async Task<List<ReviewDto>?> View(PageDto page)
@@ -33,7 +38,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                ReviewDto? review = mapper.Map<ReviewDto>(await reviewRepository.Detail(id));
+                ReviewDto? review = await reviewRepository.Detail(id);
                 return review;
             }
             catch (Exception)
@@ -46,6 +51,9 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                await userRepository.Detail(createReviewDto.UserId);
+                await garageRepository.Detail(createReviewDto.GarageId);
+                
                 await reviewRepository.Create(createReviewDto);
                 return true;
             }

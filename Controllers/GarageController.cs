@@ -100,28 +100,5 @@ namespace GraduationThesis_CarServices.Controllers
                 return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
-
-        [HttpPut("delete-garage")]
-        public async Task<ActionResult<bool>> DeleteGarage(DeleteGarageDto garageDto)
-        {
-            try
-            {
-                if (await garageService.Delete(garageDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
     }
 }

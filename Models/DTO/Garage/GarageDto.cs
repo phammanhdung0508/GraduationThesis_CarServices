@@ -1,6 +1,4 @@
 #nullable disable
-using GraduationThesis_CarServices.Models.DTO.User;
-
 namespace GraduationThesis_CarServices.Models.DTO.Garage
 {
     public class GarageDto
@@ -15,6 +13,5 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
         public string FromTo { get; set; }
         public string OpenAt { get; set; }
         public string CloseAt { get; set; }
-        public UserDto UserDto { get; set; }
     }
 }

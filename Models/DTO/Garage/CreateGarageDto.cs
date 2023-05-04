@@ -13,6 +13,5 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
         public string FromTo { get; set; }
         public string OpenAt { get; set; }
         public string CloseAt { get; set; }
-        public int UserId { get; set; }
     }
 }

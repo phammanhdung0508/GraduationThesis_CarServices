@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 await carRepository.Detail(createBookingDto.CarId);
                 await couponRepository.Detail(createBookingDto.CouponId);
-                await garageRepository.Detail(createBookingDto.GarageId);
+                await couponRepository.Detail(createBookingDto.GarageId);
                 
                 await bookingRepository.Create(createBookingDto);
                 return true;

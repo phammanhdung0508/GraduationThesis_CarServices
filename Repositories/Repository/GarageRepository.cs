@@ -24,8 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                List<Garage> list = await PagingConfiguration<Garage>
-                .Get(context.Garages.Include(g => g.User), page);
+                List<Garage> list = await PagingConfiguration<Garage>.Get(context.Garages, page);
                 return mapper.Map<List<GarageDto>>(list);
             }
             catch (Exception)

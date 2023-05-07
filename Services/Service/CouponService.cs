@@ -1,6 +1,7 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -16,11 +17,13 @@ namespace GraduationThesis_CarServices.Services.Service
             this.couponRepository = couponRepository;
         }
 
-        public async Task<List<CouponDto>?> View(PageDto page)
+        public async Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId)
         {
             try
             {
-                List<CouponDto>? list = await couponRepository.View(page);
+                var list = mapper
+                .Map<List<CouponListResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
+
                 return list;
             }
             catch (Exception)
@@ -29,12 +32,14 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<CouponDto?> Detail(int id)
+        public async Task<CouponDetailResponseDto?> Detail(int id)
         {
             try
             {
-                CouponDto? _coupon = mapper.Map<CouponDto>(await couponRepository.Detail(id));
-                return _coupon;
+                var coupon = mapper
+                .Map<CouponDetailResponseDto>(await couponRepository.Detail(id));
+
+                return coupon;
             }
             catch (Exception)
             {
@@ -42,11 +47,15 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateCouponDto createCouponDto)
+        public async Task<bool> Create(CouponCreateRequestDto requestDto)
         {
             try
             {
-                await couponRepository.Create(createCouponDto);
+                var coupon = mapper.Map<CouponCreateRequestDto, Coupon>(requestDto,
+                otp => otp.AfterMap((src, des) => {
+                    des.CreatedAt = DateTime.Now;
+                }));
+                await couponRepository.Create(coupon);
                 return true;
             }
             catch (Exception)
@@ -55,11 +64,16 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateCouponDto updateCouponDto)
+        public async Task<bool> Update(CouponUpdateRequestDto requestDto)
         {
             try
             {
-                await couponRepository.Update(updateCouponDto);
+                var c = await couponRepository.Detail(requestDto.CouponId);
+                var coupon = mapper.Map<CouponUpdateRequestDto, Coupon>(requestDto, c!,
+                otp => otp.AfterMap((src, des) => {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await couponRepository.Update(coupon);
                 return true;
             }
             catch (Exception)
@@ -68,11 +82,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Delete(DeleteCouponDto deleteCouponDto)
+        public async Task<bool> UpdateStatus(CouponStatusRequestDto requestDto)
         {
             try
             {
-                await couponRepository.Delete(deleteCouponDto);
+                var c = await couponRepository.Detail(requestDto.CouponId);
+                var coupon = mapper.Map<CouponStatusRequestDto, Coupon>(requestDto, c!);
+                await couponRepository.Update(coupon);
                 return true;
             }
             catch (Exception)

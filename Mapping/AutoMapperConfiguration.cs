@@ -36,11 +36,12 @@ namespace GraduationThesis_CarServices.Mapping
             //Coupon
             CreateMap<CouponGarageDto, Coupon>()
                 .ForMember(des => des.Garage, obj => obj.Ignore()).ReverseMap();
-            CreateMap<Coupon, CouponDto>().ReverseMap();
-            CreateMap<Coupon, CreateCouponDto>().ReverseMap();
-            CreateMap<Coupon, UpdateCouponDto>()
+            CreateMap<Coupon, CouponListResponseDto>().ReverseMap();
+            CreateMap<Coupon, CouponDetailResponseDto>().ReverseMap();
+            CreateMap<Coupon, CouponCreateRequestDto>().ReverseMap();
+            CreateMap<Coupon, CouponUpdateRequestDto>()
                 .ForMember(des => des.CouponId, obj => obj.Ignore()).ReverseMap();
-            CreateMap<Coupon, DeleteCouponDto>().ReverseMap();
+            CreateMap<Coupon, CouponStatusRequestDto>().ReverseMap();
 
 
             //Garage
@@ -62,9 +63,6 @@ namespace GraduationThesis_CarServices.Mapping
 
             //User
             CreateMap<User, UserGarageDto>().ForMember(des => des.FullName,
-                obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
-                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role)).ReverseMap();
-            CreateMap<User, UserCarDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role)).ReverseMap();
             CreateMap<User, UserListResponseDto>().ForMember(des => des.FullName,
@@ -115,8 +113,7 @@ namespace GraduationThesis_CarServices.Mapping
 
             //Car
             CreateMap<Car, CarListResponseDto>().ReverseMap();
-            CreateMap<Car, CarDetailResponseDto>()
-                .ForMember(des => des.UserCarDto, obj => obj.MapFrom(src => src.User)).ReverseMap();
+            CreateMap<Car, CarDetailResponseDto>().ReverseMap();
             CreateMap<Car, CarCreateRequestDto>().ReverseMap();
             CreateMap<Car, CarUpdateRequestDto>()
                 .ForMember(des => des.CarId, obj => obj.Ignore()).ReverseMap();

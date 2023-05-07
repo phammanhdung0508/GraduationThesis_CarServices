@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
-                var list = await context.Cars.Include(c => c.User)
+                var list = await context.Cars
                 .Where(c => c.UserId == userId).ToListAsync();
 
                 return list;
@@ -33,7 +33,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
-                var car = await context.Cars.Include(c => c.User)
+                var car = await context.Cars
                 .FirstOrDefaultAsync(c => c.CarId == id);
 
                 return car;

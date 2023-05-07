@@ -12,6 +12,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int CouponId { get; set; }
         [MaxLength(20)]
         public string CouponCode { get; set; }
+        // [MaxLength(300)]
+        // public string CouponDescription { get; set; }
         [MaxLength(20)]
         public CouponType CouponType { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]

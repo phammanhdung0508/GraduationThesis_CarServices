@@ -53,7 +53,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await PagingConfiguration<Garage>.Get(context.Garages
                 .Where(g => g.Coupons.Count > 0)
                 .Include(g => g.Reviews), page);
-                
+
                 return list;
             }
             catch (Exception)
@@ -68,8 +68,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var garage = await context.Garages
                 .Where(g => g.GarageId == id)
-                .Include(g => g.User).ThenInclude(u => u.Role)
                 .Include(g => g.Reviews)
+                .Include(g => g.Coupons)
+                .Include(g => g.User).ThenInclude(u => u.Role)
+                .Include(g => g.ServiceGarages).ThenInclude(s => s.Service)
                 .FirstOrDefaultAsync();
 
                 return garage;

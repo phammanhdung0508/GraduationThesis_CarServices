@@ -1,5 +1,6 @@
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -23,6 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await PagingConfiguration<Garage>
                 .Get(context.Garages.Include(g => g.User)
                 .ThenInclude(u => u.Role), page);
+
                 return list;
             }
             catch (Exception)
@@ -36,6 +38,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.Garages
+                .Include(g => g.Reviews).ToListAsync();
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Garage>?> Search(SearchDto search)
+        {
+            try
+            {
+                var list = await context.Garages
+                .Where(g => g.GarageDistrict.Contains(search.SearchString))
                 .Include(g => g.Reviews).ToListAsync();
 
                 return list;

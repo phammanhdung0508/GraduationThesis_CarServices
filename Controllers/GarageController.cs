@@ -1,5 +1,6 @@
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +62,26 @@ namespace GraduationThesis_CarServices.Controllers
             try
             {
                 var list = await garageService.View(page)!;
+                return Ok(list);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPost("search-garage")]
+        public async Task<ActionResult> SearchGarage(SearchDto search)
+        {
+            try
+            {
+                var list = await garageService.Search(search)!;
                 return Ok(list);
             }
             catch (Exception e)
@@ -172,9 +193,9 @@ namespace GraduationThesis_CarServices.Controllers
                 if (await garageService.UpdateLocation(locationUpdateRequestDto))
                 {
                     return Ok("Successfully!");
-    }
+                }
                 return BadRequest("Fail!");
-}
+            }
             catch (Exception e)
             {
                 var inner = e.InnerException;

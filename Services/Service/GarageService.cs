@@ -2,6 +2,7 @@ using AutoMapper;
 using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
@@ -27,6 +28,20 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var list = mapper
                 .Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GarageListResponseDto>?> Search(SearchDto search)
+        {
+            try
+            {
+                var list = mapper
+                .Map<List<GarageListResponseDto>>(await garageRepository.Search(search));
                 return list;
             }
             catch (Exception)

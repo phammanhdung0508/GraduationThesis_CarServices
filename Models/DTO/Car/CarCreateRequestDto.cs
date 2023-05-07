@@ -2,7 +2,7 @@
 
 namespace GraduationThesis_CarServices.Models.DTO.Car
 {
-    public class CarDto
+    public class CarCreateRequestDto
     {
         public string CarModel { get; set; }
         public string CarBrand { get; set; }
@@ -10,5 +10,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Car
         public int CarYear { get; set; }
         public string CarBodyType { get; set; }
         public string CarFuelType { get; set; }
+        
+        public int UserId { get; set; }
     }
 }

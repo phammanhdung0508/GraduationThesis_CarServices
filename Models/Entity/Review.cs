@@ -20,9 +20,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public bool IsApproved { get; set; }
 
         /*-------------------------------------------------*/
-        public int UserId { get; set; }
+        public Nullable<int> UserId { get; set; }
         public virtual User User { get; set; }
-        public int GarageId { get; set; }
+        public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
     }
 }

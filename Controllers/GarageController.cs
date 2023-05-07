@@ -162,7 +162,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-status")]
+        [HttpPut("update-garage-status")]
         public async Task<ActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
             try

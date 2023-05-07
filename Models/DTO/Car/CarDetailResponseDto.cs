@@ -1,8 +1,7 @@
 #nullable disable
-
 namespace GraduationThesis_CarServices.Models.DTO.Car
 {
-    public class UpdateCarDto
+    public class CarDetailResponseDto
     {
         public int CarId { get; set; }
         public string CarModel { get; set; }
@@ -11,5 +10,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Car
         public int CarYear { get; set; }
         public string CarBodyType { get; set; }
         public string CarFuelType { get; set; }
+
+        public UserCarDto UserCarDto {get; set;}
     }
 }

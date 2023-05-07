@@ -14,7 +14,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public DateTime BookingTime { get; set; }
         public BookingStatus BookingStatus { get; set; }
 
-        public CarDto CarDto {get; set;}
+
         public PaymentDto PaymentDto {get; set;}
         public CouponDto CouponDto {get; set;}
         public ScheduleDto ScheduleDto {get; set;}

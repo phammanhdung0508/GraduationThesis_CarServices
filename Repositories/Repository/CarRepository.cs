@@ -1,9 +1,6 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Car;
-using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
-using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,19 +9,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
     public class CarRepository : ICarRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public CarRepository(DataContext context, IMapper mapper)
+        public CarRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<List<CarDto>?> View(PageDto page)
+        public async Task<List<Car>?> FilterUserCar(int userId)
         {
             try
             {
-                List<Car> list = await PagingConfiguration<Car>.Get(context.Cars, page);
-                return mapper.Map<List<CarDto>>(list);
+                var list = await context.Cars.Include(c => c.User)
+                .Where(c => c.UserId == userId).ToListAsync();
+
+                return list;
             }
             catch (Exception)
             {
@@ -32,11 +29,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public async Task<CarDto?> Detail(int id)
+        public async Task<Car?> Detail(int id)
         {
             try
             {
-                CarDto car = mapper.Map<CarDto>(await context.Cars.FirstOrDefaultAsync(c => c.CarId == id));
+                var car = await context.Cars.Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.CarId == id);
+
                 return car;
             }
             catch (Exception)
@@ -45,11 +44,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public async Task Create(CreateCarDto carDto)
+        public async Task Create(Car car)
         {
             try
             {
-                Car car = mapper.Map<Car>(carDto);
                 context.Cars.Add(car);
                 await context.SaveChangesAsync();
             }
@@ -59,27 +57,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public async Task Update(UpdateCarDto carDto)
+        public async Task Update(Car car)
         {
             try
             {
-                var car = context.Cars.FirstOrDefault(c => c.CarId == carDto.CarId)!;
-                mapper.Map<UpdateCarDto, Car?>(carDto, car);
-                context.Cars.Update(car);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteCarDto carDto)
-        {
-            try
-            {
-                var car = context.Cars.FirstOrDefault(c => c.CarId == carDto.CarId)!;
-                mapper.Map<DeleteCarDto, Car?>(carDto, car);
                 context.Cars.Update(car);
                 await context.SaveChangesAsync();
             }

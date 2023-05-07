@@ -22,7 +22,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public int BookingId { get; set; }
+        public Nullable<int> BookingId { get; set; }
         public virtual Booking Booking { get; set; }
     }
 }

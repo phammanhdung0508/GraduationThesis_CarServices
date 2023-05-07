@@ -25,7 +25,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public int SubcategoryId { get; set; }
+        public Nullable<int> SubcategoryId { get; set; }
         public virtual Subcategory Subcategory { get; set; }
         public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }

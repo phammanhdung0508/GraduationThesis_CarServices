@@ -17,7 +17,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public int CategoryId { get; set; }
+        public Nullable<int> CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         /*-------------------------------------------------*/

@@ -40,9 +40,18 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var list = mapper
-                .Map<List<GarageListResponseDto>>(await garageRepository.Search(search));
-                return list;
+                var list = await garageRepository.Search(search);
+                return mapper.Map<List<GarageListResponseDto>>
+                (list, opt => opt.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < list?.Count; i++)
+                    {
+                        if (list[i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                        }
+                    }
+                }));
             }
             catch (Exception)
             {

@@ -17,7 +17,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ReviewStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
-        public bool IsApproved { get; set; }
 
         /*-------------------------------------------------*/
         public Nullable<int> UserId { get; set; }

@@ -13,8 +13,6 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IBookingRepository bookingRepository;
         private readonly IScheduleRepository scheduleRepository;
-        private readonly IServiceGarageRepository serviceGarageRepository;
-        private readonly ICarRepository carRepository;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository,
         IMapper mapper, ICarRepository carRepository, IScheduleRepository scheduleRepository,
@@ -22,16 +20,16 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             this.mapper = mapper;
             this.bookingRepository = bookingRepository;
-            this.carRepository = carRepository;
             this.scheduleRepository = scheduleRepository;
-            this.serviceGarageRepository = serviceGarageRepository;
         }
 
-        public async Task<List<BookingResponseDto>?> View(PageDto page)
+        public async Task<List<BookingListResponseDto>?> View(PageDto page)
         {
             try
             {
-                List<BookingResponseDto>? list = await bookingRepository.View(page);
+                var list = mapper
+                .Map<List<BookingListResponseDto>>(await bookingRepository.View(page));
+
                 return list;
             }
             catch (Exception)
@@ -40,12 +38,14 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<BookingResponseDto?> Detail(int id)
+        public async Task<BookingDetailResponseDto?> Detail(int id)
         {
             try
             {
-                BookingResponseDto? car = await bookingRepository.Detail(id);
-                return car;
+                var booking = mapper
+                .Map<BookingDetailResponseDto>(await bookingRepository.Detail(id));
+
+                return booking;
             }
             catch (Exception)
             {
@@ -53,20 +53,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> CheckBooking(CreateRequestBookingDto requestDto)
-        {
-            try
-            {
-                ServiceGarage? serviceGarage = await serviceGarageRepository.Detail(requestDto.GarageId);
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<bool> Create(CreateRequestBookingDto requestDto)
+        public async Task<bool> Create(BookingCreateRequestDto requestDto)
         {
             try
             {
@@ -80,7 +67,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 opt => opt.AfterMap((src, des) => des.BookingTime = bookingTime));
                 await scheduleRepository.Create(schedule);
 
-                Booking booking = mapper.Map<CreateRequestBookingDto, Booking>(requestDto,
+                Booking booking = mapper.Map<BookingCreateRequestDto, Booking>(requestDto,
                 opt => opt.AfterMap((src, des) =>
                 {
                     DateTime now = DateTime.Now;
@@ -105,24 +92,16 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateBookingDto updateBookingDto)
+        public async Task<bool> Update(BookingUpdateRequestDto requestDto)
         {
             try
             {
-                await bookingRepository.Update(updateBookingDto);
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<bool> Delete(DeleteBookingDto deleteBookingDto)
-        {
-            try
-            {
-                await bookingRepository.Delete(deleteBookingDto);
+                var b = await bookingRepository.Detail(requestDto.BookingId);
+                var booking = mapper.Map<BookingUpdateRequestDto, Booking>(requestDto, b!,
+                otp => otp.AfterMap((src, des) => {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await bookingRepository.Update(booking);
                 return true;
             }
             catch (Exception)

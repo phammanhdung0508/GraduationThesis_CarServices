@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
-    public class CreateRequestBookingDto
+    public class BookingCreateRequestDto
     {
         [DefaultValue("04/05/2023")]
         public string DateSelected { get; set; }

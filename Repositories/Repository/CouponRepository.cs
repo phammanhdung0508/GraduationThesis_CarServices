@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -9,11 +8,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class CouponRepository : ICouponRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public CouponRepository(DataContext context, IMapper mapper)
+        public CouponRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
 

@@ -17,7 +17,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("view-all-booking")]
-        public async Task<ActionResult<List<BookingResponseDto>>> ViewCategory(PageDto page)
+        public async Task<ActionResult> ViewCategory(PageDto page)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpGet("detail-booking/{id}")]
-        public async Task<ActionResult<BookingResponseDto>> DetailCategory(int id)
+        public async Task<ActionResult> DetailCategory(int id)
         {
             try
             {
@@ -57,11 +57,11 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("create-booking")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateRequestBookingDto BookingDto)
+        public async Task<ActionResult> CreateCategory(BookingCreateRequestDto bookingCreateRequestDto)
         {
             try
             {
-                if (await bookingService.Create(BookingDto))
+                if (await bookingService.Create(bookingCreateRequestDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -80,34 +80,11 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPut("update-booking")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateBookingDto BookingDto)
+        public async Task<ActionResult> UpdateCategory(BookingUpdateRequestDto bookingUpdateRequestDto)
         {
             try
             {
-                if (await bookingService.Update(BookingDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpPut("delete-booking")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteBookingDto BookingDto)
-        {
-            try
-            {
-                if (await bookingService.Delete(BookingDto))
+                if (await bookingService.Update(bookingUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }

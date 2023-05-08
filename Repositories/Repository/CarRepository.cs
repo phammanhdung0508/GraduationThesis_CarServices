@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;

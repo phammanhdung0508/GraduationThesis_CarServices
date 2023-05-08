@@ -11,21 +11,17 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int BookingId { get; set; }
         public DateTime BookingTime { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
-        public Nullable<DateTime> CanceledAt { get; set; }
+        public string PaymentMethod { get; set; }
+        [Column(TypeName = "tinyint")]
+        public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]
         public BookingStatus BookingStatus { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float TotalCost { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
+        public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        // public Nullable<int> PaymentId { get; set; }
-        // public virtual Payment Payment { get; set; }
         public Nullable<int> CarId { get; set; }
         public virtual Car Car { get; set; }
-        public Nullable<int> ScheduleId { get; set; }
-        public virtual Schedule Schedule { get; set; }
         public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
         public Nullable<int> ReportId { get; set; }

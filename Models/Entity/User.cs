@@ -14,16 +14,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserFirstName { get; set; }
         [MaxLength(20)]
         public string UserLastName { get; set; }
-        [MaxLength(12)]
-        public string UserPhone { get; set; }
-        [Column(TypeName = "tinyint")]
-        public Gender UserGender { get; set; }
-        [Column(TypeName = "date")]
-        public Nullable<DateTime> UserDateOfBirth { get; set; }
-        [MaxLength(1024)]
-        public string UserImage { get; set; }
-        [MaxLength(1024)]
-        public string UserBio { get; set; }
         [MaxLength(50)]
         public string UserEmail { get; set; }
         [MaxLength(1024)]
@@ -34,6 +24,16 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Required]
         [Column(TypeName = "varbinary(1024)")]
         public byte[] PasswordSalt { get; set; }
+        [MaxLength(1024)]
+        public string UserImage { get; set; }
+        [MaxLength(12)]
+        public string UserPhone { get; set; }
+        [Column(TypeName = "tinyint")]
+        public Gender UserGender { get; set; }
+        [Column(TypeName = "date")]
+        public Nullable<DateTime> UserDateOfBirth { get; set; }
+        [MaxLength(1024)]
+        public string UserBio { get; set; }
         [MaxLength(30)]
         public string UserAddress { get; set; }
         [MaxLength(20)]
@@ -42,8 +42,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserDistrict { get; set; }
         [MaxLength(40)]
         public string UserWard { get; set; }
-        public double Latitude {get; set;} = 0;
-        public double Longitude {get; set;} = 0;
+        public double Latitude { get; set; } = 0;
+        public double Longitude { get; set; } = 0;
         [Column(TypeName = "tinyint")]
         public UserStatus UserStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }

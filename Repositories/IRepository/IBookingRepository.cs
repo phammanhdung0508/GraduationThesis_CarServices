@@ -7,7 +7,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     {
         Task<List<Booking>?> View(PageDto page);
         Task<Booking?> Detail(int id);
-        Task Create(Booking booking);
+        Task<int> Create(Booking booking);
         Task Update(Booking booking);
     }
 }

@@ -13,12 +13,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             this.context = context;
         }
 
-        public async Task<List<Car>?> FilterUserCar(int userId)
+        public async Task<List<Car>?> FilterUserCar(int customerId)
         {
             try
             {
                 var list = await context.Cars
-                .Where(c => c.UserId == userId).ToListAsync();
+                .Where(c => c.CustomerId == customerId).ToListAsync();
 
                 return list;
             }

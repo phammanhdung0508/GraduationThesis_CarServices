@@ -22,9 +22,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await PagingConfiguration<Booking>
                 .Get(context.Bookings.Include(b => b.Car)
-                // .Include(b => b.Coupon).Include(b => b.Payment)
-                .Include(b => b.Report).Include(b => b.Garage)
-                .Include(b => b.Schedule), page);
+                .Include(b => b.Report).Include(b => b.Garage), page);
                 return list;
             }
             catch (Exception)
@@ -38,9 +36,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var booking = await context.Bookings.Include(b => b.Car)
-                // .Include(b => b.Coupon).Include(b => b.Payment)
-                .Include(b => b.Report).Include(b => b.Garage)
-                .Include(b => b.Schedule).FirstOrDefaultAsync(c => c.BookingId == id);
+                .Include(b => b.Report).Include(b => b.Garage).FirstOrDefaultAsync(c => c.BookingId == id);
                 return booking;
             }
             catch (Exception)
@@ -49,12 +45,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(Booking booking)
+        public async Task<int> Create(Booking booking)
         {
             try
             {
                 context.Bookings.Add(booking);
                 await context.SaveChangesAsync();
+
+                return context.Bookings
+                .OrderByDescending(b => b.BookingId)
+                .Select(b => b.BookingId).First();
             }
             catch (Exception)
             {

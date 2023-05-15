@@ -100,6 +100,37 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<Garage?> GetGarage(int id)
+        {
+            try
+            {
+                var garage = await context.Garages
+                .Where(g => g.GarageId == id).FirstOrDefaultAsync();
+
+                return garage;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public bool CheckVersionNumber(int garageId)
+        {
+            try
+            {
+                bool check = context.Garages
+                .Any(g => g.GarageId == garageId);
+
+                return check;
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task Create(Garage garage)
         {
             try

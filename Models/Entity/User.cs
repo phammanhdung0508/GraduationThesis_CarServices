@@ -34,30 +34,19 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UserDateOfBirth { get; set; }
         [MaxLength(1024)]
         public string UserBio { get; set; }
-        [MaxLength(30)]
-        public string UserAddress { get; set; }
-        [MaxLength(20)]
-        public string UserCity { get; set; }
-        [MaxLength(30)]
-        public string UserDistrict { get; set; }
-        [MaxLength(40)]
-        public string UserWard { get; set; }
-        public double Latitude { get; set; } = 0;
-        public double Longitude { get; set; } = 0;
         [Column(TypeName = "tinyint")]
-        public UserStatus UserStatus { get; set; }
+        public Status UserStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
         [MaxLength(1024)]
 
         /*-------------------------------------------------*/
-        public int RoleId { get; set; }
+        public virtual Customer Customer { get; set; }
+        public virtual Mechanic Mechanic { get; set; }
+        public Nullable<int> RoleId { get; set; }
         public virtual Role Role { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<Car> Cars { get; set; }
         public virtual ICollection<Garage> Garages { get; set; }
-        public virtual ICollection<Schedule> Schedules { get; set; }
-        public virtual ICollection<Review> Reviews { get; set; }
     }
 }

@@ -10,10 +10,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ServiceGaragesId { get; set; }
-        [Range(0, 100, ErrorMessage = "")]
-        public int LotNumber { get; set; }
-        [Column(TypeName = "tinyint")]
-        public LotStatus LotStatus { get; set; }
 
         /*-------------------------------------------------*/
         public Nullable<int> GarageId { get; set; }

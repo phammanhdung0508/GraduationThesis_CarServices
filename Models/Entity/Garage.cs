@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -31,12 +32,15 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string GarageDistrict { get; set; }
         [MaxLength(20)]
         public string GarageCity { get; set; }
-        public double Latitude {get; set;} = 0;
-        public double Longitude {get; set;} = 0;
+        public double GarageLatitude { get; set; } = 0;
+        public double GarageLongitude { get; set; } = 0;
         [Column(TypeName = "tinyint")]
-        public int GarageStatus { get; set; }
+        public Status GarageStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
+
+        [Timestamp]
+        public byte[] VersionNumber { get; set; }
 
         /*-------------------------------------------------*/
         public Nullable<int> UserId { get; set; }
@@ -46,6 +50,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<Coupon> Coupons { get; set; }
         public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }
+        public virtual ICollection<Lot> Lots { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<WorkingSchedule> WorkingSchedules { get; set; }
     }
 }

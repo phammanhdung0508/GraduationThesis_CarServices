@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IProductRepository productRepository;
         private readonly ISubcategoryRepository subcategoryRepository;
         private readonly IServiceRepository serviceRepository;
-        
+
         private readonly IMapper mapper;
         public ProductService(IMapper mapper, IProductRepository productRepository, ISubcategoryRepository subcategoryRepository, IServiceRepository serviceRepository)
         {
@@ -53,7 +53,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 await subcategoryRepository.Detail(createProductDto.SubcategoryId);
                 await serviceRepository.Detail(createProductDto.ServiceId);
-                
+
                 await productRepository.Create(createProductDto);
                 return true;
             }

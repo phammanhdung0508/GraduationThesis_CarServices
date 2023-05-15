@@ -76,5 +76,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
 
         //Temporary don't make delete function because there's no service status
+        public float GetPrice(int serviceId)
+        {
+            try
+            {
+                var price = context.Services
+                .Where(p => p.ServiceId.Equals(serviceId))
+                .Select(p => p.ServicePrice).FirstOrDefault();
+
+                return price;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

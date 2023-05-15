@@ -94,5 +94,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+
+        public float GetPrice(int productId)
+        {
+            try
+            {
+                var price = context.Products
+                .Where(p => p.ProductId.Equals(productId))
+                .Select(p => p.ProductPrice).FirstOrDefault();
+
+                return price;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

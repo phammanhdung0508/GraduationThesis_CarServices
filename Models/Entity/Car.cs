@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -9,6 +10,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int CarId { get; set; }
+        [MaxLength(20)]
+        public string CarColor { get; set; }
         [MaxLength(20)]
         public string CarModel { get; set; }
         [MaxLength(20)]
@@ -22,13 +25,13 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(20)]
         public string CarFuelType { get; set; }
         [Column(TypeName = "tinyint")]
-        public int CarStatus {get; set;}
+        public Status CarStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> UserId { get; set; }
-        public virtual User User { get; set; }
+        public Nullable<int> CustomerId { get; set; }
+        public virtual Customer Customer { get; set; }
 
         /*-------------------------------------------------*/
         public virtual ICollection<Booking> Bookings { get; set; }

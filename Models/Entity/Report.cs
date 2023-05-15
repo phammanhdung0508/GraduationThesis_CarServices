@@ -17,12 +17,11 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(1200)]
         public string Description { get; set; }
         [Column(TypeName = "tinyint")]
-        public ReportStatus ReportStatus { get; set; }
+        public Status ReportStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> BookingId { get; set; }
         public virtual Booking Booking { get; set; }
     }
 }

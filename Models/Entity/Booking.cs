@@ -16,6 +16,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]
         public BookingStatus BookingStatus { get; set; }
+        public float TotalPrice { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 
@@ -24,7 +25,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public virtual Car Car { get; set; }
         public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
-        public Nullable<int> ReportId { get; set; }
+
         public virtual Report Report { get; set; }
 
         /*-------------------------------------------------*/

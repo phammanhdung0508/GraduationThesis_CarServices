@@ -10,5 +10,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task Create(CreateProductDto ProductDto);
         Task Update(UpdateProductDto ProductDto);
         Task Delete(DeleteProductDto ProductDto);
+        float GetPrice(int productId);
     }
 }

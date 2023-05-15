@@ -1,4 +1,5 @@
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Car;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -16,12 +17,12 @@ namespace GraduationThesis_CarServices.Services.Service
             this.carRepository = carRepository;
         }
 
-        public async Task<List<CarListResponseDto>?> FilterUserCar(int userId)
+        public async Task<List<CarListResponseDto>?> FilterUserCar(int customerId)
         {
             try
             {
                 var list = mapper
-                .Map<List<CarListResponseDto>>(await carRepository.FilterUserCar(userId));
+                .Map<List<CarListResponseDto>>(await carRepository.FilterUserCar(customerId));
 
                 return list;
             }
@@ -53,7 +54,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
-                    des.CarStatus = 1;
+                    des.CarStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
                 await carRepository.Create(car);

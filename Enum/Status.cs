@@ -1,10 +1,8 @@
 namespace GraduationThesis_CarServices.Enum
 {
-    public enum UserStatus
+    public enum Status
     {
         Deactivate,
-        Activate,
-        Wait,
-        Working
+        Activate
     }
 }

@@ -8,6 +8,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Report
         public DateTime Date { get; set; }
         public string Notes { get; set; }
         public string Description { get; set; }
-        public ReportStatus ReportStatus { get; set; }
+        public Status ReportStatus { get; set; }
     }
 }

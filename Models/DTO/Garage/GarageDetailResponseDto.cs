@@ -17,8 +17,12 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
         public string OpenAt { get; set; }
         public string CloseAt { get; set; }
         public int GarageStatus { get; set; }
-        
+
+        public byte[] VersionNumber { get; set; }
+
         public UserGarageDto UserGarageDto { get; set; }
-        public ICollection<ReviewGarageDto> ReviewGarageDto {get; set;}
+        public ICollection<ReviewGarageDto> ReviewGarageDtos { get; set; }
+        public ICollection<CouponGarageDto> CouponGarageDtos { get; set; }
+        public ICollection<ServiceGarageGarageDto> ServiceGarageGarageDtos { get; set; }
     }
 }

@@ -5,6 +5,6 @@ namespace GraduationThesis_CarServices.Models.DTO.User
     public class UserStatusRequestDto
     {
         public int UserId { get; set; }
-        public UserStatus UserStatus { get; set; }
+        public Status UserStatus { get; set; }
     }
 }

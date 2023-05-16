@@ -4,22 +4,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
-    public class Schedule
+    public class Mechanic
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int ScheduleId { get; set; }
-        public DateTime BookingTime { get; set; }
-        [MaxLength(100)]
-        public string WorkDescription { get; set; }
-        [Column(TypeName = "tinyint")]
-        public int ScheduleStatus { get; set; }
+        public int MechanicId { get; set; }
+        public int TotalWorkingHours { get; set; }
+        public string Specialities { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> UserId { get; set; }
         public virtual User User { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<Booking> Bookings { get; set; }
+        public virtual ICollection<WorkingSchedule> WorkingSchedules { get; set; }
     }
 }

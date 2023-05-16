@@ -3,7 +3,7 @@ using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.DTO.Coupon
 {
-    public class CouponDto
+    public class CouponDetailResponseDto
     {
         public string CouponCode { get; set; }
         public CouponType CouponType { get; set; }
@@ -13,5 +13,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Coupon
         public float CouponMinSpend { get; set; }
         public float CouponMaxSpend { get; set; }
         public int NumberOfTimesToTUse { get; set; }
+        public CouponStatus CouponStatus { get; set; }
     }
 }

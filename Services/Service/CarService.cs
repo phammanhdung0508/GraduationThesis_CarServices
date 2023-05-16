@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Car;
-using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -20,11 +17,13 @@ namespace GraduationThesis_CarServices.Services.Service
             this.carRepository = carRepository;
         }
 
-        public async Task<List<CarDto>?> View(PageDto page)
+        public async Task<List<CarListResponseDto>?> FilterUserCar(int customerId)
         {
             try
             {
-                List<CarDto>? list = await carRepository.View(page);
+                var list = mapper
+                .Map<List<CarListResponseDto>>(await carRepository.FilterUserCar(customerId));
+
                 return list;
             }
             catch (Exception)
@@ -33,11 +32,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<CarDto?> Detail(int id)
+        public async Task<CarDetailResponseDto?> Detail(int id)
         {
             try
             {
-                CarDto? car = mapper.Map<CarDto>(await carRepository.Detail(id));
+                var car = mapper
+                .Map<CarDetailResponseDto>(await carRepository.Detail(id));
+
                 return car;
             }
             catch (Exception)
@@ -46,11 +47,17 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateCarDto createCarDto)
+        public async Task<bool> Create(CarCreateRequestDto requestDto)
         {
             try
             {
-                await carRepository.Create(createCarDto);
+                var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.CarStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                }));
+                await carRepository.Create(car);
                 return true;
             }
             catch (Exception)
@@ -59,11 +66,17 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateCarDto updateCarDto)
+        public async Task<bool> Update(CarUpdateRequestDto requestDto)
         {
             try
             {
-                await carRepository.Update(updateCarDto);
+                var c = await carRepository.Detail(requestDto.CarId);
+                var car = mapper.Map<CarUpdateRequestDto, Car>(requestDto, c!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await carRepository.Update(car);
                 return true;
             }
             catch (Exception)
@@ -72,11 +85,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Delete(DeleteCarDto deleteCarDto)
+        public async Task<bool> UpdateStatus(CarStatusRequestDto requestDto)
         {
             try
             {
-                await carRepository.Delete(deleteCarDto);
+                var c = await carRepository.Detail(requestDto.CarId);
+                var car = mapper.Map<CarStatusRequestDto, Car>(requestDto, c!);
+                await carRepository.Update(car);
                 return true;
             }
             catch (Exception)

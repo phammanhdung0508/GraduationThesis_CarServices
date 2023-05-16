@@ -1,6 +1,5 @@
 using GraduationThesis_CarServices.Models.DTO.Coupon;
 using Microsoft.AspNetCore.Mvc;
-using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
 
 namespace GraduationThesis_CarServices.Controllers
@@ -17,12 +16,12 @@ namespace GraduationThesis_CarServices.Controllers
             this.couponService = couponService;
         }
 
-        [HttpPost("view-all-coupon")]
-        public async Task<ActionResult<List<CouponDto>>> ViewCoupon(PageDto page)
+        [HttpGet("get-garage-coupon/{garageId}")]
+        public async Task<ActionResult> GetGarageCoupon(int garageId)
         {
             try
             {
-                var list = await couponService.View(page)!;
+                var list = await couponService.FilterGarageCoupon(garageId)!;
                 return Ok(list);
             }
             catch (Exception e)
@@ -38,7 +37,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-coupon/{id}")]
-        public async Task<ActionResult<CouponDto>> DetailCoupon(int id)
+        public async Task<ActionResult> DetailCoupon(int id)
         {
             try
             {
@@ -58,11 +57,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-coupon")]
-        public async Task<ActionResult<bool>> CreateCoupon(CreateCouponDto couponDto)
+        public async Task<ActionResult> CreateCoupon(CouponCreateRequestDto couponCreateRequestDto)
         {
             try
             {
-                if (await couponService.Create(couponDto))
+                if (await couponService.Create(couponCreateRequestDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -81,11 +80,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-coupon")]
-        public async Task<ActionResult<bool>> UpdateCoupon(UpdateCouponDto couponDto)
+        public async Task<ActionResult> UpdateCoupon(CouponUpdateRequestDto couponUpdateRequestDto)
         {
             try
             {
-                if (await couponService.Update(couponDto))
+                if (await couponService.Update(couponUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -103,12 +102,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-coupon")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteCouponDto couponDto)
+        [HttpPut("update-coupon-status")]
+        public async Task<ActionResult<bool>> UpdateStatus(CouponStatusRequestDto couponStatusRequestDto)
         {
             try
             {
-                if (await couponService.Delete(couponDto))
+                if (await couponService.UpdateStatus(couponStatusRequestDto))
                 {
                     return Ok("Successfully!");
                 }

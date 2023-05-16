@@ -5,10 +5,9 @@ namespace GraduationThesis_CarServices.Services.IService
 {
     public interface IBookingService
     {
-        Task<List<BookingResponseDto>?> View(PageDto page);
-        Task<BookingResponseDto?> Detail(int id);
-        Task<bool> Create(CreateRequestBookingDto createBookingDto);
-        Task<bool> Update(UpdateBookingDto updateBookingDto);
-        Task<bool> Delete(DeleteBookingDto deleteBookingDto);
+        Task<List<BookingListResponseDto>?> View(PageDto page);
+        Task<BookingDetailResponseDto?> Detail(int id);
+        Task<bool> Create(BookingCreateRequestDto requestDto);
+        Task<bool> Update(BookingUpdateRequestDto requestDto);
     }
 }

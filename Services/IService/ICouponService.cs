@@ -1,12 +1,13 @@
 using GraduationThesis_CarServices.Models.DTO.Coupon;
-using GraduationThesis_CarServices.Models.DTO.Page;
 
-namespace GraduationThesis_CarServices.Services.IService{
-    public interface ICouponService{
-        Task<List<CouponDto>?> View(PageDto page);
-        Task<CouponDto?> Detail(int id);
-        Task<bool> Create(CreateCouponDto _coupon);
-        Task<bool> Update(UpdateCouponDto _coupon);
-        Task<bool> Delete(DeleteCouponDto _coupon);
+namespace GraduationThesis_CarServices.Services.IService
+{
+    public interface ICouponService
+    {
+        Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId);
+        Task<CouponDetailResponseDto?> Detail(int id);
+        Task<bool> Create(CouponCreateRequestDto requestDto);
+        Task<bool> Update(CouponUpdateRequestDto requestDto);
+        Task<bool> UpdateStatus(CouponStatusRequestDto requestDto);
     }
 }

@@ -16,13 +16,13 @@ namespace GraduationThesis_CarServices.Controllers
             this.carService = carService;
         }
 
-        [HttpPost("view-all-car")]
-        public async Task<ActionResult<List<CarDto>>> ViewCategory(PageDto page)
+        [HttpGet("get-user-car/{userId}")]
+        public async Task<ActionResult> GetUserCar(int userId)
         {
             try
             {
-                var list = await carService.View(page)!;
-                return Ok(list);
+                var car = await carService.FilterUserCar(userId);
+                return Ok(car);
             }
             catch (Exception e)
             {
@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-car/{id}")]
-        public async Task<ActionResult<CarDto>> DetailCategory(int id)
+        public async Task<ActionResult> DetailCar(int id)
         {
             try
             {
@@ -57,11 +57,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-car")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateCarDto carDto)
+        public async Task<ActionResult<bool>> CreateCar(CarCreateRequestDto carCreateRequestDto)
         {
             try
             {
-                if (await carService.Create(carDto))
+                if (await carService.Create(carCreateRequestDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -80,11 +80,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-car")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateCarDto carDto)
+        public async Task<ActionResult<bool>> UpdateCar(CarUpdateRequestDto carUpdateRequestDto)
         {
             try
             {
-                if (await carService.Update(carDto))
+                if (await carService.Update(carUpdateRequestDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -102,12 +102,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-car")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteCarDto carDto)
+        [HttpPut("update-car-status")]
+        public async Task<ActionResult<bool>> UpdateStatus(CarStatusRequestDto carStatusRequestDto)
         {
             try
             {
-                if (await carService.Delete(carDto))
+                if (await carService.UpdateStatus(carStatusRequestDto))
                 {
                     return Ok("Successfully!");
                 }

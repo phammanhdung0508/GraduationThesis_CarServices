@@ -146,28 +146,5 @@ namespace GraduationThesis_CarServices.Controllers
                 return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
-
-        [HttpPut("update-location")]
-        public async Task<ActionResult> UpdateLocation(UserLocationRequestDto userLocationRequestDto)
-        {
-            try
-            {
-                if (await userService.UpdateLocation(userLocationRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
     }
 }

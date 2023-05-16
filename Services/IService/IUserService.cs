@@ -11,6 +11,5 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<bool> Update(UserUpdateRequestDto updateUserDto);
         Task<bool> UpdateRole(UserRoleRequestDto requestDto);
         Task<bool> UpdateStatus(UserStatusRequestDto requestDto);
-        Task<bool> UpdateLocation(UserLocationRequestDto requestDto);
     }
 }

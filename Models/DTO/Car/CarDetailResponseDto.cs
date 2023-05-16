@@ -1,9 +1,9 @@
 #nullable disable
-
 namespace GraduationThesis_CarServices.Models.DTO.Car
 {
-    public class CreateCarDto
+    public class CarDetailResponseDto
     {
+        public int CarId { get; set; }
         public string CarModel { get; set; }
         public string CarBrand { get; set; }
         public string CarLicensePlate { get; set; }

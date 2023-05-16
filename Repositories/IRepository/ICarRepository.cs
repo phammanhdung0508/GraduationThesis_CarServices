@@ -1,14 +1,12 @@
-using GraduationThesis_CarServices.Models.DTO.Car;
-using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface ICarRepository
     {
-        Task<List<CarDto>?> View(PageDto page);
-        Task<CarDto?> Detail(int id);
-        Task Create(CreateCarDto carDto);
-        Task Update(UpdateCarDto carDto);
-        Task Delete(DeleteCarDto carDto);
+        Task<List<Car>?> FilterUserCar(int customerId);
+        Task<Car?> Detail(int id);
+        Task Create(Car car);
+        Task Update(Car car);
     }
 }

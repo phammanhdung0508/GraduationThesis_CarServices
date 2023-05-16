@@ -12,19 +12,21 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int CouponId { get; set; }
         [MaxLength(20)]
         public string CouponCode { get; set; }
+        [MaxLength(2400)]
+        public string CouponDescription { get; set; }
         [MaxLength(20)]
         public CouponType CouponType { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
+        [Range(0, float.MaxValue)]
         public float CouponValue { get; set; }
         [Column(TypeName = "date")]
         public DateTime CouponStartDate { get; set; }
         [Column(TypeName = "date")]
         public DateTime CouponEndDate { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
+        [Range(0, float.MaxValue)]
         public float CouponMinSpend { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
+        [Range(0, float.MaxValue)]
         public float CouponMaxSpend { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "")]
+        [Range(0, int.MaxValue)]
         public int NumberOfTimesToUse { get; set; }
         [Column(TypeName = "tinyint")]
         public CouponStatus CouponStatus { get; set; }

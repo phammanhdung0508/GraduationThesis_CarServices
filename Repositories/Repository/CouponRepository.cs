@@ -1,9 +1,5 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Coupon;
-using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
-using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,20 +8,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class CouponRepository : ICouponRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public CouponRepository(DataContext context, IMapper mapper)
+        public CouponRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
 
-        public async Task<List<CouponDto>?> View(PageDto page)
+        public async Task<List<Coupon>?> FilterGarageCoupon(int garageId)
         {
             try
             {
-                List<Coupon> list = await PagingConfiguration<Coupon>.Get(context.Coupons, page);
-                return mapper.Map<List<CouponDto>>(list);
+                var list = await context.Coupons
+                .Where(c => c.GarageId == garageId).ToListAsync();
+                return list;
             }
             catch (Exception)
             {
@@ -33,11 +28,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<CouponDto?> Detail(int id)
+        public async Task<Coupon?> Detail(int id)
         {
             try
             {
-                CouponDto coupon = mapper.Map<CouponDto>(await context.Coupons.FirstOrDefaultAsync(c => c.CouponId == id));
+                var coupon = await context.Coupons
+                .FirstOrDefaultAsync(c => c.CouponId == id);
+
                 return coupon;
             }
             catch (Exception)
@@ -46,11 +43,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateCouponDto couponDto)
+        public async Task Create(Coupon coupon)
         {
             try
             {
-                Coupon coupon = mapper.Map<Coupon>(couponDto);
                 context.Coupons.Add(coupon);
                 await context.SaveChangesAsync();
             }
@@ -60,27 +56,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateCouponDto couponDto)
+        public async Task Update(Coupon coupon)
         {
             try
             {
-                var coupon = context.Coupons.FirstOrDefault(c => c.CouponId == couponDto.CouponId)!;
-                mapper.Map<UpdateCouponDto, Coupon?>(couponDto, coupon);
-                context.Coupons.Update(coupon);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteCouponDto couponDto)
-        {
-            try
-            {
-                var coupon = context.Coupons.FirstOrDefault(c => c.CouponId == couponDto.CouponId)!;
-                mapper.Map<DeleteCouponDto, Coupon?>(couponDto, coupon);
                 context.Coupons.Update(coupon);
                 await context.SaveChangesAsync();
             }

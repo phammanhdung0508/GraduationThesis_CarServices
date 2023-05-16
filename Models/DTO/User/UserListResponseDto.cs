@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public Nullable<DateTime> UserDateOfBirth { get; set; }
         public string UserImage { get; set; }
         public string UserBio { get; set; }
-        public UserStatus UserStatus { get; set; }
+        public Status UserStatus { get; set; }
         public RoleDto RoleDto { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

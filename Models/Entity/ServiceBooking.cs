@@ -8,10 +8,10 @@ namespace GraduationThesis_CarServices.Models.Entity
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int ServiceBookingsId { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
+        public int ServiceBookingId { get; set; }
+        [Range(0, float.MaxValue)]
         public float ProductCost { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
+        [Range(0, float.MaxValue)]
         public float ServiceCost { get; set; }
 
         /*-------------------------------------------------*/
@@ -19,5 +19,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public virtual Booking Booking { get; set; }
         public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }
+        public Nullable<int> ProductId { get; set; }
+        public virtual Product Product { get; set; }
+        public Nullable<int> MechanicId { get; set; }
+        public virtual Mechanic Mechanic { get; set; }
     }
 }

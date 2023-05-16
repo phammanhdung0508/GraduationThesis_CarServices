@@ -1,6 +1,6 @@
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Models.DTO.Search;
 
 namespace GraduationThesis_CarServices.Services.IService
 {
@@ -14,5 +14,6 @@ namespace GraduationThesis_CarServices.Services.IService
        Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto);
        Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
        Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page);
+       Task<List<GarageListResponseDto>?> Search(SearchDto search);
     }
 }

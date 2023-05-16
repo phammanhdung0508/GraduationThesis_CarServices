@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IUserRepository userRepository;
         private readonly EncryptConfiguration encryptConfiguration;
         private readonly GeocoderConfiguration geocoderConfiguration;
-        public UserService(IMapper mapper, IUserRepository userRepository, 
+        public UserService(IMapper mapper, IUserRepository userRepository,
         EncryptConfiguration encryptConfiguration, GeocoderConfiguration geocoderConfiguration)
         {
             this.userRepository = userRepository;
@@ -30,7 +30,9 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                List<UserListResponseDto>? list = mapper.Map<List<UserListResponseDto>>(await userRepository.View(page));
+                var list = mapper
+                .Map<List<UserListResponseDto>>(await userRepository.View(page));
+
                 return list;
             }
             catch (Exception)
@@ -43,7 +45,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                UserDetailResponseDto? user = mapper.Map<UserDetailResponseDto>(await userRepository.Detail(id));
+                var user = mapper.Map<UserDetailResponseDto>(await userRepository.Detail(id));
                 return user;
             }
             catch (Exception)
@@ -65,7 +67,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         des.PasswordHash = password_hash;
                         des.PasswordSalt = password_salt;
                         des.UserGender = Gender.Male;
-                        des.UserStatus = UserStatus.Activate;
+                        des.UserStatus = Status.Activate;
                         des.CreatedAt = DateTime.Now;
                         des.RoleId = 2;
                     }));
@@ -120,29 +122,6 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var u = await userRepository.Detail(requestDto.UserId);
                 var user = mapper.Map<UserStatusRequestDto, User>(requestDto, u!);
-                await userRepository.Update(user);
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<bool> UpdateLocation(UserLocationRequestDto requestDto)
-        {
-            try
-            {
-                (double Latitude, double Longitude) = await geocoderConfiguration
-                .GeocodeAsync(requestDto.UserAddress, requestDto.UserCity, requestDto.UserDistrict, requestDto.UserWard);
-                var u = await userRepository.Detail(requestDto.UserId);
-                var user = mapper.Map<UserLocationRequestDto, User>(requestDto, u!,
-                otp => otp.AfterMap((src, des) =>
-                {
-                    des.UpdatedAt = DateTime.Now;
-                    des.Latitude = Latitude;
-                    des.Longitude = Longitude;
-                }));
                 await userRepository.Update(user);
                 return true;
             }

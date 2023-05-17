@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -36,7 +35,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var booking = await context.Bookings.Include(b => b.Car)
-                .Include(b => b.Report).Include(b => b.Garage).FirstOrDefaultAsync(c => c.BookingId == id);
+                .Include(b => b.Report).Include(b => b.Garage)
+                .FirstOrDefaultAsync(c => c.BookingId == id);
                 return booking;
             }
             catch (Exception)

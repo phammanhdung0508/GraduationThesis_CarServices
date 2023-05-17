@@ -17,6 +17,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Column(TypeName = "tinyint")]
         public BookingStatus BookingStatus { get; set; }
         public float TotalPrice { get; set; }
+        public int TotalEstimatedCompletionTime  { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
 

@@ -19,7 +19,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Range(0, float.MaxValue, ErrorMessage = "")]
         public float ServicePrice { get; set; }
         [MaxLength(20)]
-        public string ServiceDuration { get; set; }
+        public int ServiceDuration { get; set; }
         [Column(TypeName = "tinyint")]
         public Status ServiceStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }

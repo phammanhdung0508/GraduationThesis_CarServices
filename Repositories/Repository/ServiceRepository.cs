@@ -76,15 +76,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
 
         //Temporary don't make delete function because there's no service status
-        public float GetPrice(int serviceId)
+        public (float price, int duration) GetPriceAndDuration(int serviceId)
         {
             try
             {
-                var price = context.Services
+                var service = context.Services
                 .Where(p => p.ServiceId.Equals(serviceId))
-                .Select(p => p.ServicePrice).FirstOrDefault();
+                .Select(p => new {
+                    p.ServicePrice,
+                    p.ServiceDuration
+                })
+                .FirstOrDefault();
 
-                return price;
+                return (service!.ServicePrice, service.ServiceDuration);
             }
             catch (Exception)
             {

@@ -145,40 +145,40 @@ namespace GraduationThesis_CarServices.Models
                 //Bảo dưỡng định kỳ
                 new Service{ServiceId=1, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=5, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=2, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=3, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
                 ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Sửa chữa khẩn cấp
                 new Service{ServiceId=4, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=5, ServiceName="Sửa chữa động cơ", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=5, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=6, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=6, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=7, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=7, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Nâng cấp xe
                 new Service{ServiceId=8, ServiceName="Thay đổi và nâng cấp hệ thống xe", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=10, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=9, ServiceName="Sơn lại xe, cải tạo nội thất, ngoại thất", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=12, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Khác
                 new Service{ServiceId=10, ServiceName="Rửa xe", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=11, ServiceStatus=Status.Activate, CreatedAt=now},
             };
             modelBuilder.Entity<Service>().HasData(list);
         }
@@ -323,8 +323,8 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
                     .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
                     .RuleFor(g => g.FromTo, "Monday to Saturday")
-                    .RuleFor(g => g.OpenAt, "8AM")
-                    .RuleFor(g => g.CloseAt, "5PM")
+                    .RuleFor(g => g.OpenAt, "08:00 AM")
+                    .RuleFor(g => g.CloseAt, "05:00 PM")
                     .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
                     .RuleFor(g => g.GarageCity, "Ho Chi Minh")
                     .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))

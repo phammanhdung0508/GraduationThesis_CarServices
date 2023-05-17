@@ -20,9 +20,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string GarageContactInformation { get; set; }
         [MaxLength(20)]
         public string FromTo { get; set; }
-        [MaxLength(6)]
+        [MaxLength(10)]
         public string OpenAt { get; set; }
-        [MaxLength(6)]
+        [MaxLength(10)]
         public string CloseAt { get; set; }
         [MaxLength(50)]
         public string GarageAddress { get; set; }

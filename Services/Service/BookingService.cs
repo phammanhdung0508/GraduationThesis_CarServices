@@ -51,7 +51,12 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var booking = mapper
-                .Map<BookingDetailResponseDto>(await bookingRepository.Detail(id));
+                .Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
+                otp => otp.AfterMap((src, des) =>{
+                    des.BookingStatus = src!.BookingStatus.ToString();
+                    des.PaymentStatus = src.PaymentStatus.ToString();
+                    des.BookingStatus = src.BookingStatus.ToString();
+                }));
 
                 return booking;
             }
@@ -78,11 +83,11 @@ namespace GraduationThesis_CarServices.Services.Service
                             if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
                             {
                                 await garageRepository.Update(garage);
-                                await Run(requestDto, lot!);
+                                await Run(requestDto);
                             }
                             break;
                         case false:
-                            await Run(requestDto, lot!);
+                            await Run(requestDto);
                             break;
                         default:
                     }
@@ -95,7 +100,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private async Task Run(BookingCreateRequestDto requestDto, Lot lot)
+        private async Task Run(BookingCreateRequestDto requestDto)
         {
             try
             {
@@ -122,6 +127,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 // await lotRepository.Update(lot);
 
                 float totalPrice = 0;
+                int totalEstimated = 0;
 
                 var listService = mapper.Map<List<ServiceListDto>, List<ServiceBooking>>(requestDto.ServiceList,
                 otp => otp.AfterMap((src, des) =>
@@ -129,14 +135,16 @@ namespace GraduationThesis_CarServices.Services.Service
                     for (int i = 0; i < requestDto.ServiceList.Count; i++)
                     {
                         float productCost = 0, serviceCost = 0;
+                        int serviceDuration = 0;
                         if (requestDto.ServiceList[i].ProductId > 0)
                         {
                             productCost = productRepository.GetPrice(src[i].ProductId);
                         }
                         if (requestDto.ServiceList[i].ServiceId > 0)
                         {
-                            serviceCost = serviceRepository.GetPrice(src[i].ServiceId);
+                            (serviceCost, serviceDuration) = serviceRepository.GetPriceAndDuration(src[i].ServiceId);
                         }
+                        totalEstimated += serviceDuration;
                         totalPrice += productCost + serviceCost;
                         des[i].BookingId = bookingId;
                         des[i].ProductCost = productCost;
@@ -145,6 +153,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 }));
                 await serviceBookingRepository.Create(listService);
 
+                booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.TotalPrice = totalPrice;
                 await bookingRepository.Update(booking);
             }

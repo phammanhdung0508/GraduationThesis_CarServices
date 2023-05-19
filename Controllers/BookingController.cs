@@ -17,7 +17,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("view-all-booking")]
-        public async Task<ActionResult> ViewCategory(PageDto page)
+        public async Task<ActionResult> ViewAllBooking(PageDto page)
         {
             try
             {
@@ -36,8 +36,27 @@ namespace GraduationThesis_bookingServices.Controllers
             }
         }
 
+        [HttpPost("check-booking")]
+        public async Task<ActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto){
+            try
+            {
+                var list = await bookingService.IsBookingAvailable(bookingCheckRequestDto);
+                return Ok(list);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
         [HttpGet("detail-booking/{id}")]
-        public async Task<ActionResult> DetailCategory(int id)
+        public async Task<ActionResult> DetailBooking(int id)
         {
             try
             {
@@ -57,7 +76,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("create-booking")]
-        public async Task<ActionResult> CreateCategory(BookingCreateRequestDto bookingCreateRequestDto)
+        public async Task<ActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
             try
             {
@@ -80,7 +99,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPut("update-booking")]
-        public async Task<ActionResult> UpdateCategory(BookingUpdateRequestDto bookingUpdateRequestDto)
+        public async Task<ActionResult> UpdateBooking(BookingUpdateRequestDto bookingUpdateRequestDto)
         {
             try
             {

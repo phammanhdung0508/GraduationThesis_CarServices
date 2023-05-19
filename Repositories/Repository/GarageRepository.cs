@@ -106,7 +106,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var garage = await context.Garages
-                .Where(g => g.GarageId == id).FirstOrDefaultAsync();
+                .Where(g => g.GarageId == id)
+                .Include(g => g.Lots).FirstOrDefaultAsync();
 
                 return garage;
             }

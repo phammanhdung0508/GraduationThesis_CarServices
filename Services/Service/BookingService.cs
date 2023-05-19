@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
@@ -52,7 +53,8 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var booking = mapper
                 .Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
-                otp => otp.AfterMap((src, des) =>{
+                otp => otp.AfterMap((src, des) =>
+                {
                     des.BookingStatus = src!.BookingStatus.ToString();
                     des.PaymentStatus = src.PaymentStatus.ToString();
                     des.BookingStatus = src.BookingStatus.ToString();
@@ -66,12 +68,116 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto)
+        {
+            try
+            {
+                var garage = await garageRepository.GetGarage(requestDto.GarageId);
+                var dateSelect = DateTime.Parse(requestDto.DateSelected);
+                var openAt = DateTime.ParseExact(garage!.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+                var closeAt = DateTime.ParseExact(garage!.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var listHours = new List<BookingPerHour>();
+
+                await Task.Run(() =>
+                {
+                    for (int i = openAt; i <= closeAt; i++)
+                    {
+                        var time = new TimeSpan(i, 00, 00);
+                        listHours.Add(new BookingPerHour { Hour = dateSelect.Add(time).ToString("h:mm:ss tt"), IsAvailable = true });
+                    }
+                });
+
+                var listBooking = await bookingRepository.FilterBookingByDate(dateSelect, requestDto.GarageId);
+                var lotCount = garage.Lots.Count;
+
+                await Task.Run(() =>
+                {
+                    for (int i = openAt; i <= closeAt; i++)
+                    {
+                        var bookingCount = listBooking?
+                        .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i)).Count();
+
+                        //Check if is enough Booking per Hour
+
+                        if (bookingCount.Equals(lotCount))
+                        {
+                            var selectedHour = i;
+                            var minEstimatedTime = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
+                            .Min(l => l.TotalEstimatedCompletionTime);
+
+                            //If all Booking have estimated time all > 2 skip to the next available Hour
+                            for (int y = selectedHour; y <= selectedHour + minEstimatedTime - 1; y++)
+                            {
+                                listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(y))!.IsAvailable = false;
+                            }
+
+                            i = selectedHour + minEstimatedTime - 1;
+                        }
+
+                        //Check if between two Hour if they all enough Booking with condition Hour one have Booking with estimated time == 1
+
+                        var bookingInOneHours = listBooking?
+                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime == 1).Count();
+
+                        if (bookingCount.Equals(lotCount) && bookingInOneHours > 0)
+                        {
+                            var bookingInFirstHourCount = listBooking?
+                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
+                            var bookingInNextHourCount = listBooking?
+                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1)).Count();
+
+                            if (bookingInFirstHourCount + bookingInNextHourCount == lotCount)
+                            {
+                                listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(i + 1))!.IsAvailable = false;
+                            }
+                        }
+
+                        //Check if between two Hour if they all enough Booking with condition Hour
+
+                        if (bookingCount > 0 && !bookingCount.Equals(lotCount))
+                        {
+                            var selectedHour = i;
+                            var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
+                            .Min(l => l.TotalEstimatedCompletionTime);
+
+                            var lastHour = closeAt;
+                            var remainHour = lastHour - i;
+
+                            for (int z = 1; z <= remainHour; z++)
+                            {
+                                var bookingInFirstHourCount = listBooking?
+                                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
+                                var bookingInNextHourCount = listBooking?
+                                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + z)).Count();
+
+                                if (bookingInFirstHourCount + bookingInNextHourCount == lotCount && minEstimatedTimePerHour > 1)
+                                {
+                                    listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(i + z))!.IsAvailable = false;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                watch.Stop();
+                Debug.WriteLine($"\nTotal run time (Milliseconds): {watch.ElapsedMilliseconds}\n");
+
+                return listHours;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<bool> Create(BookingCreateRequestDto requestDto)
         {
             try
             {
                 var lotList = await lotRepository.GetAllLotInGarage(requestDto.GarageId);
-                if (lotList!.All(l => l.LotStatus.Equals(LotStatus.Free)))
+                if (lotList!.Any(l => l.LotStatus.Equals(LotStatus.Free)))
                 {
                     var lotFree = lotList!.Where(l => l.LotStatus == LotStatus.Free);
                     var lot = lotFree!.OrderBy(l => l.LotStatus).FirstOrDefault();
@@ -104,6 +210,8 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+
                 DateTime bookingTime = DateOnly.Parse(requestDto.DateSelected).ToDateTime(TimeOnly.Parse(requestDto.TimeSelected));
                 var booking = mapper.Map<BookingCreateRequestDto, Booking>(requestDto,
                 otp => otp.AfterMap((src, des) =>
@@ -134,6 +242,10 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     for (int i = 0; i < requestDto.ServiceList.Count; i++)
                     {
+                        if (requestDto.ServiceList[i].ProductId == 0)
+                        {
+                            des[i].ProductId = null;
+                        }
                         float productCost = 0, serviceCost = 0;
                         int serviceDuration = 0;
                         if (requestDto.ServiceList[i].ProductId > 0)
@@ -156,6 +268,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.TotalPrice = totalPrice;
                 await bookingRepository.Update(booking);
+
+                watch.Stop();
+                Debug.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
             }
             catch (Exception)
             {

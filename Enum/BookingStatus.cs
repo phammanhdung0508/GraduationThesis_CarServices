@@ -4,6 +4,7 @@ namespace GraduationThesis_CarServices.Enum
     {
         NotStart,
         AppointmentDay,
+        CheckIn,
         Processing,
         Wait,
         Complete

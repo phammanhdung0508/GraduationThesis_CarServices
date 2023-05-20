@@ -104,14 +104,16 @@ namespace GraduationThesis_CarServices.Services.Service
                         if (bookingCount.Equals(lotCount))
                         {
                             var selectedHour = i;
-                            var minEstimatedTime = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
-                            .Min(l => l.TotalEstimatedCompletionTime);
+                            var minEstimatedTime = GetMinEstimatedTime(i, listBooking!);
 
                             //If all Booking have estimated time all > 2 skip to the next available Hour
                             for (int y = selectedHour; y <= selectedHour + minEstimatedTime - 1; y++)
                             {
-                                listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(y))!.IsAvailable = false;
+                                UpdateListHours(y, listHours);
                             }
+                            // Parallel.For(selectedHour, selectedHour + minEstimatedTime - 1, y =>{
+                            //     UpdateListHours(y, listHours);
+                            // });
 
                             i = selectedHour + minEstimatedTime - 1;
                         }
@@ -123,14 +125,11 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         if (bookingCount.Equals(lotCount) && bookingInOneHours > 0)
                         {
-                            var bookingInFirstHourCount = listBooking?
-                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
-                            var bookingInNextHourCount = listBooking?
-                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1)).Count();
+                            (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(1, i, listBooking!);
 
                             if (bookingInFirstHourCount + bookingInNextHourCount == lotCount)
                             {
-                                listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(i + 1))!.IsAvailable = false;
+                                UpdateListHours(i + 1, listHours);
                             }
                         }
 
@@ -138,23 +137,18 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         if (bookingCount > 0 && !bookingCount.Equals(lotCount))
                         {
-                            var selectedHour = i;
-                            var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
-                            .Min(l => l.TotalEstimatedCompletionTime);
-
                             var lastHour = closeAt;
                             var remainHour = lastHour - i;
 
+                            var minEstimatedTimePerHour = GetMinEstimatedTime(i, listBooking!);
+
                             for (int z = 1; z <= remainHour; z++)
                             {
-                                var bookingInFirstHourCount = listBooking?
-                                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
-                                var bookingInNextHourCount = listBooking?
-                                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + z)).Count();
+                                (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(z, i, listBooking!);
 
                                 if (bookingInFirstHourCount + bookingInNextHourCount == lotCount && minEstimatedTimePerHour > 1)
                                 {
-                                    listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(i + z))!.IsAvailable = false;
+                                    UpdateListHours(i + z, listHours);
                                 }
                             }
                         }
@@ -170,6 +164,29 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 throw;
             }
+        }
+
+        private int GetMinEstimatedTime(int i, List<Booking> listBooking)
+        {
+            var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
+            .Min(l => l.TotalEstimatedCompletionTime);
+
+            return minEstimatedTimePerHour;
+        }
+
+        private (int? bookingInFirstHourCount, int? bookingInNextHourCount) CountBookingPerHour(int num, int i, List<Booking> listBooking)
+        {
+            var bookingInFirstHourCount = listBooking?
+            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
+            var bookingInNextHourCount = listBooking?
+            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + num)).Count();
+
+            return (bookingInFirstHourCount, bookingInNextHourCount);
+        }
+
+        private void UpdateListHours(int num, List<BookingPerHour> listHours)
+        {
+            listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
         }
 
         public async Task<bool> Create(BookingCreateRequestDto requestDto)

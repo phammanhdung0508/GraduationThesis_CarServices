@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-product")]
-        public async Task<ActionResult<List<ProductDto>>> ViewProduct(PageDto page)
+        public async Task<ActionResult<List<ProductListResponseDto>>> ViewProduct(PageDto page)
         {
             try
             {
@@ -37,8 +37,28 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
+        [HttpPost("get-service-products/{id}")]
+        public async Task<ActionResult<List<ProductListResponseDto>>> GetServiceProducts(int id)
+        {
+            try
+            {
+                var productList = await productService.FilterServiceProduct(id)!;
+                return Ok(productList);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
         [HttpGet("detail-product/{id}")]
-        public async Task<ActionResult<ProductDto>> DetailProduct(int id)
+        public async Task<ActionResult<ProductDetailResponseDto>> DetailProduct(int id)
         {
             try
             {
@@ -58,7 +78,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-product")]
-        public async Task<ActionResult<bool>> CreateProduct(CreateProductDto product)
+        public async Task<ActionResult<bool>> CreateProduct(ProductCreateRequestDto product)
         {
             try
             {
@@ -81,7 +101,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-product")]
-        public async Task<ActionResult<bool>> UpdateProduct(UpdateProductDto product)
+        public async Task<ActionResult<bool>> UpdateProduct(ProductUpdateRequestDto product)
         {
             try
             {
@@ -103,12 +123,35 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-product")]
-        public async Task<ActionResult<bool>> DeleteProduct(DeleteProductDto product)
+        [HttpPut("update-status-product")]
+        public async Task<ActionResult<bool>> UpdateStatusProduct(ProductStatusRequestDto product)
         {
             try
             {
-                if (await productService.Delete(product))
+                if (await productService.UpdateStatus(product))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPut("update-quantity-product")]
+        public async Task<ActionResult<bool>> UpdateQuantityProduct(ProductQuantityRequestDto product)
+        {
+            try
+            {
+                if (await productService.UpdateQuantity(product))
                 {
                     return Ok("Successfully!");
                 }

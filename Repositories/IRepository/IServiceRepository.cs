@@ -1,14 +1,14 @@
 ﻿using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.Service;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IServiceRepository
     {
-        Task<List<ServiceDto>?> View(PageDto page);
-        Task<ServiceDto?> Detail(int id);
-        Task Create(CreateServiceDto serviceDto);
-        Task Update(UpdateServiceDto serviceDto);
+        Task<List<Service>?> View(PageDto page);
+        Task<Service?> Detail(int id);
+        Task Create(Service service);
+        Task Update(Service service);
         float GetPrice(int serviceId);
     }
 }

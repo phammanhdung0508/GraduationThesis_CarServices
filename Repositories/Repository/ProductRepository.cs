@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Models;
@@ -20,15 +19,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
 
 
-        public async Task<List<ProductDto>?> View(PageDto page)
+        public async Task<List<Product>?> View(PageDto page)
         {
             try
             {
-                List<Product> list = await PagingConfiguration<Product>
+                var list = await PagingConfiguration<Product>
                 .Get(context.Products
                 .Include(p => p.Subcategory)
-                .Include(p => p.Service), page);
-                return mapper.Map<List<ProductDto>>(list);
+                .Include(p => p.Service)
+                .Include(p => p.ProductMediaFiles).ThenInclude(m => m.MediaFile), page);
+                return list;
             }
             catch (Exception)
             {
@@ -36,13 +36,36 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<ProductDto?> Detail(int id)
+        public async Task<List<Product>?> FilterServiceProduct(int ServiceId)
         {
             try
             {
-                ProductDto product = mapper.Map<ProductDto>(await context.Products
+                var list = await context.Products
+                .Where(p => p.ServiceId == ServiceId)
                 .Include(p => p.Subcategory)
-                .Include(p => p.Service).FirstOrDefaultAsync(c => c.ProductId == id));
+                .Include(p => p.Service)
+                .Include(p => p.ProductMediaFiles)
+                .ThenInclude(m => m.MediaFile)
+                .ToListAsync();
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Product?> Detail(int id)
+        {
+            try
+            {
+                var product = await context.Products
+                .Where(p => p.ProductId == id)
+                .Include(p => p.Subcategory)
+                .Include(p => p.Service)
+                .Include(p => p.ProductMediaFiles).ThenInclude(m => m.MediaFile)
+                .FirstOrDefaultAsync();
                 return product;
             }
             catch (Exception)
@@ -51,11 +74,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateProductDto productDto)
+        public async Task Create(Product product)
         {
             try
             {
-                Product product = mapper.Map<Product>(productDto);
                 context.Products.Add(product);
                 await context.SaveChangesAsync();
             }
@@ -65,27 +87,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateProductDto productDto)
+        public async Task Update(Product product)
         {
             try
             {
-                var product = context.Products.FirstOrDefault(c => c.ProductId == productDto.ProductId)!;
-                mapper.Map<UpdateProductDto, Product?>(productDto, product);
-                context.Products.Update(product);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteProductDto productDto)
-        {
-            try
-            {
-                var product = context.Products.FirstOrDefault(c => c.ProductId == productDto.ProductId)!;
-                mapper.Map<DeleteProductDto, Product?>(productDto, product);
                 context.Products.Update(product);
                 await context.SaveChangesAsync();
             }

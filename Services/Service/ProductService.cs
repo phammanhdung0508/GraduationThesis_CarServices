@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -21,11 +23,12 @@ namespace GraduationThesis_CarServices.Services.Service
             this.serviceRepository = serviceRepository;
         }
 
-        public async Task<List<ProductDto>?> View(PageDto page)
+        public async Task<List<ProductListResponseDto>?> View(PageDto page)
         {
             try
             {
-                List<ProductDto>? list = await productRepository.View(page);
+                var list = mapper
+                .Map<List<ProductListResponseDto>>(await productRepository.View(page));
                 return list;
             }
             catch (Exception)
@@ -34,12 +37,14 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<ProductDto?> Detail(int id)
+        public async Task<List<ProductListResponseDto>?> FilterServiceProduct(int ServiceId)
         {
             try
             {
-                ProductDto? _product = mapper.Map<ProductDto>(await productRepository.Detail(id));
-                return _product;
+                var list = mapper
+                .Map<List<ProductListResponseDto>>(await productRepository.FilterServiceProduct(ServiceId));
+
+                return list;
             }
             catch (Exception)
             {
@@ -47,14 +52,31 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(CreateProductDto createProductDto)
+        public async Task<ProductDetailResponseDto?> Detail(int id)
         {
             try
             {
-                await subcategoryRepository.Detail(createProductDto.SubcategoryId);
-                await serviceRepository.Detail(createProductDto.ServiceId);
+                var product = mapper
+                .Map<ProductDetailResponseDto>(await productRepository.Detail(id));
+                return product;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-                await productRepository.Create(createProductDto);
+        public async Task<bool> Create(ProductCreateRequestDto requestDto)
+        {
+            try
+            {
+                var product = mapper.Map<ProductCreateRequestDto, Product>(requestDto,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.ProductStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                }));
+                await productRepository.Create(product);
                 return true;
             }
             catch (Exception)
@@ -63,11 +85,17 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(UpdateProductDto updateProductDto)
+        public async Task<bool> Update(ProductUpdateRequestDto requestDto)
         {
             try
             {
-                await productRepository.Update(updateProductDto);
+                var p = await productRepository.Detail(requestDto.ProductId);
+                var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await productRepository.Update(product);
                 return true;
             }
             catch (Exception)
@@ -76,11 +104,31 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Delete(DeleteProductDto deleteProductDto)
+        public async Task<bool> UpdateStatus(ProductStatusRequestDto requestDto)
         {
             try
             {
-                await productRepository.Delete(deleteProductDto);
+                var p = await productRepository.Detail(requestDto.ProductId);
+                var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
+                await productRepository.Update(product);
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<bool> UpdateQuantity(ProductQuantityRequestDto requestDto)
+        {
+            try
+            {
+                var p = await productRepository.Detail(requestDto.ProductId);
+                var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+                await productRepository.Update(product);
                 return true;
             }
             catch (Exception)

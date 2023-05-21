@@ -10,5 +10,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<int> Create(Booking booking);
         Task Update(Booking booking);
         Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId);
+        Task<List<Booking>?> FilterBookingByTimePerDay(DateTime dateTime, int garageId);
     }
 }

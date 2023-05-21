@@ -7,7 +7,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
     {
         [DefaultValue("04/05/2023")]
         public string DateSelected { get; set; }
-        public string EstimatedTime { get; set; }
         public int GarageId { get; set; }
     }
 }

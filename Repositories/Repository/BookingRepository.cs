@@ -45,6 +45,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<List<Booking>?> FilterBookingByTimePerDay(DateTime dateTime, int garageId){
+            try
+            {
+                var list = await context.Bookings
+                .Where(b => b.BookingTime.Equals(dateTime) && b.GarageId.Equals(garageId))
+                .ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+
         public async Task<Booking?> Detail(int id)
         {
             try

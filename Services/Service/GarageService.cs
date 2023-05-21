@@ -87,9 +87,9 @@ namespace GraduationThesis_CarServices.Services.Service
                             des.IsOpen = "Closed";
                             break;
                     }
-                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.Busy))){
+                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.BeingUsed))){
                         case var source when source == true:
-                            des.IsFull = "Full";
+                            des.IsFull = "Being Used";
                             break;
                         case var source when source == false:
                             des.IsFull = "Free";

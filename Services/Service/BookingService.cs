@@ -15,13 +15,16 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IServiceBookingRepository serviceBookingRepository;
         private readonly IBookingRepository bookingRepository;
         private readonly IProductRepository productRepository;
+        private readonly ICouponRepository couponRepository;
         private readonly IServiceRepository serviceRepository;
         private readonly IGarageRepository garageRepository;
         private readonly ILotRepository lotRepository;
+        private readonly ICarRepository carRepository;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IServiceBookingRepository serviceBookingRepository, IProductRepository productRepository,
-        IServiceRepository serviceRepository, IGarageRepository garageRepository)
+        IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
+        ICouponRepository couponRepository)
         {
             this.mapper = mapper;
             this.bookingRepository = bookingRepository;
@@ -30,6 +33,8 @@ namespace GraduationThesis_CarServices.Services.Service
             this.productRepository = productRepository;
             this.serviceRepository = serviceRepository;
             this.garageRepository = garageRepository;
+            this.carRepository = carRepository;
+            this.couponRepository = couponRepository;
         }
 
         public async Task<List<BookingListResponseDto>?> View(PageDto page)
@@ -82,11 +87,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await Task.Run(() =>
                 {
-                    for (int i = openAt; i <= closeAt; i++)
-                    {
-                        var time = new TimeSpan(i, 00, 00);
-                        listHours.Add(new BookingPerHour { Hour = dateSelect.Add(time).ToString("h:mm:ss tt"), IsAvailable = true });
-                    }
+                    CreateListHourPerDay(openAt, closeAt, listHours, dateSelect);
                 });
 
                 var listBooking = await bookingRepository.FilterBookingByDate(dateSelect, requestDto.GarageId);
@@ -94,65 +95,16 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await Task.Run(() =>
                 {
-                    for (int i = openAt; i <= closeAt; i++)
-                    {
-                        var bookingCount = listBooking?
-                        .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i)).Count();
+                    CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours);
+                });
 
-                        //Check if is enough Booking per Hour
+                var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
+                .Select(l => DateTime.Parse(l.Hour).TimeOfDay.Hours).Order().ToList();
+                var sequenceLength = 1;
 
-                        if (bookingCount.Equals(lotCount))
-                        {
-                            var selectedHour = i;
-                            var minEstimatedTime = GetMinEstimatedTime(i, listBooking!);
-
-                            //If all Booking have estimated time all > 2 skip to the next available Hour
-                            for (int y = selectedHour; y <= selectedHour + minEstimatedTime - 1; y++)
-                            {
-                                UpdateListHours(y, listHours);
-                            }
-                            // Parallel.For(selectedHour, selectedHour + minEstimatedTime - 1, y =>{
-                            //     UpdateListHours(y, listHours);
-                            // });
-
-                            i = selectedHour + minEstimatedTime - 1;
-                        }
-
-                        //Check if between two Hour if they all enough Booking with condition Hour one have Booking with estimated time == 1
-
-                        var bookingInOneHours = listBooking?
-                            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime == 1).Count();
-
-                        if (bookingCount.Equals(lotCount) && bookingInOneHours > 0)
-                        {
-                            (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(1, i, listBooking!);
-
-                            if (bookingInFirstHourCount + bookingInNextHourCount == lotCount)
-                            {
-                                UpdateListHours(i + 1, listHours);
-                            }
-                        }
-
-                        //Check if between two Hour if they all enough Booking with condition Hour
-
-                        if (bookingCount > 0 && !bookingCount.Equals(lotCount))
-                        {
-                            var lastHour = closeAt;
-                            var remainHour = lastHour - i;
-
-                            var minEstimatedTimePerHour = GetMinEstimatedTime(i, listBooking!);
-
-                            for (int z = 1; z <= remainHour; z++)
-                            {
-                                (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(z, i, listBooking!);
-
-                                if (bookingInFirstHourCount + bookingInNextHourCount == lotCount && minEstimatedTimePerHour > 1)
-                                {
-                                    UpdateListHours(i + z, listHours);
-                                }
-                            }
-                        }
-                    }
+                await Task.Run(() =>
+                {
+                    UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours);
                 });
 
                 watch.Stop();
@@ -189,31 +141,139 @@ namespace GraduationThesis_CarServices.Services.Service
             listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
         }
 
+        private void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours)
+        {
+            if (sequenceLength > 1)
+            {
+                for (int i = from; i <= to; i++)
+                {
+                    listHours.AsParallel().FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
+                    .Equals(i))!.EstimatedTimeCanBeBook = estimatedTime - i;
+                }
+            }
+        }
+
+        private void CreateListHourPerDay(int openAt, int closeAt, List<BookingPerHour> listHours, DateTime dateSelect)
+        {
+            for (int i = openAt; i <= closeAt; i++)
+            {
+                var time = new TimeSpan(i, 00, 00);
+                listHours.Add(new BookingPerHour { Hour = dateSelect.Add(time).ToString("h:mm:ss tt") });
+            }
+        }
+
+        private void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours)
+        {
+            for (int i = 0; i <= isAvailableList.Count - 1; i++)
+            {
+                var currentHour = isAvailableList[i];
+
+                if (isAvailableList[i + 1] - isAvailableList[i] == 1)
+                {
+                    sequenceLength++;
+                }
+                else
+                {
+                    listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
+                        .Equals(isAvailableList[i]))!.EstimatedTimeCanBeBook = 1;
+
+                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 1, isAvailableList[i] + 1, isAvailableList[i] + 1, sequenceLength, isAvailableList, listHours);
+
+                    sequenceLength = 1;
+                }
+
+                var isLastNumber = isAvailableList[i] + 1;
+
+                if (isLastNumber.Equals(isAvailableList.Last()))
+                {
+                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours);
+                    break;
+                }
+            }
+        }
+
+        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours)
+        {
+            for (int i = openAt; i <= closeAt; i++)
+            {
+                var bookingCount = listBooking?
+                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i)).Count();
+
+                //Check if is enough Booking per Hour
+
+                if (bookingCount.Equals(lotCount))
+                {
+                    var selectedHour = i;
+                    var minEstimatedTime = GetMinEstimatedTime(i, listBooking!);
+
+                    //If all Booking have estimated time all > 2 skip to the next available Hour
+                    for (int y = selectedHour; y <= selectedHour + minEstimatedTime - 1; y++)
+                    {
+                        UpdateListHours(y, listHours);
+                    }
+
+                    i = selectedHour + minEstimatedTime - 1;
+                }
+
+                //Check if between two Hour if they all enough Booking with condition Hour one have Booking with estimated time == 1
+
+                var bookingInOneHours = listBooking?
+                    .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime == 1).Count();
+
+                if (bookingCount.Equals(lotCount) && bookingInOneHours > 0)
+                {
+                    (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(1, i, listBooking!);
+
+                    if (bookingInFirstHourCount + bookingInNextHourCount == lotCount)
+                    {
+                        UpdateListHours(i + 1, listHours);
+                    }
+                }
+
+                //Check if between two Hour if they all enough Booking with condition Hour
+
+                if (bookingCount > 0 && !bookingCount.Equals(lotCount))
+                {
+                    var lastHour = closeAt;
+                    var remainHour = lastHour - i;
+
+                    var minEstimatedTimePerHour = GetMinEstimatedTime(i, listBooking!);
+
+                    for (int z = 1; z <= remainHour; z++)
+                    {
+                        (int? bookingInFirstHourCount, int? bookingInNextHourCount) = CountBookingPerHour(z, i, listBooking!);
+
+                        if (bookingInFirstHourCount + bookingInNextHourCount == lotCount && minEstimatedTimePerHour > 1)
+                        {
+                            UpdateListHours(i + z, listHours);
+                        }
+                    }
+                }
+            }
+        }
+
         public async Task<bool> Create(BookingCreateRequestDto requestDto)
         {
             try
             {
-                var lotList = await lotRepository.GetAllLotInGarage(requestDto.GarageId);
-                if (lotList!.Any(l => l.LotStatus.Equals(LotStatus.Free)))
+                var bookingTime = DateOnly.Parse(requestDto.DateSelected).ToDateTime(TimeOnly.Parse(requestDto.TimeSelected));
+
+                var garage = await garageRepository.GetGarage(requestDto.GarageId);
+                var listBooking = await bookingRepository.FilterBookingByTimePerDay(bookingTime, requestDto.GarageId);
+                var lotCount = garage!.Lots.Count;
+
+                if (lotCount - listBooking!.Count == 1)
                 {
-                    var lotFree = lotList!.Where(l => l.LotStatus == LotStatus.Free);
-                    var lot = lotFree!.OrderBy(l => l.LotStatus).FirstOrDefault();
-                    switch (lotFree.Count() == 1)
+                    Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
+                    if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
                     {
-                        case true:
-                            var garage = await garageRepository.GetGarage(requestDto.GarageId);
-                            Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
-                            if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
-                            {
-                                await garageRepository.Update(garage);
-                                await Run(requestDto);
-                            }
-                            break;
-                        case false:
-                            await Run(requestDto);
-                            break;
-                        default:
+                        await garageRepository.Update(garage);
+                        //await Run(requestDto, bookingTime);
                     }
+                }
+                else
+                {
+                    // await Run(requestDto, bookingTime);
                 }
                 return true;
             }
@@ -223,13 +283,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private async Task Run(BookingCreateRequestDto requestDto)
+        private async Task Run(BookingCreateRequestDto requestDto, DateTime bookingTime)
         {
             try
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
 
-                DateTime bookingTime = DateOnly.Parse(requestDto.DateSelected).ToDateTime(TimeOnly.Parse(requestDto.TimeSelected));
                 var booking = mapper.Map<BookingCreateRequestDto, Booking>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -246,10 +305,12 @@ namespace GraduationThesis_CarServices.Services.Service
                             break;
                     }
                 }));
+
                 var bookingId = await bookingRepository.Create(booking);
 
-                // lot!.LotStatus = LotStatus.AlreadyBooked;
-                // await lotRepository.Update(lot);
+                var coupon = await couponRepository.Detail(requestDto.CouponId);
+
+                
 
                 float totalPrice = 0;
                 int totalEstimated = 0;
@@ -273,6 +334,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             (serviceCost, serviceDuration) = serviceRepository.GetPriceAndDuration(src[i].ServiceId);
                         }
+                        if (requestDto.CouponId > 0)
                         totalEstimated += serviceDuration;
                         totalPrice += productCost + serviceCost;
                         des[i].BookingId = bookingId;
@@ -280,10 +342,12 @@ namespace GraduationThesis_CarServices.Services.Service
                         des[i].ServiceCost = serviceCost;
                     }
                 }));
+
                 await serviceBookingRepository.Create(listService);
 
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.TotalPrice = totalPrice;
+
                 await bookingRepository.Update(booking);
 
                 watch.Stop();
@@ -292,6 +356,55 @@ namespace GraduationThesis_CarServices.Services.Service
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public async Task<bool> UpdateStatus(BookingStatusRequestDto requestDto)
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            var b = await bookingRepository.Detail(requestDto.BookingId);
+            var booking = mapper.Map<BookingStatusRequestDto, Booking>(requestDto, b!);
+            await bookingRepository.Update(booking);
+
+            switch (requestDto.BookingStatus)
+            {
+                case BookingStatus.CheckIn:
+                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
+                    break;
+                case BookingStatus.Processing:
+                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
+                    break;
+                case BookingStatus.Completed:
+                    await UpdateLotStatus(LotStatus.Free, booking);
+                    break;
+            }
+
+            watch.Stop();
+            Debug.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
+
+            return true;
+        }
+
+        private async Task UpdateLotStatus(LotStatus status, Booking booking)
+        {
+            if (status.Equals(BookingStatus.CheckIn))
+            {
+                var lot = await lotRepository.GetFreeLotInGarage((int)booking.GarageId!);
+                var licensePlate = await carRepository.GetLicensePlate((int)booking.CarId!);
+
+                lot.LotStatus = status;
+                lot.IsAssignedFor = licensePlate;
+
+                await lotRepository.Update(lot);
+            }
+            else
+            {
+                var lot = await lotRepository.GetLotByLicensePlate((int)booking.GarageId!, booking.Car.CarLicensePlate);
+
+                lot.LotStatus = status;
+
+                await lotRepository.Update(lot);
             }
         }
 

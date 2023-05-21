@@ -11,6 +11,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int LotId { get; set; }
         public string LotNumber { get; set; }
+        public string IsAssignedFor { get; set; }
         [Column(TypeName = "tinyint")]
         public LotStatus LotStatus { get; set; }
 

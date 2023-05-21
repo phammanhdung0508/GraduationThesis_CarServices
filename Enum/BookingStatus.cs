@@ -6,7 +6,6 @@ namespace GraduationThesis_CarServices.Enum
         AppointmentDay,
         CheckIn,
         Processing,
-        Wait,
-        Complete
+        Completed
     }
 }

@@ -275,9 +275,9 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 30; i++)
             {
                 workingScheduleFaker.RuleFor(w => w.WorkingScheduleId, i)
-                    .RuleFor(w => w.StartTime, "07:00 AM")
-                    .RuleFor(w => w.EndTime, "05:00 PM")
-                    .RuleFor(w => w.DaysOfTheWeek, "Monday")
+                    .RuleFor(w => w.StartTime, "08:00 AM")
+                    .RuleFor(w => w.EndTime, "07:00 PM")
+                    .RuleFor(w => w.DaysOfTheWeek, f => f.PickRandom<DayOfWeek>().ToString())
                     .RuleFor(w => w.Description, f => f.Lorem.Lines())
                     .RuleFor(w => w.WorkingScheduleStatus, f => f.PickRandom<WorkingScheduleStatus>())
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
@@ -388,7 +388,17 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(c => c.CouponCode, f => f.Random.Replace("##?###???#"))
                     .RuleFor(c => c.CouponDescription, f => f.Lorem.Paragraph())
                     .RuleFor(c => c.CouponType, f => f.PickRandom<CouponType>())
-                    .RuleFor(c => c.CouponValue, f => f.Random.Float(1, 100))
+                    .RuleFor(c => c.CouponValue, (f, g) =>
+                    {
+                        switch (g.CouponType)
+                        {
+                            case CouponType.Percent:
+                                return f.Random.Int(1, 10);
+                            case CouponType.FixedAmount:
+                                return f.Random.Int(50, 100);
+                        }
+                        return 0;
+                    })
                     .RuleFor(c => c.CouponStartDate, f => f.Date.Recent())
                     .RuleFor(c => c.CouponEndDate, f => f.Date.Soon())
                     .RuleFor(c => c.CouponMinSpend, f => f.Random.Float(1, 20))

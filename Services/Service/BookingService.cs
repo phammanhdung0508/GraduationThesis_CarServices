@@ -268,12 +268,12 @@ namespace GraduationThesis_CarServices.Services.Service
                     if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
                     {
                         await garageRepository.Update(garage);
-                        //await Run(requestDto, bookingTime);
+                        await Run(requestDto, bookingTime);
                     }
                 }
                 else
                 {
-                    // await Run(requestDto, bookingTime);
+                    await Run(requestDto, bookingTime);
                 }
                 return true;
             }
@@ -308,11 +308,8 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var bookingId = await bookingRepository.Create(booking);
 
-                var coupon = await couponRepository.Detail(requestDto.CouponId);
-
-                
-
-                float totalPrice = 0;
+                float discountedPrice = 0;
+                float originalPrice = 0;
                 int totalEstimated = 0;
 
                 var listService = mapper.Map<List<ServiceListDto>, List<ServiceBooking>>(requestDto.ServiceList,
@@ -334,9 +331,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             (serviceCost, serviceDuration) = serviceRepository.GetPriceAndDuration(src[i].ServiceId);
                         }
-                        if (requestDto.CouponId > 0)
-                        totalEstimated += serviceDuration;
-                        totalPrice += productCost + serviceCost;
+                        originalPrice += productCost + serviceCost;
                         des[i].BookingId = bookingId;
                         des[i].ProductCost = productCost;
                         des[i].ServiceCost = serviceCost;
@@ -345,8 +340,29 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await serviceBookingRepository.Create(listService);
 
+                if (requestDto.CouponId > 0)
+                {
+                    var coupon = await couponRepository.Detail(requestDto.CouponId);
+
+                    switch (coupon!.CouponType)
+                    {
+                        case CouponType.Percent:
+                            discountedPrice = originalPrice * (coupon.CouponValue / 100);
+                            break;
+                        case CouponType.FixedAmount:
+                            discountedPrice = originalPrice - coupon.CouponValue;
+                            break;
+                    }
+                }
+
+                if(discountedPrice > 0)
+                {
+                    booking.TotalPrice = discountedPrice;
+                }else{
+                    booking.TotalPrice = originalPrice;
+                }
+
                 booking.TotalEstimatedCompletionTime = totalEstimated;
-                booking.TotalPrice = totalPrice;
 
                 await bookingRepository.Update(booking);
 
@@ -370,7 +386,7 @@ namespace GraduationThesis_CarServices.Services.Service
             switch (requestDto.BookingStatus)
             {
                 case BookingStatus.CheckIn:
-                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
+                    await UpdateLotStatus(LotStatus.Assigned, booking);
                     break;
                 case BookingStatus.Processing:
                     await UpdateLotStatus(LotStatus.BeingUsed, booking);

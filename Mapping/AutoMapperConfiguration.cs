@@ -114,8 +114,8 @@ namespace GraduationThesis_CarServices.Mapping
             //Service
             CreateMap<Service, ServiceGarageDto>().ReverseMap();
             CreateMap<Service, ServiceDto>().ReverseMap();
-            CreateMap<Service, CreateServiceDto>().ReverseMap();
-            CreateMap<Service, UpdateServiceDto>().ForMember(des => des.ServiceId, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Service, ServiceCreateRequestDto>().ReverseMap();
+            CreateMap<Service, ServiceUpdateRequestDto>().ForMember(des => des.ServiceId, obj => obj.Ignore()).ReverseMap();
             //CreateMap<Service, DeleteServiceDto>().ReverseMap();
 
             //Report

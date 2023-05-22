@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
@@ -65,7 +66,36 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var garage = mapper
-                .Map<GarageDetailResponseDto>(await garageRepository.Detail(id));
+                .Map<Garage?, GarageDetailResponseDto>(await garageRepository.Detail(id),
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
+                    
+                    var presentTime = DateTime.Now.TimeOfDay;
+                    var openAt = DateTime.ParseExact(src.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                    var closeAt = DateTime.ParseExact(src.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                    var midnight = TimeSpan.Zero;
+
+                    switch (presentTime)
+                    {
+                        case var time when TimeSpan.Compare(time, openAt).Equals(1) && TimeSpan.Compare(time, closeAt).Equals(-1):
+
+                            des.IsOpen = "Open";
+                            break;
+                        case var time when TimeSpan.Compare(time, closeAt).Equals(1) || TimeSpan.Compare(midnight, openAt).Equals(-1):
+
+                            des.IsOpen = "Closed";
+                            break;
+                    }
+                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.BeingUsed))){
+                        case var source when source == true:
+                            des.IsFull = "Being Used";
+                            break;
+                        case var source when source == false:
+                            des.IsFull = "Free";
+                            break;
+                    }
+                }));
                 return garage;
             }
             catch (Exception)

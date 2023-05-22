@@ -9,6 +9,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<ServiceDto?> Detail(int id);
         Task Create(CreateServiceDto serviceDto);
         Task Update(UpdateServiceDto serviceDto);
-        float GetPrice(int serviceId);
+        (float price, int duration) GetPriceAndDuration(int serviceId);
     }
 }

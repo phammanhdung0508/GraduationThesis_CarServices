@@ -86,6 +86,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var garage = await context.Garages
                 .Where(g => g.GarageId == id)
+                .Include(g => g.Lots)
                 .Include(g => g.Reviews)
                 .Include(g => g.Coupons)
                 .Include(g => g.User).ThenInclude(u => u.Role)
@@ -105,7 +106,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var garage = await context.Garages
-                .Where(g => g.GarageId == id).FirstOrDefaultAsync();
+                .Where(g => g.GarageId == id)
+                .Include(g => g.Lots).FirstOrDefaultAsync();
 
                 return garage;
             }

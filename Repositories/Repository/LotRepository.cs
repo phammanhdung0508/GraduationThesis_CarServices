@@ -14,14 +14,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<Lot>?> GetAllLotInGarage(int garageId)
-        {
+        public async Task<Lot> GetLotByLicensePlate(int garageId, string licensePlate){
             try
             {
-                var list = await context.Lots
-                .Where(l => l.GarageId == garageId).ToListAsync();
+                var lot = await context.Lots
+                .Where(l => l.GarageId.Equals(garageId) && l.IsAssignedFor.Equals(licensePlate))
+                .OrderBy(l => l.LotStatus).FirstOrDefaultAsync();
 
-                return list;
+                return lot!;
             }
             catch (Exception)
             {
@@ -29,14 +29,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<Lot?> IsFree()
+        public async Task<Lot> GetFreeLotInGarage(int garageId)
         {
             try
             {
                 var lot = await context.Lots
-                .Where(l => l.LotStatus.Equals(LotStatus.Free)).OrderBy(l => l.LotStatus).FirstOrDefaultAsync();
+                .Where(l => l.GarageId.Equals(garageId) && l.LotStatus.Equals(LotStatus.Free))
+                .OrderBy(l => l.LotStatus).FirstOrDefaultAsync();
 
-                return lot;
+                return lot!;
             }
             catch (Exception)
             {

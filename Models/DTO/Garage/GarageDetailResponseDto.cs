@@ -13,10 +13,9 @@ namespace GraduationThesis_CarServices.Models.DTO.Garage
         public string GarageWard { get; set; }
         public string GarageDistrict { get; set; }
         public string GarageCity { get; set; }
-        public string FromTo { get; set; }
-        public string OpenAt { get; set; }
-        public string CloseAt { get; set; }
-        public int GarageStatus { get; set; }
+        public string HoursOfOperation { get; set; }
+        public string IsOpen { get; set; }
+        public string IsFull { get; set; }
 
         public byte[] VersionNumber { get; set; }
 

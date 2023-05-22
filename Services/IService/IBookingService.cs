@@ -6,6 +6,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IBookingService
     {
         Task<List<BookingListResponseDto>?> View(PageDto page);
+        Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto);
         Task<BookingDetailResponseDto?> Detail(int id);
         Task<bool> Create(BookingCreateRequestDto requestDto);
         Task<bool> Update(BookingUpdateRequestDto requestDto);

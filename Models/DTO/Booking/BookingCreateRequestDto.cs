@@ -8,7 +8,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
     {
         [DefaultValue("04/05/2023")]
         public string DateSelected { get; set; }
-        [DefaultValue("8:00:00 AM")]
+        [DefaultValue("8:00:00")]
         public string TimeSelected { get; set; }
         public string PaymentMethod { get; set; }
         [DefaultValue(2)]

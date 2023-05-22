@@ -4,8 +4,8 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface ILotRepository
     {
-        Task<List<Lot>?> GetAllLotInGarage(int garageId);
-        Task<Lot?> IsFree();
+        Task<Lot> GetFreeLotInGarage(int garageId);
+        Task<Lot> GetLotByLicensePlate(int garageId, string licensePlate);
         Task Update(Lot lot);
     }
 }

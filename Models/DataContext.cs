@@ -145,40 +145,40 @@ namespace GraduationThesis_CarServices.Models
                 //Bảo dưỡng định kỳ
                 new Service{ServiceId=1, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=2, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=3, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
-                ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
+                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Sửa chữa khẩn cấp
                 new Service{ServiceId=4, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=5, ServiceName="Sửa chữa động cơ", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=6, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=7, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Nâng cấp xe
                 new Service{ServiceId=8, ServiceName="Thay đổi và nâng cấp hệ thống xe", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=5, ServiceStatus=Status.Activate, CreatedAt=now},
                 new Service{ServiceId=9, ServiceName="Sơn lại xe, cải tạo nội thất, ngoại thất", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Khác
                 new Service{ServiceId=10, ServiceName="Rửa xe", ServiceImage="",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration="10 tiếng", ServiceStatus=Status.Activate, CreatedAt=now},
+                    ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
             };
             modelBuilder.Entity<Service>().HasData(list);
         }
@@ -275,9 +275,9 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 30; i++)
             {
                 workingScheduleFaker.RuleFor(w => w.WorkingScheduleId, i)
-                    .RuleFor(w => w.StartTime, "7AM")
-                    .RuleFor(w => w.EndTime, "5PM")
-                    .RuleFor(w => w.DaysOfTheWeek, "Monday")
+                    .RuleFor(w => w.StartTime, "08:00 AM")
+                    .RuleFor(w => w.EndTime, "07:00 PM")
+                    .RuleFor(w => w.DaysOfTheWeek, f => f.PickRandom<DayOfWeek>().ToString())
                     .RuleFor(w => w.Description, f => f.Lorem.Lines())
                     .RuleFor(w => w.WorkingScheduleStatus, f => f.PickRandom<WorkingScheduleStatus>())
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
@@ -323,8 +323,8 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
                     .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
                     .RuleFor(g => g.FromTo, "Monday to Saturday")
-                    .RuleFor(g => g.OpenAt, "8AM")
-                    .RuleFor(g => g.CloseAt, "5PM")
+                    .RuleFor(g => g.OpenAt, "08:00 AM")
+                    .RuleFor(g => g.CloseAt, "05:00 PM")
                     .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
                     .RuleFor(g => g.GarageCity, "Ho Chi Minh")
                     .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))
@@ -388,7 +388,17 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(c => c.CouponCode, f => f.Random.Replace("##?###???#"))
                     .RuleFor(c => c.CouponDescription, f => f.Lorem.Paragraph())
                     .RuleFor(c => c.CouponType, f => f.PickRandom<CouponType>())
-                    .RuleFor(c => c.CouponValue, f => f.Random.Float(1, 100))
+                    .RuleFor(c => c.CouponValue, (f, g) =>
+                    {
+                        switch (g.CouponType)
+                        {
+                            case CouponType.Percent:
+                                return f.Random.Int(1, 10);
+                            case CouponType.FixedAmount:
+                                return f.Random.Int(50, 100);
+                        }
+                        return 0;
+                    })
                     .RuleFor(c => c.CouponStartDate, f => f.Date.Recent())
                     .RuleFor(c => c.CouponEndDate, f => f.Date.Soon())
                     .RuleFor(c => c.CouponMinSpend, f => f.Random.Float(1, 20))

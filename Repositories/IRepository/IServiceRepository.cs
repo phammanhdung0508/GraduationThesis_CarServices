@@ -5,10 +5,10 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IServiceRepository
     {
-        Task<List<ServiceDto>?> View(PageDto page);
-        Task<ServiceDto?> Detail(int id);
-        Task Create(CreateServiceDto serviceDto);
-        Task Update(UpdateServiceDto serviceDto);
+        Task<List<Service>?> View(PageDto page);
+        Task<Service?> Detail(int id);
+        Task Create(Service service);
+        Task Update(Service service);
         (float price, int duration) GetPriceAndDuration(int serviceId);
     }
 }

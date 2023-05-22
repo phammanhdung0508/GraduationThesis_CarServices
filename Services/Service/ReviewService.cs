@@ -12,10 +12,11 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IReviewRepository reviewRepository;
-        private readonly IUserService userRepository;
+        private readonly IUserRepository userRepository;
         private readonly IGarageService garageRepository;
 
-        public ReviewService(IMapper mapper, IReviewRepository reviewRepository, IUserService userRepository, IGarageService garageRepository){
+        public ReviewService(IMapper mapper, IReviewRepository reviewRepository, IUserRepository userRepository, IGarageService garageRepository)
+        {
             this.mapper = mapper;
             this.reviewRepository = reviewRepository;
             this.userRepository = userRepository;
@@ -27,8 +28,8 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper
-                .Map<List<ReviewListResponseDto>>(await reviewRepository.View(page));
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.View(page));
+
                 return list;
             }
             catch (Exception)
@@ -37,14 +38,31 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ReviewListResponseDto>?> FilterGarageReview(int garageId)
+        public async Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(int garageId, PageDto page)
         {
             try
             {
-                var list = mapper
-                .Map<List<ReviewListResponseDto>>(await reviewRepository.FilterGarageReview(garageId));
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(garageId, page));
 
                 return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ReviewDetailResponseDto?> Detail(int reviewId)
+        {
+            try
+            {
+                switch (await reviewRepository.IsReviewExist(reviewId))
+                {
+                    case true:
+                        var review = mapper.Map<ReviewDetailResponseDto>(await reviewRepository.Detail(reviewId));
+                        return review;
+                }
+                return null;
             }
             catch (Exception)
             {
@@ -56,14 +74,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
-                otp => otp.AfterMap((src, des) =>
+                switch (await userRepository.IsCustomer(requestDto.CustomerId))
                 {
-                    des.ReviewStatus = Status.Activate;
-                    des.CreatedAt = DateTime.Now;
-                }));
-                await reviewRepository.Create(review);
-                return true;
+                    case true:
+                        var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.ReviewStatus = Status.Activate;
+                            des.CreatedAt = DateTime.Now;
+                        }));
+                        await reviewRepository.Create(review);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -75,14 +98,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var r = await reviewRepository.Detail(requestDto.ReviewId);
-                var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await reviewRepository.IsReviewExist(requestDto.ReviewId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await reviewRepository.Update(review);
-                return true;
+                    case true:
+                        var r = await reviewRepository.Detail(requestDto.ReviewId);
+                        var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+                        await reviewRepository.Update(review);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {

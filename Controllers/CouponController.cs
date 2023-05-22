@@ -17,7 +17,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("get-garage-coupon/{garageId}")]
-        public async Task<ActionResult> GetGarageCoupon(int garageId)
+        public async Task<IActionResult> GetGarageCoupon(int garageId)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-coupon/{id}")]
-        public async Task<ActionResult> DetailCoupon(int id)
+        public async Task<IActionResult> DetailCoupon(int id)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-coupon")]
-        public async Task<ActionResult> CreateCoupon(CouponCreateRequestDto couponCreateRequestDto)
+        public async Task<IActionResult> CreateCoupon(CouponCreateRequestDto couponCreateRequestDto)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-coupon")]
-        public async Task<ActionResult> UpdateCoupon(CouponUpdateRequestDto couponUpdateRequestDto)
+        public async Task<IActionResult> UpdateCoupon(CouponUpdateRequestDto couponUpdateRequestDto)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-coupon-status")]
-        public async Task<ActionResult<bool>> UpdateStatus(CouponStatusRequestDto couponStatusRequestDto)
+        public async Task<IActionResult> UpdateStatus(CouponStatusRequestDto couponStatusRequestDto)
         {
             try
             {

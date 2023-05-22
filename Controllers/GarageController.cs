@@ -17,7 +17,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("get-nearby-garages-location")]
-        public async Task<ActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
+        public async Task<IActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("get-garages-with-coupon")]
-        public async Task<ActionResult> FilterGaragesWithCoupon(PageDto page)
+        public async Task<IActionResult> FilterGaragesWithCoupon(PageDto page)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-garage")]
-        public async Task<ActionResult> ViewGarage(PageDto page)
+        public async Task<IActionResult> ViewGarage(PageDto page)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("search-garage")]
-        public async Task<ActionResult> SearchGarage(SearchDto search)
+        public async Task<IActionResult> SearchGarage(SearchDto search)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-garage/{id}")]
-        public async Task<ActionResult> DetailGarage(int id)
+        public async Task<IActionResult> DetailGarage(int id)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-garage")]
-        public async Task<ActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
+        public async Task<IActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-garage")]
-        public async Task<ActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
+        public async Task<IActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-garage-status")]
-        public async Task<ActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
+        public async Task<IActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
             try
             {
@@ -186,7 +186,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-location")]
-        public async Task<ActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
+        public async Task<IActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {
             try
             {

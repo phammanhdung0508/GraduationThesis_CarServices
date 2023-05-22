@@ -1,7 +1,6 @@
 using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -12,10 +11,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class ReviewRepository : IReviewRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
         public ReviewRepository(IMapper mapper, DataContext context)
         {
-            this.mapper = mapper;
             this.context = context;
         }
 
@@ -24,10 +21,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await PagingConfiguration<Review>
-                .Get(context.Reviews
-                .Include(r => r.Customer)
-                .ThenInclude(c => c.User)
-                .Include(r => r.Garage), page);
+                .Get(context.Reviews, page);
+
                 return list;
             }
             catch (Exception)
@@ -36,15 +31,26 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Review>?> FilterGarageReview(int garageId)
+        public async Task<bool> IsReviewExist(int reviewId){
+            try
+            {
+                var check = await context.Reviews
+                .Where(r => r.ReviewId == reviewId).AnyAsync();
+
+                return check;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Review>?> FilterReviewByGarageId(int garageId, PageDto page)
         {
             try
             {
-                var list = await context.Reviews
-                .Where(c => c.GarageId == garageId)
-                .Include(r => r.Customer)
-                .Include(r => r.Garage)
-                .ThenInclude(c => c.User).ToListAsync();
+                var list = await PagingConfiguration<Review>
+                .Get(context.Reviews.Where(c => c.GarageId == garageId), page);
 
                 return list;
             }
@@ -63,6 +69,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(r => r.Customer).ThenInclude(c => c.User)
                 .Include(r => r.Garage)
                 .ThenInclude(c => c.User).FirstOrDefaultAsync();
+                
                 return review;
             }
             catch (Exception)

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Services.IService;
@@ -20,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-review")]
-        public async Task<ActionResult<List<ReviewListResponseDto>>> ViewReview(PageDto page)
+        public async Task<IActionResult> ViewReview(PageDto page)
         {
             try
             {
@@ -39,12 +35,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-garage-reviews/{id}")]
-        public async Task<ActionResult<List<ReviewListResponseDto>>> GetGarageReview(int id)
+        [HttpGet("get-garage-reviews/{garageId}")]
+        public async Task<IActionResult> GerReviewPerGarage(int garageId, PageDto page)
         {
             try
             {
-                var list = await reviewService.FilterGarageReview(id)!;
+                var list = await reviewService.FilterReviewByGarageId(garageId, page)!;
                 return Ok(list);
             }
             catch (Exception e)
@@ -59,28 +55,28 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        // [HttpGet("detail-review/{id}")]
-        // public async Task<ActionResult<ReviewDto>> DetailReview(int id)
-        // {
-        //     try
-        //     {
-        //         var review = await reviewService.Detail(id);
-        //         return Ok(review);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         var inner = e.InnerException;
-        //         while (inner != null)
-        //         {
-        //             Console.WriteLine(inner.StackTrace);
-        //             inner = inner.InnerException;
-        //         }
-        //         return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-        //     }
-        // }
+        [HttpGet("detail-review/{id}")]
+        public async Task<IActionResult> DetailReview(int id)
+        {
+            try
+            {
+                var review = await reviewService.Detail(id);
+                return Ok(review);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
 
         [HttpPost("create-review")]
-        public async Task<ActionResult<bool>> CreateReview(ReviewCreateRequestDto reviewDto)
+        public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
         {
             try
             {
@@ -103,7 +99,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-review")]
-        public async Task<ActionResult<bool>> UpdateReview(ReviewUpdateRequestDto reviewDto)
+        public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
         {
             try
             {
@@ -126,7 +122,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-status-review")]
-        public async Task<ActionResult<bool>> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
+        public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {
             try
             {

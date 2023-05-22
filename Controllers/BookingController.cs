@@ -17,7 +17,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("view-all-booking")]
-        public async Task<ActionResult> ViewAllBooking(PageDto page)
+        public async Task<IActionResult> ViewAllBooking(PageDto page)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("check-booking")]
-        public async Task<ActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto){
+        public async Task<IActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto){
             try
             {
                 var list = await bookingService.IsBookingAvailable(bookingCheckRequestDto);
@@ -56,7 +56,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpGet("detail-booking/{id}")]
-        public async Task<ActionResult> DetailBooking(int id)
+        public async Task<IActionResult> DetailBooking(int id)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPost("create-booking")]
-        public async Task<ActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
+        public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [HttpPut("update-booking")]
-        public async Task<ActionResult> UpdateBooking(BookingUpdateRequestDto bookingUpdateRequestDto)
+        public async Task<IActionResult> UpdateBooking(BookingUpdateRequestDto bookingUpdateRequestDto)
         {
             try
             {

@@ -45,6 +45,7 @@ namespace GraduationThesis_CarServices.Mapping
             //Garage
             CreateMap<Garage, GarageBookingDto>()
                 .ReverseMap().ForMember(des => des.Bookings, obj => obj.Ignore());
+            CreateMap<Garage, GarageReviewDto>();
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<Garage, GarageListResponseDto>()
                 .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User)).ReverseMap();
@@ -63,9 +64,11 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //User
+            CreateMap<User, UserReviewDto>();
             CreateMap<User, UserGarageDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
-                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role)).ReverseMap();
+                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
+            //----------------------------------------------------------------------------------------------------------------------
             CreateMap<User, UserListResponseDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role)).ReverseMap();
@@ -85,13 +88,16 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
 
 
+            //Customer
+            CreateMap<Customer, CustomerReviewDto>()
+                .ForMember(des => des.UserReviewDto, obj => obj.MapFrom(src => src.User));
+
+
             //Review
             CreateMap<ReviewGarageDto, Review>()
                 .ForMember(des => des.Garage, obj => obj.Ignore()).ReverseMap();
             //----------------------------------------------------------------------------------------------------------------------
-            CreateMap<Review, ReviewListResponseDto>()
-                .ForMember(des => des.CustomerReviewDto, obj => obj.MapFrom(src => src.Customer))
-                .ForMember(des => des.GarageReviewDto, obj => obj.MapFrom(src => src.Garage)).ReverseMap();
+            CreateMap<Review, ReviewListResponseDto>();
             CreateMap<Review, ReviewDetailResponseDto>()
                 .ForMember(des => des.CustomerReviewDto, obj => obj.MapFrom(src => src.Customer))
                 .ForMember(des => des.GarageReviewDto, obj => obj.MapFrom(src => src.Garage)).ReverseMap();;

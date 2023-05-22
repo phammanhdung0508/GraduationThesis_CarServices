@@ -10,7 +10,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class UserRepository : IUserRepository
     {
         public readonly DataContext context;
-        public UserRepository(DataContext context){
+        public UserRepository(DataContext context)
+        {
             this.context = context;
         }
 
@@ -21,6 +22,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await PagingConfiguration<User>
                 .Get(context.Users.Include(u => u.Role), page);
                 return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsCustomer(int customerId)
+        {
+            try
+            {
+                var check = await context.Customers
+                .Where(l => l.CustomerId == customerId).AnyAsync();
+
+                return check;
             }
             catch (Exception)
             {

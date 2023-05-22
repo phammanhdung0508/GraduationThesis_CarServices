@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-service")]
-        public async Task<ActionResult<List<ServiceDto>>> ViewService(PageDto page)
+        public async Task<ActionResult<List<ServiceListResponseDto>>>ViewService(PageDto page)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-service/{id}")]
-        public async Task<ActionResult<ServiceDto>> DetailService(int id)
+        public async Task<ActionResult<ServiceDetailResponseDto>> DetailService(int id)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-service")]
-        public async Task<ActionResult<bool>> CreateService(CreateServiceDto service)
+        public async Task<ActionResult<bool>> CreateService(ServiceCreateRequestDto service)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-service")]
-        public async Task<ActionResult<bool>> UpdateService(UpdateServiceDto service)
+        public async Task<ActionResult<bool>> UpdateService(ServiceUpdateRequestDto service)
         {
             try
             {
@@ -101,7 +101,28 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        //Temporary don't make delete function because there's no service status
+        [HttpPut("update-status-service")]
+        public async Task<ActionResult<bool>> UpdateStatusService(ServiceStatusRequestDto service)
+        {
+            try
+            {
+                if (await serviceService.UpdateStatus(service))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
 
     }
 }

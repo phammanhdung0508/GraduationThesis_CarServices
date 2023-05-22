@@ -20,12 +20,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
 
 
-        public async Task<List<ServiceDto>?> View(PageDto page)
+        public async Task<List<Service>?> View(PageDto page)
         {
             try
             {
-                List<Service> list = await PagingConfiguration<Service>.Get(context.Services, page);
-                return mapper.Map<List<ServiceDto>>(list);
+                var list = await PagingConfiguration<Service>.Get(context.Services, page);
+                return list;
             }
             catch (Exception)
             {
@@ -33,11 +33,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<ServiceDto?> Detail(int id)
+        public async Task<Service?> Detail(int id)
         {
             try
             {
-                ServiceDto service = mapper.Map<ServiceDto>(await context.Services.FirstOrDefaultAsync(c => c.ServiceId == id));
+                var service = await context.Services
+                .Where(s => s.ServiceId == id)
+                .Include(s => s.Products)
+                .Include(s => s.ServiceGarages).ThenInclude(g => g.Garage).FirstOrDefaultAsync();
                 return service;
             }
             catch (Exception)
@@ -46,11 +49,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateServiceDto serviceDto)
+        public async Task Create(Service service)
         {
             try
             {
-                Service service = mapper.Map<Service>(serviceDto);
                 context.Services.Add(service);
                 await context.SaveChangesAsync();
             }
@@ -60,12 +62,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateServiceDto serviceDto)
+        public async Task Update(Service service)
         {
             try
             {
-                var service = context.Services.FirstOrDefault(c => c.ServiceId == serviceDto.ServiceId)!;
-                mapper.Map<UpdateServiceDto, Service?>(serviceDto, service);
                 context.Services.Update(service);
                 await context.SaveChangesAsync();
             }

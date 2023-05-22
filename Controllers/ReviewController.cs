@@ -39,7 +39,7 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("get-garage-reviews/{id}")]
+        [HttpGet("get-garage-reviews/{id}")]
         public async Task<ActionResult<List<ReviewListResponseDto>>> GetGarageReview(int id)
         {
             try

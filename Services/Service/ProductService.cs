@@ -37,12 +37,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ProductListResponseDto>?> FilterServiceProduct(int ServiceId)
+        public async Task<List<ProductListResponseDto>?> FilterAvailableServiceProduct(int ServiceId)
         {
             try
             {
                 var list = mapper
-                .Map<List<ProductListResponseDto>>(await productRepository.FilterServiceProduct(ServiceId));
+                .Map<List<ProductListResponseDto>>(await productRepository.FilterAvailableServiceProduct(ServiceId));
 
                 return list;
             }

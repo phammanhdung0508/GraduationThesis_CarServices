@@ -7,7 +7,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IProductRepository
     {
         Task<List<Product>?> View(PageDto page);
-        Task<List<Product>?> FilterServiceProduct(int ServiceId);
+        Task<List<Product>?> FilterAvailableServiceProduct(int ServiceId);
         Task<Product?> Detail(int id);
         Task Create(Product product);
         Task Update(Product product);

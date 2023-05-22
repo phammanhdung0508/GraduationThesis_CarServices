@@ -19,15 +19,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<ReviewDto>?> View(PageDto page)
+        public async Task<List<Review>?> View(PageDto page)
         {
             try
             {
-                List<Review> list = await PagingConfiguration<Review>
+                var list = await PagingConfiguration<Review>
                 .Get(context.Reviews
                 .Include(r => r.Customer)
+                .ThenInclude(c => c.User)
                 .Include(r => r.Garage), page);
-                return mapper.Map<List<ReviewDto>>(list);
+                return list;
             }
             catch (Exception)
             {
@@ -35,13 +36,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<ReviewDto?> Detail(int id)
+        public async Task<List<Review>?> FilterGarageReview(int garageId)
         {
             try
             {
-                ReviewDto review = mapper.Map<ReviewDto>(await context.Reviews
-                .Include(r => r.Customer).Include(r => r.Garage)
-                .FirstOrDefaultAsync(r => r.ReviewId == id));
+                var list = await context.Reviews
+                .Where(c => c.GarageId == garageId)
+                .Include(r => r.Customer)
+                .Include(r => r.Garage)
+                .ThenInclude(c => c.User).ToListAsync();
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Review?> Detail(int id)
+        {
+            try
+            {
+                var review = await context.Reviews
+                .Where(r => r.ReviewId == id)
+                .Include(r => r.Customer).ThenInclude(c => c.User)
+                .Include(r => r.Garage)
+                .ThenInclude(c => c.User).FirstOrDefaultAsync();
                 return review;
             }
             catch (Exception)
@@ -50,12 +71,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(CreateReviewDto reviewDto)
+        public async Task Create(Review review)
         {
             try
             {
-                Review Review = mapper.Map<Review>(reviewDto);
-                context.Reviews.Add(Review);
+                context.Reviews.Add(review);
                 await context.SaveChangesAsync();
             }
             catch (Exception)
@@ -64,27 +84,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(UpdateReviewDto reviewDto)
+        public async Task Update(Review review)
         {
             try
             {
-                var review = context.Reviews.FirstOrDefault(g => g.ReviewId == reviewDto.ReviewId)!;
-                mapper.Map<UpdateReviewDto, Review?>(reviewDto, review);
-                context.Reviews.Update(review);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task Delete(DeleteReviewDto reviewDto)
-        {
-            try
-            {
-                var review = context.Reviews.FirstOrDefault(g => g.ReviewId == reviewDto.ReviewId)!;
-                mapper.Map<DeleteReviewDto, Review?>(reviewDto, review);
                 context.Reviews.Update(review);
                 await context.SaveChangesAsync();
             }

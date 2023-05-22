@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-review")]
-        public async Task<ActionResult<List<ReviewDto>>> ViewReview(PageDto page)
+        public async Task<ActionResult<List<ReviewListResponseDto>>> ViewReview(PageDto page)
         {
             try
             {
@@ -39,13 +39,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-review/{id}")]
-        public async Task<ActionResult<ReviewDto>> DetailReview(int id)
+        [HttpGet("get-garage-reviews/{id}")]
+        public async Task<ActionResult<List<ReviewListResponseDto>>> GetGarageReview(int id)
         {
             try
             {
-                var review = await reviewService.Detail(id);
-                return Ok(review);
+                var list = await reviewService.FilterGarageReview(id)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
@@ -59,8 +59,28 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
+        // [HttpGet("detail-review/{id}")]
+        // public async Task<ActionResult<ReviewDto>> DetailReview(int id)
+        // {
+        //     try
+        //     {
+        //         var review = await reviewService.Detail(id);
+        //         return Ok(review);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         var inner = e.InnerException;
+        //         while (inner != null)
+        //         {
+        //             Console.WriteLine(inner.StackTrace);
+        //             inner = inner.InnerException;
+        //         }
+        //         return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+        //     }
+        // }
+
         [HttpPost("create-review")]
-        public async Task<ActionResult<bool>> CreateReview(CreateReviewDto reviewDto)
+        public async Task<ActionResult<bool>> CreateReview(ReviewCreateRequestDto reviewDto)
         {
             try
             {
@@ -83,7 +103,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-review")]
-        public async Task<ActionResult<bool>> UpdateReview(UpdateReviewDto reviewDto)
+        public async Task<ActionResult<bool>> UpdateReview(ReviewUpdateRequestDto reviewDto)
         {
             try
             {
@@ -105,12 +125,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("delete-review")]
-        public async Task<ActionResult<bool>> DeleteReview(DeleteReviewDto reviewDto)
+        [HttpPut("update-status-review")]
+        public async Task<ActionResult<bool>> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {
             try
             {
-                if (await reviewService.Delete(reviewDto))
+                if (await reviewService.UpdateStatus(reviewDto))
                 {
                     return Ok("Successfully!");
                 }

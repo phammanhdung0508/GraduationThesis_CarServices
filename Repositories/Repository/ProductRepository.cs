@@ -25,9 +25,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await PagingConfiguration<Product>
                 .Get(context.Products
-                .Include(p => p.Subcategory)
-                .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles).ThenInclude(m => m.MediaFile), page);
+                // .Include(p => p.Subcategory)
+                // .Include(p => p.Service)
+                // .Include(p => p.ProductMediaFiles)
+                //.ThenInclude(m => m.MediaFile)
+                , page);
                 return list;
             }
             catch (Exception)
@@ -36,16 +38,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Product>?> FilterAvailableServiceProduct(int ServiceId)
+        public async Task<List<Product>?> FilterAvailableProductForService(int ServiceId)
         {
             try
             {
                 var list = await context.Products
                 .Where(p => p.ServiceId == ServiceId && p.ProductQuantity > 0)
-                .Include(p => p.Subcategory)
-                .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles)
-                .ThenInclude(m => m.MediaFile)
+                // .Include(p => p.Subcategory)
+                // .Include(p => p.Service)
+                // .Include(p => p.ProductMediaFiles)
+                // .ThenInclude(m => m.MediaFile)
                 .ToListAsync();
 
                 return list;
@@ -62,9 +64,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var product = await context.Products
                 .Where(p => p.ProductId == id)
-                .Include(p => p.Subcategory)
-                .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles).ThenInclude(m => m.MediaFile)
+                // .Include(p => p.Subcategory)
+                // .Include(p => p.Service)
+                // .Include(p => p.ProductMediaFiles)
+                // .ThenInclude(m => m.MediaFile)
                 .FirstOrDefaultAsync();
                 return product;
             }

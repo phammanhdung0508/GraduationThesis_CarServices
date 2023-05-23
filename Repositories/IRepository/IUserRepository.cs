@@ -6,6 +6,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IUserRepository
     {
         Task<List<User>?> View(PageDto page);
+        Task<bool> IsCustomer(int customerId);
         Task<User?> Detail(int id);
         Task Create(User user);
         Task Update(User user);

@@ -11,16 +11,12 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository productRepository;
-        private readonly ISubcategoryRepository subcategoryRepository;
-        private readonly IServiceRepository serviceRepository;
 
         private readonly IMapper mapper;
-        public ProductService(IMapper mapper, IProductRepository productRepository, ISubcategoryRepository subcategoryRepository, IServiceRepository serviceRepository)
+        public ProductService(IMapper mapper, IProductRepository productRepository)
         {
             this.mapper = mapper;
             this.productRepository = productRepository;
-            this.subcategoryRepository = subcategoryRepository;
-            this.serviceRepository = serviceRepository;
         }
 
         public async Task<List<ProductListResponseDto>?> View(PageDto page)
@@ -37,12 +33,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ProductListResponseDto>?> FilterAvailableServiceProduct(int ServiceId)
+        public async Task<List<ProductListResponseDto>?> FilterAvailableProductForService(int ServiceId)
         {
             try
             {
                 var list = mapper
-                .Map<List<ProductListResponseDto>>(await productRepository.FilterAvailableServiceProduct(ServiceId));
+                .Map<List<ProductListResponseDto>>(await productRepository.FilterAvailableProductForService(ServiceId));
 
                 return list;
             }

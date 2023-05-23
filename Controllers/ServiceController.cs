@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-service")]
-        public async Task<ActionResult<List<ServiceListResponseDto>>>ViewService(PageDto page)
+        public async Task<IActionResult>ViewService(PageDto page)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-service/{id}")]
-        public async Task<ActionResult<ServiceDetailResponseDto>> DetailService(int id)
+        public async Task<IActionResult> DetailService(int id)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-service")]
-        public async Task<ActionResult<bool>> CreateService(ServiceCreateRequestDto service)
+        public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-service")]
-        public async Task<ActionResult<bool>> UpdateService(ServiceUpdateRequestDto service)
+        public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
         {
             try
             {
@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-status-service")]
-        public async Task<ActionResult<bool>> UpdateStatusService(ServiceStatusRequestDto service)
+        public async Task<IActionResult> UpdateStatusService(ServiceStatusRequestDto service)
         {
             try
             {

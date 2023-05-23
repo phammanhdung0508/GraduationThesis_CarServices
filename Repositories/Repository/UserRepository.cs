@@ -28,6 +28,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsCustomer(int customerId)
+        {
+            try
+            {
+                var check = await context.Customers
+                .Where(l => l.CustomerId == customerId).AnyAsync();
+
+                return check;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<User?> Detail(int id)
         {
             try

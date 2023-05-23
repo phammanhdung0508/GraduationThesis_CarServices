@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-product")]
-        public async Task<ActionResult<List<ProductListResponseDto>>> ViewProduct(PageDto page)
+        public async Task<IActionResult> ViewProduct(PageDto page)
         {
             try
             {
@@ -37,12 +37,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-available-service-products/{id}")]
-        public async Task<ActionResult<List<ProductListResponseDto>>> GetAvailableServiceProducts(int id)
+        [HttpGet("get-available-products-for-service/{id}")]
+        public async Task<IActionResult> GetAvailableProductsForService(int id)
         {
             try
             {
-                var productList = await productService.FilterAvailableServiceProduct(id)!;
+                var productList = await productService.FilterAvailableProductForService(id)!;
                 return Ok(productList);
             }
             catch (Exception e)
@@ -58,7 +58,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpGet("detail-product/{id}")]
-        public async Task<ActionResult<ProductDetailResponseDto>> DetailProduct(int id)
+        public async Task<IActionResult> DetailProduct(int id)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("create-product")]
-        public async Task<ActionResult<bool>> CreateProduct(ProductCreateRequestDto product)
+        public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
         {
             try
             {
@@ -101,7 +101,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-product")]
-        public async Task<ActionResult<bool>> UpdateProduct(ProductUpdateRequestDto product)
+        public async Task<IActionResult> UpdateProduct(ProductUpdateRequestDto product)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-status-product")]
-        public async Task<ActionResult<bool>> UpdateStatusProduct(ProductStatusRequestDto product)
+        public async Task<IActionResult> UpdateStatusProduct(ProductStatusRequestDto product)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPut("update-quantity-product")]
-        public async Task<ActionResult<bool>> UpdateQuantityProduct(ProductQuantityRequestDto product)
+        public async Task<IActionResult> UpdateQuantityProduct(ProductQuantityRequestDto product)
         {
             try
             {

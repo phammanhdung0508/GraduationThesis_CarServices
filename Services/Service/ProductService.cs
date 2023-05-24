@@ -72,8 +72,13 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.ProductStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
-                await productRepository.Create(product);
-                return true;
+                switch (await productRepository.IsDuplicatedProduct(product))
+                {
+                    case false:
+                        await productRepository.Create(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -85,14 +90,20 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await productRepository.Update(product);
-                return true;
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -104,10 +115,15 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
-                await productRepository.Update(product);
-                return true;
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
+                {
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -118,14 +134,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await productRepository.Update(product);
-                return true;
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {

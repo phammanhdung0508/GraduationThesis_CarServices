@@ -38,6 +38,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsProductExist(int productId){
+            try
+            {
+                var check = await context.Products
+                .Where(p => p.ProductId == productId).AnyAsync();
+
+                return check;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<Product>?> FilterAvailableProductForService(int ServiceId)
         {
             try
@@ -70,6 +84,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 // .ThenInclude(m => m.MediaFile)
                 .FirstOrDefaultAsync();
                 return product;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsDuplicatedProduct(Product product){
+            try
+            {
+                var check = await context.Products
+                .Where(s => s.ProductName.Equals(product.ProductName)
+                && s.ProductDetailDescription.Equals(product.ProductDetailDescription)
+                && s.ProductPrice == product.ProductPrice).AnyAsync();
+
+                return check;
             }
             catch (Exception)
             {

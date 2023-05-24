@@ -33,16 +33,48 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsServiceExist(int serviceId){
+            try
+            {
+                var check = await context.Services
+                .Where(s => s.ServiceId == serviceId).AnyAsync();
+
+                return check;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         public async Task<Service?> Detail(int id)
         {
             try
             {
                 var service = await context.Services
                 .Where(s => s.ServiceId == id)
-                .Include(s => s.Products)
-                .Include(s => s.ServiceGarages).ThenInclude(g => g.Garage)
+                // .Include(s => s.Products)
+                // .Include(s => s.ServiceGarages).ThenInclude(g => g.Garage)
                 .FirstOrDefaultAsync();
                 return service;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsDuplicatedService(Service service){
+            try
+            {
+                var check = await context.Services
+                .Where(s => s.ServiceName.Equals(service.ServiceName)
+                && s.ServiceDetailDescription.Equals(service.ServiceDetailDescription)
+                && s.ServicePrice == service.ServicePrice
+                && s.ServiceDuration == service.ServiceDuration).AnyAsync();
+
+                return check;
             }
             catch (Exception)
             {

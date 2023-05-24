@@ -33,6 +33,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsGarageExist(int garageId){
+            try
+            {
+                var isExist = await context.Garages
+                .Where(g => g.GarageId == garageId).AnyAsync();
+
+                return isExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<Garage>?> GetAll()
         {
             try

@@ -9,5 +9,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<Car?> Detail(int id);
         Task Create(Car car);
         Task Update(Car car);
+        Task<bool> IsCarExist(int carId);
     }
 }

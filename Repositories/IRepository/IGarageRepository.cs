@@ -7,6 +7,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IGarageRepository
     {
         Task<List<Garage>?> View(PageDto page);
+        Task<bool> IsGarageExist(int garageId);
         Task<List<Garage>?> GetAll();
         Task<List<Garage>?> Search(SearchDto search);
         Task<List<Garage>?> FilterCoupon(PageDto page);

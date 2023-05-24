@@ -34,10 +34,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         public async Task<bool> IsReviewExist(int reviewId){
             try
             {
-                var check = await context.Reviews
+                var isExist = await context.Reviews
                 .Where(r => r.ReviewId == reviewId).AnyAsync();
 
-                return check;
+                return isExist;
             }
             catch (Exception)
             {

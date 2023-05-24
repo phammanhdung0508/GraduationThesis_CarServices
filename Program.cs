@@ -112,6 +112,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("MyCors");
 
+app.UseExceptionHandler("/error");
+
 app.UseAuthentication();
 
 app.UseAuthorization();

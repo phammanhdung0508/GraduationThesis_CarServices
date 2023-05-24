@@ -29,14 +29,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsCustomer(int customerId)
+        public async Task<bool> IsCustomerExist(int customerId)
         {
             try
             {
-                var check = await context.Customers
+                var isExist = await context.Customers
                 .Where(l => l.CustomerId == customerId).AnyAsync();
 
-                return check;
+                return isExist;
             }
             catch (Exception)
             {

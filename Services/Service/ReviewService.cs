@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -13,9 +14,9 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMapper mapper;
         private readonly IReviewRepository reviewRepository;
         private readonly IUserRepository userRepository;
-        private readonly IGarageService garageRepository;
+        private readonly IGarageRepository garageRepository;
 
-        public ReviewService(IMapper mapper, IReviewRepository reviewRepository, IUserRepository userRepository, IGarageService garageRepository)
+        public ReviewService(IMapper mapper, IReviewRepository reviewRepository, IUserRepository userRepository, IGarageRepository garageRepository)
         {
             this.mapper = mapper;
             this.reviewRepository = reviewRepository;
@@ -32,22 +33,50 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(int garageId, PageDto page)
+        public async Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(PagingReviewPerGarageRequestDto requestDto)
         {
             try
             {
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(garageId, page));
+                var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
 
+                switch (false)
+                {
+                    case var isExist when isExist == isGarageExist:
+                        throw new NullReferenceException("The garage doesn't exist.");
+                }
+
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(requestDto.GarageId, page));
+                
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -56,51 +85,94 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                switch (await reviewRepository.IsReviewExist(reviewId))
+                var isReviewExist = await reviewRepository.IsReviewExist(reviewId);
+
+                switch (false)
                 {
-                    case true:
-                        var review = mapper.Map<ReviewDetailResponseDto>(await reviewRepository.Detail(reviewId));
-                        return review;
+                    case var isExist when isExist == isReviewExist:
+                        throw new Exception("The review doesn't exist.");
                 }
-                return null;
+
+                var review = mapper.Map<ReviewDetailResponseDto>(await reviewRepository.Detail(reviewId));
+
+                return review;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Create(ReviewCreateRequestDto requestDto)
+        public async Task Create(ReviewCreateRequestDto requestDto)
         {
             try
             {
-                switch (await userRepository.IsCustomer(requestDto.CustomerId))
+                var isInRange = false;
+                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
+                var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
+                if (requestDto.Rating >= 0 && requestDto.Rating <= 5)
                 {
-                    case true:
+                    isInRange = true;
+                }
+
+                switch (false)
+                {
+                    case var isExist when isExist == isCustomerExist:
+                        throw new Exception("The customer doesn't exist.");
+                    case var isExist when isExist == isGarageExist:
+                        throw new Exception("The garage doesn't exist.");
+                    case var isRange when isRange == isInRange:
+                        throw new Exception("Rating is outside of the range allowed.");
+                    default:
                         var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
-                        otp => otp.AfterMap((src, des) =>
-                        {
-                            des.ReviewStatus = Status.Activate;
-                            des.CreatedAt = DateTime.Now;
-                        }));
+                            otp => otp.AfterMap((src, des) =>
+                            {
+                                des.ReviewStatus = Status.Activate;
+                                des.CreatedAt = DateTime.Now;
+                            }));
                         await reviewRepository.Create(review);
-                        return true;
+
+                        throw new Exception("Successfully.");
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Update(ReviewUpdateRequestDto requestDto)
+        public async Task Update(ReviewUpdateRequestDto requestDto)
         {
             try
             {
-                switch (await reviewRepository.IsReviewExist(requestDto.ReviewId))
+                var isInRange = false;
+                var isReviewExist = await reviewRepository.IsReviewExist(requestDto.ReviewId);
+                if (requestDto.Rating >= 0 && requestDto.Rating <= 5)
                 {
-                    case true:
+                    isInRange = true;
+                }
+
+                switch (false)
+                {
+                    case var isExist when isExist == isReviewExist:
+                        throw new Exception("The review doesn't exist.");
+                    case var isRange when isRange == isInRange:
+                        throw new Exception("Rating is outside of the range allowed.");
+                    default:
                         var r = await reviewRepository.Detail(requestDto.ReviewId);
                         var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
                         otp => otp.AfterMap((src, des) =>
@@ -108,27 +180,50 @@ namespace GraduationThesis_CarServices.Services.Service
                             des.UpdatedAt = DateTime.Now;
                         }));
                         await reviewRepository.Update(review);
-                        return true;
+
+                        throw new Exception("Successfully.");
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> UpdateStatus(ReviewStatusRequestDto requestDto)
+        public async Task UpdateStatus(ReviewStatusRequestDto requestDto)
         {
             try
             {
-                var r = await reviewRepository.Detail(requestDto.ReviewId);
-                var review = mapper.Map<ReviewStatusRequestDto, Review>(requestDto, r!);
-                await reviewRepository.Update(review);
-                return true;
+                var isReviewExist = await reviewRepository.IsReviewExist(requestDto.ReviewId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isReviewExist:
+                        throw new Exception("The review doesn't exist.");
+                    default:
+                        var r = await reviewRepository.Detail(requestDto.ReviewId);
+                        var review = mapper.Map<ReviewStatusRequestDto, Review>(requestDto, r!);
+                        await reviewRepository.Update(review);
+
+                        throw new Exception("Successfully.");
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }

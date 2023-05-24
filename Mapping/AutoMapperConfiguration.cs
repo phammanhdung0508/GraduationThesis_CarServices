@@ -182,8 +182,6 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.ReportBookingDto, obj => obj.MapFrom(src => src.Report));
             CreateMap<Booking, BookingCreateRequestDto>()
                 .ReverseMap();
-            CreateMap<Booking, BookingUpdateRequestDto>()
-                .ForMember(des => des.BookingId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Booking, BookingStatusRequestDto>()
                 .ForMember(des => des.BookingId, obj => obj.Ignore()).ReverseMap();
         }

@@ -6,10 +6,10 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IReviewService
     {
         Task<List<ReviewListResponseDto>?> View(PageDto page);
-        Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(int garageId, PageDto page);
+        Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(PagingReviewPerGarageRequestDto requestDto);
         Task<ReviewDetailResponseDto?> Detail(int garageId);
-        Task<bool> Create(ReviewCreateRequestDto requestDto);
-        Task<bool> Update(ReviewUpdateRequestDto requestDto);
-        Task<bool> UpdateStatus(ReviewStatusRequestDto requestDto);
+        Task Create(ReviewCreateRequestDto requestDto);
+        Task Update(ReviewUpdateRequestDto requestDto);
+        Task UpdateStatus(ReviewStatusRequestDto requestDto);
     }
 }

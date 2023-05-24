@@ -8,7 +8,8 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<BookingListResponseDto>?> View(PageDto page);
         Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto);
         Task<BookingDetailResponseDto?> Detail(int id);
-        Task<bool> Create(BookingCreateRequestDto requestDto);
-        Task<bool> Update(BookingUpdateRequestDto requestDto);
+        Task Create(BookingCreateRequestDto requestDto);
+        Task UpdateStatus(BookingStatusRequestDto requestDto);
+        Task<List<BookingListResponseDto>?> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
     }
 }

@@ -30,6 +30,35 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsBookingExist(int bookingId){
+            try
+            {
+                var isExist = await context.Bookings
+                .Where(b => b.BookingId == bookingId).AnyAsync();
+
+                return isExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Booking>?> FilterBookingByGarageId(int garageId, PageDto page)
+        {
+            try
+            {
+                var list = await PagingConfiguration<Booking>
+                .Get(context.Bookings.Where(b => b.GarageId == garageId), page);
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId){
             try
             {

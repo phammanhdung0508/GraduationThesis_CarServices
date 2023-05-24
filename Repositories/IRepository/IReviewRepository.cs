@@ -6,7 +6,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IReviewRepository
     {
         Task<List<Review>?> View(PageDto page);
-        Task<bool> IsReviewExist(int reviewId);
         Task<List<Review>?> FilterReviewByGarageId(int garageId, PageDto page);
         Task<Review?> Detail(int id);
         Task Create(Review review);

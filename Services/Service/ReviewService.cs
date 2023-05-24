@@ -65,7 +65,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 };
 
                 var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(requestDto.GarageId, page));
-                
+
                 return list;
             }
             catch (Exception e)
@@ -85,15 +85,13 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var isReviewExist = await reviewRepository.IsReviewExist(reviewId);
+                var review = mapper.Map<ReviewDetailResponseDto>(await reviewRepository.Detail(reviewId));
 
                 switch (false)
                 {
-                    case var isExist when isExist == isReviewExist:
-                        throw new Exception("The review doesn't exist.");
+                    case var isExist when isExist == (review != null):
+                        throw new NullReferenceException("The review doesn't exist.");
                 }
-
-                var review = mapper.Map<ReviewDetailResponseDto>(await reviewRepository.Detail(reviewId));
 
                 return review;
             }
@@ -125,22 +123,21 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isCustomerExist:
-                        throw new Exception("The customer doesn't exist.");
+                        throw new NullReferenceException("The customer doesn't exist.");
                     case var isExist when isExist == isGarageExist:
-                        throw new Exception("The garage doesn't exist.");
+                        throw new NullReferenceException("The garage doesn't exist.");
                     case var isRange when isRange == isInRange:
-                        throw new Exception("Rating is outside of the range allowed.");
-                    default:
-                        var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
+                        throw new ArgumentOutOfRangeException("Rating is outside of the range allowed.");
+                }
+
+                var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
                             otp => otp.AfterMap((src, des) =>
                             {
                                 des.ReviewStatus = Status.Activate;
                                 des.CreatedAt = DateTime.Now;
                             }));
-                        await reviewRepository.Create(review);
 
-                        throw new Exception("Successfully.");
-                }
+                await reviewRepository.Create(review);
             }
             catch (Exception e)
             {
@@ -159,30 +156,23 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var isInRange = false;
-                var isReviewExist = await reviewRepository.IsReviewExist(requestDto.ReviewId);
-                if (requestDto.Rating >= 0 && requestDto.Rating <= 5)
-                {
-                    isInRange = true;
-                }
+                var r = await reviewRepository.Detail(requestDto.ReviewId);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isReviewExist:
-                        throw new Exception("The review doesn't exist.");
-                    case var isRange when isRange == isInRange:
-                        throw new Exception("Rating is outside of the range allowed.");
-                    default:
-                        var r = await reviewRepository.Detail(requestDto.ReviewId);
-                        var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
-                        otp => otp.AfterMap((src, des) =>
-                        {
-                            des.UpdatedAt = DateTime.Now;
-                        }));
-                        await reviewRepository.Update(review);
-
-                        throw new Exception("Successfully.");
+                    case var isExist when isExist == (r != null):
+                        throw new NullReferenceException("The review doesn't exist.");
+                    case var isRange when isRange == (requestDto.Rating >= 0 && requestDto.Rating <= 5):
+                        throw new ArgumentOutOfRangeException("Rating is outside of the range allowed.");
                 }
+
+                var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+
+                await reviewRepository.Update(review);
             }
             catch (Exception e)
             {
@@ -201,19 +191,17 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var isReviewExist = await reviewRepository.IsReviewExist(requestDto.ReviewId);
+                var r = await reviewRepository.Detail(requestDto.ReviewId);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isReviewExist:
-                        throw new Exception("The review doesn't exist.");
-                    default:
-                        var r = await reviewRepository.Detail(requestDto.ReviewId);
-                        var review = mapper.Map<ReviewStatusRequestDto, Review>(requestDto, r!);
-                        await reviewRepository.Update(review);
-
-                        throw new Exception("Successfully.");
+                    case var isExist when isExist == (r != null):
+                        throw new NullReferenceException("The review doesn't exist.");
                 }
+
+                var review = mapper.Map<ReviewStatusRequestDto, Review>(requestDto, r!);
+
+                await reviewRepository.Update(review);
             }
             catch (Exception e)
             {

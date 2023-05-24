@@ -49,14 +49,14 @@ namespace GraduationThesis_bookingServices.Controllers
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
             await bookingService.Create(bookingCreateRequestDto);
-            throw new Exception("Successfully");
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-status-booking")]
         public async Task<IActionResult> UpdateBooking(BookingStatusRequestDto bookingStatusRequestDto)
         {
             await bookingService.UpdateStatus(bookingStatusRequestDto);
-            throw new Exception("Successfully");
+            throw new Exception("Successfully.");
         }
     }
 }

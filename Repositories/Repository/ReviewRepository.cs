@@ -31,20 +31,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsReviewExist(int reviewId){
-            try
-            {
-                var isExist = await context.Reviews
-                .Where(r => r.ReviewId == reviewId).AnyAsync();
-
-                return isExist;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         public async Task<List<Review>?> FilterReviewByGarageId(int garageId, PageDto page)
         {
             try

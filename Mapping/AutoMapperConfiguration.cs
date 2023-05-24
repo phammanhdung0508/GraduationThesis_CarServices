@@ -142,7 +142,7 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Car, CarCreateRequestDto>().ReverseMap();
             CreateMap<Car, CarUpdateRequestDto>()
                 .ForMember(des => des.CarId, obj => obj.Ignore()).ReverseMap();
-            CreateMap<Car, CarUpdateRequestDto>()
+            CreateMap<Car, CarStatusRequestDto>()
                 .ForMember(des => des.CarId, obj => obj.Ignore()).ReverseMap();
 
             CreateMap<Subcategory, SubcategoryDto>().ReverseMap();

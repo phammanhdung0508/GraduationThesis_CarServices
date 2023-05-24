@@ -102,7 +102,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isBookingExist:
-                        throw new Exception("The booking doesn't exist.");
+                        throw new NullReferenceException("The booking doesn't exist.");
                 }
 
                 var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
@@ -139,9 +139,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (garage != null):
-                        throw new Exception("The garage doesn't exist.");
+                        throw new NullReferenceException("The garage doesn't exist.");
                     case var isDate when isDate == (dateSelect.Date >= currentDay.Date):
-                        throw new Exception("The selected date must be greater than or equal to the current date.");
+                        throw new ArgumentOutOfRangeException("The selected date must be greater than or equal to the current date.");
                 }
 
                 var openAt = DateTime.ParseExact(garage!.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
@@ -334,7 +334,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     if (!await couponRepository.IsCouponExist(requestDto.CouponId))
                     {
-                        throw new Exception("The coupon doesn't exist.");
+                        throw new NullReferenceException("The coupon doesn't exist.");
                     }
                 }
 
@@ -353,13 +353,13 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == IsCarExist:
-                        throw new Exception("The car doesn't exist.");
+                        throw new NullReferenceException("The car doesn't exist.");
                     case var isTime when isTime == (bookingTime >= currentDay):
-                        throw new Exception("The selected time must be greater than or equal to the current time.");
+                        throw new ArgumentOutOfRangeException("The selected time must be greater than or equal to the current time.");
                     case var isEmpty when isEmpty == (requestDto.ServiceList.Count > 0):
-                        throw new Exception("Must select the service before booking.");
+                        throw new ArgumentException("Must select the service before booking.");
                     case var isFalse when isFalse == (isAvailableHours!.IsAvailable == true && isAvailableHours.EstimatedTimeCanBeBook > totalEstimated):
-                        throw new Exception("Estimated hours for service will conflict with another booking.");
+                        throw new ArgumentException("Estimated hours for service will conflict with another booking.");
                 }
 
                 var listBooking = await bookingRepository.FilterBookingByTimePerDay(bookingTime, requestDto.GarageId);
@@ -375,7 +375,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                     else
                     {
-                        throw new Exception("Sorry, there is someone before you booked this.");
+                        throw new TaskCanceledException("Sorry, there is someone before you booked this.");
                     }
                 }
                 else
@@ -502,7 +502,7 @@ namespace GraduationThesis_CarServices.Services.Service
             switch (false)
             {
                 case var isExist when isExist == (b != null):
-                    throw new Exception("The booking doesn't exist.");
+                    throw new NullReferenceException("The booking doesn't exist.");
             }
 
             var booking = mapper.Map<BookingStatusRequestDto, Booking>(requestDto, b!);

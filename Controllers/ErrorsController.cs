@@ -11,16 +11,19 @@ namespace GlobalErrorHandling.Controllers
         public IActionResult Error()
         {
             Exception? exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
-            switch (exception?.Message)
+            switch (exception)
             {
-                case var message when message!.Contains("exist."):
+                case NullReferenceException:
                     return Problem(title: exception?.Message, statusCode: 404);
-                case "Successfully.":
-                    return Problem(title: exception?.Message, statusCode: 200);
-                case "Sorry, there is someone before you booked this.":
+                case ArgumentOutOfRangeException:
+                    return Problem(title: exception?.Message, statusCode: 404);
+                case ArgumentException:
+                    return Problem(title: exception?.Message, statusCode: 404);
+                case TaskCanceledException:
                     return Problem(title: exception?.Message, statusCode: 409);
+                default:
+                    return Problem(title: exception?.Message, statusCode: 500);
             }
-            return Problem(title: exception?.Message, statusCode: 400);
         }
     }
 }

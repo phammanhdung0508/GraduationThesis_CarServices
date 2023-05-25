@@ -25,8 +25,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await PagingConfiguration<Product>
                 .Get(context.Products
-                // .Include(p => p.Subcategory)
-                // .Include(p => p.Service)
+                .Include(p => p.Subcategory)
+                .ThenInclude(s => s.Category)
+                .Include(p => p.Service)
                 // .Include(p => p.ProductMediaFiles)
                 //.ThenInclude(m => m.MediaFile)
                 , page);
@@ -58,8 +59,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Products
                 .Where(p => p.ServiceId == ServiceId && p.ProductQuantity > 0)
-                // .Include(p => p.Subcategory)
-                // .Include(p => p.Service)
+                .Include(p => p.Subcategory)
+                .ThenInclude(s => s.Category)
+                .Include(p => p.Service)
                 // .Include(p => p.ProductMediaFiles)
                 // .ThenInclude(m => m.MediaFile)
                 .ToListAsync();
@@ -78,8 +80,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var product = await context.Products
                 .Where(p => p.ProductId == id)
-                // .Include(p => p.Subcategory)
-                // .Include(p => p.Service)
+                .Include(p => p.Subcategory)
+                .ThenInclude(s => s.Category)
+                .Include(p => p.Service)
                 // .Include(p => p.ProductMediaFiles)
                 // .ThenInclude(m => m.MediaFile)
                 .FirstOrDefaultAsync();

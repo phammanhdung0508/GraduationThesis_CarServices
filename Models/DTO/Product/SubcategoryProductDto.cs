@@ -6,5 +6,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
     {
         public int SubcategoryId { get; set; }
         public string SubcategoryName { get; set; }
+        public CategoryProductDto CategoryProductDto { get; set; }
     }
 }

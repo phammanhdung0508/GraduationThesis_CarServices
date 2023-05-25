@@ -2,7 +2,7 @@
 
 namespace GraduationThesis_CarServices.Models.DTO.Product
 {
-    public class ProductMediaFileDto
+    public class MediaFileProductDto
     {
         public int ProductMediaFileId { get; set; }
         public int MediaFileId { get; set; }

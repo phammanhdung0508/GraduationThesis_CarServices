@@ -6,6 +6,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
     {
         public int ProductMediaFileId { get; set; }
 
-        public ProductMediaFileDto ProductMediaFileDto { get; set; }
+        public MediaFileProductDto MediaFileProductDto { get; set; }
     }
 }

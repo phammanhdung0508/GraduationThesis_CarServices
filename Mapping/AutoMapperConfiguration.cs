@@ -107,6 +107,8 @@ namespace GraduationThesis_CarServices.Mapping
             //ServiceGarage
             CreateMap<ServiceGarage, ServiceGarageGarageDto>()
                 .ForMember(des => des.ServiceGarageDto, obj => obj.MapFrom(src => src.Service));
+            CreateMap<ServiceGarage, ServiceGarageServiceDto>()
+                .ForMember(des => des.GarageServiceDto, obj => obj.MapFrom(src => src.Garage));
 
             //ServiceBooking
             CreateMap<ServiceBooking, ServiceListDto>()
@@ -116,10 +118,11 @@ namespace GraduationThesis_CarServices.Mapping
             //Service
             CreateMap<Service, ServiceGarageDto>().ReverseMap();
             CreateMap<Service, ServiceDto>().ReverseMap();
+            CreateMap<Service, ServiceProductDto>().ReverseMap().ForMember(des => des.Products, obj => obj.Ignore());
             CreateMap<Service, ServiceListResponseDto>().ReverseMap();
             CreateMap<Service, ServiceDetailResponseDto>()
-                // .ForMember(des => des.ProductServiceDtos, obj => obj.MapFrom(src => src.Products))
-                // .ForMember(des => des.ServiceGarageServiceDtos, obj => obj.MapFrom(src => src.ServiceGarages))
+                .ForMember(des => des.ProductServiceDtos, obj => obj.MapFrom(src => src.Products))
+                .ForMember(des => des.ServiceGarageServiceDtos, obj => obj.MapFrom(src => src.ServiceGarages))
                 .ReverseMap();
             CreateMap<Service, ServiceCreateRequestDto>().ReverseMap();
             CreateMap<Service, ServiceUpdateRequestDto>().ForMember(des => des.ServiceId, obj => obj.Ignore()).ReverseMap();
@@ -148,24 +151,27 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.CarId, obj => obj.Ignore()).ReverseMap();
 
             CreateMap<Subcategory, SubcategoryDto>().ReverseMap();
+            CreateMap<Subcategory, SubcategoryProductDto>().ForMember(des => des.CategoryProductDto, obj => obj.MapFrom(src => src.Category)).ReverseMap();
             CreateMap<Subcategory, CreateSubcategoryDto>().ReverseMap();
             CreateMap<Subcategory, UpdateSubcategoryDto>().ForMember(des => des.SubcategoryId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Subcategory, DeleteSubcategoryDto>().ReverseMap();
 
             CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Category, CategoryProductDto>();
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, UpdateCategoryDto>().ForMember(des => des.CategoryId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Category, DeleteCategoryDto>().ReverseMap();
 
             CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<Product, ProductServiceDto>().ReverseMap();
             CreateMap<Product, ProductListResponseDto>()
-                // .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
-                // .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
+                .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
+                .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
                 // .ForMember(des => des.ProductMediaFileProductDtos, obj => obj.MapFrom(src => src.ProductMediaFiles))
                 .ReverseMap();
             CreateMap<Product, ProductDetailResponseDto>()
-                // .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
-                // .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
+                .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
+                .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
                 // .ForMember(des => des.ProductMediaFileProductDtos, obj => obj.MapFrom(src => src.ProductMediaFiles))
                 .ReverseMap();
             CreateMap<Product, ProductCreateRequestDto>().ReverseMap();

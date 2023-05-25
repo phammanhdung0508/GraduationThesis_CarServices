@@ -54,8 +54,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var service = await context.Services
                 .Where(s => s.ServiceId == id)
-                // .Include(s => s.Products)
-                // .Include(s => s.ServiceGarages).ThenInclude(g => g.Garage)
+                .Include(s => s.Products)
+                .Include(s => s.ServiceGarages)
+                .ThenInclude(g => g.Garage)
                 .FirstOrDefaultAsync();
                 return service;
             }

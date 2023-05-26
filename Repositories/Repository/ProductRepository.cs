@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
@@ -28,8 +29,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                // .Include(p => p.ProductMediaFiles)
-                //.ThenInclude(m => m.MediaFile)
+                .Include(p => p.ProductMediaFiles)
+                .ThenInclude(m => m.MediaFile)
                 , page);
                 return list;
             }
@@ -62,8 +63,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                // .Include(p => p.ProductMediaFiles)
-                // .ThenInclude(m => m.MediaFile)
+                .Include(p => p.ProductMediaFiles)
+                .ThenInclude(m => m.MediaFile)
                 .ToListAsync();
 
                 return list;
@@ -83,8 +84,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                // .Include(p => p.ProductMediaFiles)
-                // .ThenInclude(m => m.MediaFile)
+                .Include(p => p.ProductMediaFiles)
+                .ThenInclude(m => m.MediaFile)
                 .FirstOrDefaultAsync();
                 return product;
             }
@@ -98,9 +99,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var check = await context.Products
-                .Where(s => s.ProductName.Equals(product.ProductName)
-                && s.ProductDetailDescription.Equals(product.ProductDetailDescription)
-                && s.ProductPrice == product.ProductPrice).AnyAsync();
+                .Where(p => p.ProductName.Equals(product.ProductName)
+                && p.ProductDetailDescription.Equals(product.ProductDetailDescription)
+                && p.ProductPrice == product.ProductPrice
+                && p.ProductStatus == Status.Activate).AnyAsync();
 
                 return check;
             }

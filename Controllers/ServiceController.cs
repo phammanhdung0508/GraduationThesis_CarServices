@@ -35,6 +35,26 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
+        [HttpGet("get-available-services-for-garage/{id}")]
+        public async Task<IActionResult> GetAvailableServicesForGarage(int id)
+        {
+            try
+            {
+                var productList = await serviceService.FilterServiceByGarage(id)!;
+                return Ok(productList);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
         [HttpGet("detail-service/{id}")]
         public async Task<IActionResult> DetailService(int id)
         {

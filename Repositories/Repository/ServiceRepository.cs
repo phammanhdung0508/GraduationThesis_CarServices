@@ -6,6 +6,7 @@ using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Paging;
 using Microsoft.EntityFrameworkCore;
 using GraduationThesis_CarServices.Repositories.IRepository;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
@@ -73,7 +74,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Where(s => s.ServiceName.Equals(service.ServiceName)
                 && s.ServiceDetailDescription.Equals(service.ServiceDetailDescription)
                 && s.ServicePrice == service.ServicePrice
-                && s.ServiceDuration == service.ServiceDuration).AnyAsync();
+                && s.ServiceDuration == service.ServiceDuration
+                && s.ServiceStatus == Status.Activate).AnyAsync();
 
                 return check;
             }

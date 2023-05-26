@@ -13,6 +13,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
         public Status ProductStatus { get; set; }
         public SubcategoryProductDto SubcategoryProductDto { get; set; }
         public ServiceProductDto ServiceProductDto { get; set; }
-        // public ICollection<ProductMediaFileProductDto> ProductMediaFileProductDtos { get; set; }
+        public ICollection<ProductMediaFileProductDto> ProductMediaFileProductDtos { get; set; }
     }
 }

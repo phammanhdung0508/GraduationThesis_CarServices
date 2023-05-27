@@ -13,6 +13,8 @@ using GraduationThesis_CarServices.Models.DTO.Category;
 using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.DTO.Booking;
+using GraduationThesis_CarServices.Models.DTO.Mechanic;
+using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
 
 namespace GraduationThesis_CarServices.Mapping
 {
@@ -68,6 +70,11 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<User, UserGarageDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
+            CreateMap<User, UserMechanicDto>().ForMember(des => des.FullName,
+                obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName));
+            CreateMap<User, UserDetailMechanicDto>().ForMember(des => des.FullName,
+                obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
+                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<User, UserListResponseDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
@@ -92,6 +99,16 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Customer, CustomerReviewDto>()
                 .ForMember(des => des.UserReviewDto, obj => obj.MapFrom(src => src.User));
 
+
+            //Mechanic
+            CreateMap<Mechanic, MechanicListResponseDto>()
+                .ForMember(des => des.UserMechanicDto, obj => obj.MapFrom(src => src.User));
+            CreateMap<Mechanic, MechanicDetailResponseDto>()
+                .ForMember(des => des.UserDetailMechanicDto, obj => obj.MapFrom(src => src.User));
+
+
+            //Working Schedule
+            CreateMap<WorkingSchedule, WorkingScheduleListResponseDto>();
 
             //Review
             CreateMap<ReviewGarageDto, Review>()

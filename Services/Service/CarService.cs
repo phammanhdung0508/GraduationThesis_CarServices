@@ -83,11 +83,14 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
+                var isLicensePlateExist = await carRepository.IsLicensePlate(requestDto.CarLicensePlate);
 
                 switch (false)
                 {
                     case var isExist when isExist == isCustomerExist:
                         throw new NullReferenceException("The customer doesn't exist.");
+                    case var isExist when isExist != isLicensePlateExist:
+                        throw new NullReferenceException("The license plate already exists.");
                 }
 
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,

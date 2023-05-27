@@ -29,8 +29,8 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper
-                .Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+                var list = mapper.Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+
                 return list;
             }
             catch (Exception e)
@@ -51,6 +51,7 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var list = await garageRepository.Search(search);
+
                 return mapper.Map<List<GarageListResponseDto>>
                 (list, opt => opt.AfterMap((src, des) =>
                 {
@@ -80,8 +81,15 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var garage = mapper
-                .Map<Garage?, GarageDetailResponseDto>(await garageRepository.Detail(id),
+                var garage = await garageRepository.Detail(id);
+                
+                switch (false)
+                {
+                    case var isExist when isExist == (garage != null):
+                        throw new NullReferenceException("The garage doesn't exist.");
+                }
+                
+                return mapper.Map<Garage?, GarageDetailResponseDto>(garage,
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
@@ -112,7 +120,6 @@ namespace GraduationThesis_CarServices.Services.Service
                             break;
                     }
                 }));
-                return garage;
             }
             catch (Exception e)
             {
@@ -127,7 +134,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Create(GarageCreateRequestDto requestDto)
+        public async Task Create(GarageCreateRequestDto requestDto)
         {
             try
             {
@@ -142,7 +149,6 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLongitude = Longitude;
                 }));
                 await garageRepository.Create(garage);
-                return true;
             }
             catch (Exception e)
             {
@@ -157,7 +163,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(GarageUpdateRequestDto requestDto)
+        public async Task Update(GarageUpdateRequestDto requestDto)
         {
             try
             {
@@ -168,7 +174,6 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await garageRepository.Update(garage);
-                return true;
             }
             catch (Exception e)
             {
@@ -183,7 +188,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto)
+        public async Task UpdateLocation(LocationUpdateRequestDto requestDto)
         {
             try
             {
@@ -198,7 +203,6 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLongitude = Longitude;
                 }));
                 await garageRepository.Update(garage);
-                return true;
             }
             catch (Exception e)
             {
@@ -213,14 +217,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> UpdateStatus(GarageStatusRequestDto requestDto)
+        public async Task UpdateStatus(GarageStatusRequestDto requestDto)
         {
             try
             {
                 var g = await garageRepository.Detail(requestDto.GarageId);
                 var garage = mapper.Map<GarageStatusRequestDto, Garage>(requestDto, g!);
                 await garageRepository.Update(garage);
-                return true;
             }
             catch (Exception e)
             {

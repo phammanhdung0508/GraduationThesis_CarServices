@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -26,8 +27,15 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -41,13 +49,20 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return coupon;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Create(CouponCreateRequestDto requestDto)
+        public async Task Create(CouponCreateRequestDto requestDto)
         {
             try
             {
@@ -56,15 +71,21 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.CreatedAt = DateTime.Now;
                 }));
                 await couponRepository.Create(coupon);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Update(CouponUpdateRequestDto requestDto)
+        public async Task Update(CouponUpdateRequestDto requestDto)
         {
             try
             {
@@ -74,25 +95,37 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await couponRepository.Update(coupon);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> UpdateStatus(CouponStatusRequestDto requestDto)
+        public async Task UpdateStatus(CouponStatusRequestDto requestDto)
         {
             try
             {
                 var c = await couponRepository.Detail(requestDto.CouponId);
                 var coupon = mapper.Map<CouponStatusRequestDto, Coupon>(requestDto, c!);
                 await couponRepository.Update(coupon);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }

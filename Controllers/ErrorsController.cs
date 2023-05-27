@@ -21,6 +21,8 @@ namespace GlobalErrorHandling.Controllers
                     return Problem(title: exception?.Message, statusCode: 404);
                 case TaskCanceledException:
                     return Problem(title: exception?.Message, statusCode: 409);
+                case var ex when ex!.Message.Equals("Successfully."):
+                    return Problem(title: exception?.Message, statusCode: 200);
                 default:
                     return Problem(title: exception?.Message, statusCode: 500);
             }

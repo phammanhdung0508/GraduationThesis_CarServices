@@ -18,13 +18,14 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICouponRepository couponRepository;
         private readonly IServiceRepository serviceRepository;
         private readonly IGarageRepository garageRepository;
+        private readonly IMechanicRepository mechanicRepository;
         private readonly ILotRepository lotRepository;
         private readonly ICarRepository carRepository;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IServiceBookingRepository serviceBookingRepository, IProductRepository productRepository,
         IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
-        ICouponRepository couponRepository)
+        ICouponRepository couponRepository, IMechanicRepository mechanicRepository)
         {
             this.mapper = mapper;
             this.bookingRepository = bookingRepository;
@@ -35,6 +36,7 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
             this.carRepository = carRepository;
             this.couponRepository = couponRepository;
+            this.mechanicRepository = mechanicRepository;
         }
 
         public async Task<List<BookingListResponseDto>?> View(PageDto page)
@@ -535,7 +537,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 lot.LotStatus = status;
                 lot.IsAssignedFor = licensePlate;
 
-                await lotRepository.Update(lot);
+                //await lotRepository.Update(lot);
+
+                await AssigneMechanicForBooking(booking);
             }
             else
             {
@@ -549,6 +553,29 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await lotRepository.Update(lot);
             }
+        }
+
+        private async Task AssigneMechanicForBooking(Booking booking)
+        {
+            var serviceBookingList = await serviceBookingRepository.FilterServiceBookingByBookingId(booking.BookingId);
+            var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
+
+            switch (false)
+            {
+                case var isFalse when isFalse == (serviceBookingList.Count <= mechanicAvailableList.Count):
+                    throw new ArgumentException("There are not enough mechanic for booking.");
+            }
+
+            var minWorkingHour = mechanicAvailableList.Take(serviceBookingList.Count).ToList();
+
+            for (int i = 0; i < serviceBookingList.Count; i++)
+            {
+                serviceBookingList[i].MechanicId = minWorkingHour[i].MechanicId;
+                var estimatedTime = await serviceRepository.GetDuration((int)serviceBookingList[i].ServiceId!);
+                minWorkingHour[i].TotalWorkingHours += estimatedTime;
+            }
+
+            await serviceBookingRepository.Update(serviceBookingList);
         }
     }
 }

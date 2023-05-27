@@ -19,193 +19,64 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("get-nearby-garages-location")]
         public async Task<IActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
-            try
-            {
-                var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
+            return Ok(list);
         }
 
         [HttpPost("get-garages-with-coupon")]
         public async Task<IActionResult> FilterGaragesWithCoupon(PageDto page)
         {
-            try
-            {
-                var list = await garageService.FilterGaragesWithCoupon(page);
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await garageService.FilterGaragesWithCoupon(page);
+            return Ok(list);
         }
 
         [HttpPost("view-all-garage")]
         public async Task<IActionResult> ViewGarage(PageDto page)
         {
-            try
-            {
-                var list = await garageService.View(page)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await garageService.View(page)!;
+            return Ok(list);
         }
 
         [HttpPost("search-garage")]
         public async Task<IActionResult> SearchGarage(SearchDto search)
         {
-            try
-            {
-                var list = await garageService.Search(search)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await garageService.Search(search)!;
+            return Ok(list);
         }
 
         [HttpGet("detail-garage/{id}")]
         public async Task<IActionResult> DetailGarage(int id)
         {
-            try
-            {
-                var garage = await garageService.Detail(id);
-                return Ok(garage);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var garage = await garageService.Detail(id);
+            return Ok(garage);
         }
 
         [HttpPost("create-garage")]
         public async Task<IActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
-            try
-            {
-                if (await garageService.Create(garageCreateRequestDto))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageService.Create(garageCreateRequestDto);
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-garage")]
         public async Task<IActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
-            try
-            {
-                if (await garageService.Update(garageUpdateRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageService.Update(garageUpdateRequestDto);
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-garage-status")]
         public async Task<IActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
-            try
-            {
-                if (await garageService.UpdateStatus(garageStatusRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageService.UpdateStatus(garageStatusRequestDto);
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-location")]
         public async Task<IActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {
-            try
-            {
-                if (await garageService.UpdateLocation(locationUpdateRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageService.UpdateLocation(locationUpdateRequestDto);
+            throw new Exception("Successfully.");
         }
     }
 }

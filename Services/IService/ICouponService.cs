@@ -6,8 +6,8 @@ namespace GraduationThesis_CarServices.Services.IService
     {
         Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId);
         Task<CouponDetailResponseDto?> Detail(int id);
-        Task<bool> Create(CouponCreateRequestDto requestDto);
-        Task<bool> Update(CouponUpdateRequestDto requestDto);
-        Task<bool> UpdateStatus(CouponStatusRequestDto requestDto);
+        Task Create(CouponCreateRequestDto requestDto);
+        Task Update(CouponUpdateRequestDto requestDto);
+        Task UpdateStatus(CouponStatusRequestDto requestDto);
     }
 }

@@ -14,6 +14,8 @@ using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.ServiceGarage;
+using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
+
 
 
 namespace GraduationThesis_CarServices.Mapping
@@ -49,6 +51,7 @@ namespace GraduationThesis_CarServices.Mapping
                 .ReverseMap().ForMember(des => des.Bookings, obj => obj.Ignore());
             CreateMap<GarageServiceDto, Garage>()
                 .ForMember(des => des.ServiceGarages, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Garage, GarageWorkingScheduleDto>();
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<Garage, GarageListResponseDto>()
                 .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User)).ReverseMap();
@@ -87,6 +90,19 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
             CreateMap<User, UserLocationRequestDto>()
                 .ForMember(des => des.UserId, obj => obj.Ignore()).ReverseMap();
+
+            //Mechanic
+            CreateMap<Mechanic, MechanicWorkingScheduleDto>()
+                .ForMember(des => des.UserDetailResponseDto, obj => obj.MapFrom(src => src.User));
+
+            //Working Schedule
+            CreateMap<WorkingSchedule, WorkingScheduleListResponseDto>();
+            CreateMap<WorkingSchedule, WorkingScheduleDetailResponseDto>()
+                .ForMember(des => des.GarageWorkingScheduleDto, obj => obj.MapFrom(src => src.Garage))
+                .ForMember(des => des.MechanicWorkingScheduleDto, obj => obj.MapFrom(src => src.Mechanic))
+                .ReverseMap();
+            CreateMap<WorkingSchedule, WorkingScheduleCreateRequestDto>().ForMember(des => des.WorkingScheduleId, obj => obj.Ignore()).ReverseMap();
+            CreateMap<WorkingSchedule, WorkingScheduleUpdateStatusDto>().ForMember(des => des.WorkingScheduleId, obj => obj.Ignore()).ReverseMap();
 
 
             //Review

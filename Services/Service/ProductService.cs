@@ -86,7 +86,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(ProductUpdateRequestDto requestDto)
+        public async Task<bool> UpdatePrice(ProductPriceRequestDto requestDto)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     case true:
                         var p = await productRepository.Detail(requestDto.ProductId);
-                        var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!,
+                        var product = mapper.Map<ProductPriceRequestDto, Product>(requestDto, p!,
                         otp => otp.AfterMap((src, des) =>
                         {
                             des.UpdatedAt = DateTime.Now;

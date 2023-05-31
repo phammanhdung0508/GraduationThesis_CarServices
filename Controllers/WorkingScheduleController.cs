@@ -36,12 +36,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("get-working-schedule-by-garage/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleByGarage(int id, PageDto pageDto)
+        [HttpGet("get-working-schedule-by-garage/{id}")]
+        public async Task<IActionResult> GetWorkingScheduleByGarage(int id)
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByGarage(id, pageDto);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByGarage(id);
                 return Ok(workingSchedule);
             }
             catch (Exception e)
@@ -56,12 +56,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("get-working-schedule-by-mechanic/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleByMechanic(int id, PageDto pageDto)
+        [HttpGet("get-working-schedule-by-mechanic/{id}")]
+        public async Task<IActionResult> GetWorkingScheduleByMechanic(int id)
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByMechanic(id, pageDto);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByMechanic(id);
                 return Ok(workingSchedule);
             }
             catch (Exception e)
@@ -76,12 +76,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("get-working-schedule-who-available/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int id, PageDto pageDto)
+        [HttpGet("get-working-schedule-who-available/{id}")]
+        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int id)
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleWhoAvailable(id, pageDto);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleWhoAvailable(id);
                 return Ok(workingSchedule);
             }
             catch (Exception e)

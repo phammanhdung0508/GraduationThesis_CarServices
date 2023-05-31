@@ -9,7 +9,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ProductListResponseDto>?> FilterAvailableProductForService(int ServiceId);
         Task<ProductDetailResponseDto?> Detail(int id);
         Task<bool> Create(ProductCreateRequestDto requestDto);
-        Task<bool> Update(ProductUpdateRequestDto requestDto);
+        Task<bool> UpdatePrice(ProductPriceRequestDto requestDto);
         Task<bool> UpdateStatus(ProductStatusRequestDto requestDto);
         Task<bool> UpdateQuantity(ProductQuantityRequestDto requestDto);
 

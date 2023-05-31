@@ -33,12 +33,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleListResponseDto>?> FilterWorkingScheduleByGarage(int id, PageDto page)
+        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleByGarage(int id)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleListResponseDto>>(await workingScheduleRepository.FilterWorkingScheduleByGarage(id, page));
+                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleByGarage(id));
 
                 return list;
             }
@@ -48,12 +48,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleListResponseDto>?> FilterWorkingScheduleByMechanic(int id, PageDto page)
+        public async Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int id)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleListResponseDto>>(await workingScheduleRepository.FilterWorkingScheduleByMechanic(id, page));
+                .Map<List<WorkingScheduleByMechanicDto>>(await workingScheduleRepository.FilterWorkingScheduleByMechanic(id));
 
                 return list;
             }
@@ -63,12 +63,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleListResponseDto>?> FilterWorkingScheduleWhoAvailable(int id, PageDto page)
+        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int id)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleListResponseDto>>(await workingScheduleRepository.FilterWorkingScheduleWhoAvailable(id, page));
+                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleWhoAvailable(id));
 
                 return list;
             }

@@ -29,13 +29,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByGarage(int garageId, PageDto page)
+        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByGarage(int garageId)
         {
             try
             {
-                var list = await PagingConfiguration<WorkingSchedule>
-                .Get(context.WorkingSchedules
-                .Where(w => w.GarageId == garageId), page);
+                var list = await context.WorkingSchedules
+                .Where(w => w.GarageId == garageId)
+                .Include(w => w.Mechanic)
+                .ThenInclude(m => m.User)
+                .ToListAsync();
                 return list;
             }
             catch (Exception)
@@ -44,13 +46,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByMechanic(int mechanicId, PageDto page)
+        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByMechanic(int mechanicId)
         {
             try
             {
-                var list = await PagingConfiguration<WorkingSchedule>
-                .Get(context.WorkingSchedules
-                .Where(w => w.MechanicId == mechanicId), page);
+                var list = await context.WorkingSchedules
+                .Where(w => w.MechanicId == mechanicId)
+                .Include(w => w.Garage)
+                .ToListAsync();
                 return list;
             }
             catch (Exception)
@@ -59,14 +62,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleWhoAvailable(int mechanicId, PageDto page)
+        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleWhoAvailable(int mechanicId)
         {
             try
             {
-                var list = await PagingConfiguration<WorkingSchedule>
-                .Get(context.WorkingSchedules
+                var list = await context.WorkingSchedules
                 .Where(w => w.MechanicId == mechanicId
-                && w.WorkingScheduleStatus == WorkingScheduleStatus.Available), page);
+                && w.WorkingScheduleStatus == WorkingScheduleStatus.Available)
+                .Include(w => w.Mechanic)
+                .ThenInclude(m => m.User)
+                .ToListAsync();
                 return list;
             }
             catch (Exception)

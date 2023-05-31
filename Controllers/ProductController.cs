@@ -100,12 +100,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-product")]
-        public async Task<IActionResult> UpdateProduct(ProductUpdateRequestDto product)
+        [HttpPut("update-price-product")]
+        public async Task<IActionResult> UpdatePriceProduct(ProductPriceRequestDto product)
         {
             try
             {
-                if (await productService.Update(product))
+                if (await productService.UpdatePrice(product))
                 {
                     return Ok("Successfully!");
                 }

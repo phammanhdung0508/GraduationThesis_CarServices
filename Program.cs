@@ -100,7 +100,7 @@ builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
-builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>()
+builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>();
 
 var app = builder.Build();
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
@@ -28,12 +29,19 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper
-                .Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+                var list = mapper.Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -43,6 +51,7 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var list = await garageRepository.Search(search);
+
                 return mapper.Map<List<GarageListResponseDto>>
                 (list, opt => opt.AfterMap((src, des) =>
                 {
@@ -55,8 +64,15 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                 }));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -65,12 +81,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var garage = mapper
-                .Map<Garage?, GarageDetailResponseDto>(await garageRepository.Detail(id),
+                var garage = await garageRepository.Detail(id);
+                
+                switch (false)
+                {
+                    case var isExist when isExist == (garage != null):
+                        throw new NullReferenceException("The garage doesn't exist.");
+                }
+                
+                return mapper.Map<Garage?, GarageDetailResponseDto>(garage,
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
-                    
+
                     var presentTime = DateTime.Now.TimeOfDay;
                     var openAt = DateTime.ParseExact(src.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
                     var closeAt = DateTime.ParseExact(src.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
@@ -87,7 +110,8 @@ namespace GraduationThesis_CarServices.Services.Service
                             des.IsOpen = "Closed";
                             break;
                     }
-                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.BeingUsed))){
+                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.BeingUsed)))
+                    {
                         case var source when source == true:
                             des.IsFull = "Being Used";
                             break;
@@ -96,15 +120,21 @@ namespace GraduationThesis_CarServices.Services.Service
                             break;
                     }
                 }));
-                return garage;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Create(GarageCreateRequestDto requestDto)
+        public async Task Create(GarageCreateRequestDto requestDto)
         {
             try
             {
@@ -119,15 +149,21 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLongitude = Longitude;
                 }));
                 await garageRepository.Create(garage);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> Update(GarageUpdateRequestDto requestDto)
+        public async Task Update(GarageUpdateRequestDto requestDto)
         {
             try
             {
@@ -138,15 +174,21 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await garageRepository.Update(garage);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto)
+        public async Task UpdateLocation(LocationUpdateRequestDto requestDto)
         {
             try
             {
@@ -161,25 +203,37 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLongitude = Longitude;
                 }));
                 await garageRepository.Update(garage);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
-        public async Task<bool> UpdateStatus(GarageStatusRequestDto requestDto)
+        public async Task UpdateStatus(GarageStatusRequestDto requestDto)
         {
             try
             {
                 var g = await garageRepository.Detail(requestDto.GarageId);
                 var garage = mapper.Map<GarageStatusRequestDto, Garage>(requestDto, g!);
                 await garageRepository.Update(garage);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -221,26 +275,47 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                 }));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
 
         public async Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page)
         {
-            var list = await garageRepository.FilterCoupon(page);
-            return mapper.Map<List<GarageListResponseDto>>
-                (list, opt => opt.AfterMap((src, des) =>
-                {
-                    for (int i = 0; i < list?.Count; i++)
+            try
+            {
+                var list = await garageRepository.FilterCoupon(page);
+                return mapper.Map<List<GarageListResponseDto>>
+                    (list, opt => opt.AfterMap((src, des) =>
                     {
-                        if (list[i].Reviews.Count != 0)
+                        for (int i = 0; i < list?.Count; i++)
                         {
-                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                            if (list[i].Reviews.Count != 0)
+                            {
+                                des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                            }
                         }
-                    }
-                }));
+                    }));
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                throw;
+            }
         }
     }
 }

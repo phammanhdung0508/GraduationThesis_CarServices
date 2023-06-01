@@ -28,6 +28,35 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
+        public async Task<bool> IsCarExist(int carId){
+            try
+            {
+                var isExist = await context.Cars
+                .Where(c => c.CarId == carId).AnyAsync();
+
+                return isExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsLicensePlate(string licensePlate){
+            try
+            {
+                var isExist = await context.Cars
+                .Where(c => c.CarLicensePlate.Equals(licensePlate)).AnyAsync();
+
+                return isExist;
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+
         public async Task<string> GetLicensePlate(int carId){
             try
             {

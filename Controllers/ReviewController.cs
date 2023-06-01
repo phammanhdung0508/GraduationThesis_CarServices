@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Services.IService;
@@ -20,132 +16,45 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-review")]
-        public async Task<ActionResult<List<ReviewListResponseDto>>> ViewReview(PageDto page)
+        public async Task<IActionResult> ViewAllReview(PageDto page)
         {
-            try
-            {
-                var list = await reviewService.View(page)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await reviewService.View(page)!;
+            return Ok(list);
         }
 
-        [HttpGet("get-garage-reviews/{id}")]
-        public async Task<ActionResult<List<ReviewListResponseDto>>> GetGarageReview(int id)
+        [HttpPost("get-garage-reviews")]
+        public async Task<IActionResult> GerReviewPerGarage(PagingReviewPerGarageRequestDto requestDto)
         {
-            try
-            {
-                var list = await reviewService.FilterGarageReview(id)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await reviewService.FilterReviewByGarageId(requestDto)!;
+            return Ok(list);
         }
 
-        // [HttpGet("detail-review/{id}")]
-        // public async Task<ActionResult<ReviewDto>> DetailReview(int id)
-        // {
-        //     try
-        //     {
-        //         var review = await reviewService.Detail(id);
-        //         return Ok(review);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         var inner = e.InnerException;
-        //         while (inner != null)
-        //         {
-        //             Console.WriteLine(inner.StackTrace);
-        //             inner = inner.InnerException;
-        //         }
-        //         return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-        //     }
-        // }
+        [HttpGet("detail-review/{id}")]
+        public async Task<IActionResult> DetailReview(int id)
+        {
+            var review = await reviewService.Detail(id);
+            return Ok(review);
+        }
 
         [HttpPost("create-review")]
-        public async Task<ActionResult<bool>> CreateReview(ReviewCreateRequestDto reviewDto)
+        public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
         {
-            try
-            {
-                if (await reviewService.Create(reviewDto))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reviewService.Create(reviewDto);
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-review")]
-        public async Task<ActionResult<bool>> UpdateReview(ReviewUpdateRequestDto reviewDto)
+        public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
         {
-            try
-            {
-                if (await reviewService.Update(reviewDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reviewService.Update(reviewDto);
+            throw new Exception("Successfully.");
         }
 
         [HttpPut("update-status-review")]
-        public async Task<ActionResult<bool>> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
+        public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {
-            try
-            {
-                if (await reviewService.UpdateStatus(reviewDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reviewService.UpdateStatus(reviewDto);
+            throw new Exception("Successfully.");
         }
     }
 }

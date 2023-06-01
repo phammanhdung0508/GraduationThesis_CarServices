@@ -10,7 +10,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class UserRepository : IUserRepository
     {
         public readonly DataContext context;
-        public UserRepository(DataContext context){
+        public UserRepository(DataContext context)
+        {
             this.context = context;
         }
 
@@ -28,14 +29,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsCustomer(int customerId)
+        public async Task<bool> IsCustomerExist(int customerId)
         {
             try
             {
-                var check = await context.Customers
+                var isExist = await context.Customers
                 .Where(l => l.CustomerId == customerId).AnyAsync();
 
-                return check;
+                return isExist;
             }
             catch (Exception)
             {

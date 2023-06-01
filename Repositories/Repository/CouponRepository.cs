@@ -28,6 +28,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsCouponExist(int couponId)
+        {
+            try
+            {
+                var isExist = await context.Coupons
+                .Where(c => c.CouponId == couponId).AnyAsync();
+
+                return isExist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<Coupon?> Detail(int id)
         {
             try

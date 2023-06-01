@@ -11,6 +11,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Car
         public string CarBodyType { get; set; }
         public string CarFuelType { get; set; }
         
-        public int UserId { get; set; }
+        public int CustomerId { get; set; }
     }
 }

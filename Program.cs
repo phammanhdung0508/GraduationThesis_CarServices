@@ -81,11 +81,11 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
-// builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IServiceGarageRepository, ServiceGarageRepository>();
 builder.Services.AddScoped<IServiceBookingRepository, ServiceBookingRepository>();
 builder.Services.AddScoped<ILotRepository, LotRepository>();
+builder.Services.AddScoped<IMechanicRepository, MechanicRepository>();
 builder.Services.AddScoped<IWorkingScheduleRepository, WorkingScheduleRepository>();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
@@ -99,7 +99,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>();
+builder.Services.AddScoped<IMechanicService, MechanicService>();
+builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>()
 
 var app = builder.Build();
 
@@ -113,6 +114,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("MyCors");
+
+app.UseExceptionHandler("/error");
 
 app.UseAuthentication();
 

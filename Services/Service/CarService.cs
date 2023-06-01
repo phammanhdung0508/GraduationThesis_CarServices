@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Car;
@@ -10,24 +11,41 @@ namespace GraduationThesis_CarServices.Services.Service
     public class CarService : ICarService
     {
         private readonly ICarRepository carRepository;
+        private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
-        public CarService(ICarRepository carRepository, IMapper mapper)
+        public CarService(ICarRepository carRepository, IMapper mapper, IUserRepository userRepository)
         {
             this.mapper = mapper;
             this.carRepository = carRepository;
+            this.userRepository = userRepository;
         }
 
         public async Task<List<CarListResponseDto>?> FilterUserCar(int customerId)
         {
             try
             {
+                var isCustomerExist = await userRepository.IsCustomerExist(customerId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isCustomerExist:
+                        throw new NullReferenceException("The customer doesn't exist.");
+                }
+
                 var list = mapper
                 .Map<List<CarListResponseDto>>(await carRepository.FilterUserCar(customerId));
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -39,10 +57,23 @@ namespace GraduationThesis_CarServices.Services.Service
                 var car = mapper
                 .Map<CarDetailResponseDto>(await carRepository.Detail(id));
 
+                switch (false)
+                {
+                    case var isExist when isExist == (car != null):
+                        throw new NullReferenceException("The car doesn't exist.");
+                }
+
                 return car;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -51,6 +82,17 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
+                var isLicensePlateExist = await carRepository.IsLicensePlate(requestDto.CarLicensePlate);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isCustomerExist:
+                        throw new NullReferenceException("The customer doesn't exist.");
+                    case var isExist when isExist != isLicensePlateExist:
+                        throw new NullReferenceException("The license plate already exists.");
+                }
+
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -60,8 +102,15 @@ namespace GraduationThesis_CarServices.Services.Service
                 await carRepository.Create(car);
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -71,6 +120,13 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var c = await carRepository.Detail(requestDto.CarId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new NullReferenceException("The car doesn't exist.");
+                }
+
                 var car = mapper.Map<CarUpdateRequestDto, Car>(requestDto, c!,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -79,8 +135,15 @@ namespace GraduationThesis_CarServices.Services.Service
                 await carRepository.Update(car);
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }
@@ -90,12 +153,26 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var c = await carRepository.Detail(requestDto.CarId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new NullReferenceException("The car doesn't exist.");
+                }
+
                 var car = mapper.Map<CarStatusRequestDto, Car>(requestDto, c!);
                 await carRepository.Update(car);
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                 throw;
             }
         }

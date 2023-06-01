@@ -11,6 +11,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsDuplicatedService(Service service);
         Task Create(Service service);
         Task Update(Service service);
-        (float price, int duration) GetPriceAndDuration(int serviceId);
+        float GetPrice(int serviceId);
+        Task<int> GetDuration(int serviceId);
     }
 }

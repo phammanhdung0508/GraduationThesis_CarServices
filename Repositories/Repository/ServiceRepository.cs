@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Models;
@@ -110,20 +109,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-
-        public (float price, int duration) GetPriceAndDuration(int serviceId)
+        
+        //Temporary don't make delete function because there's no service status
+        public float GetPrice(int serviceId)
         {
             try
             {
-                var service = context.Services
+                var servicePrice = context.Services
                 .Where(p => p.ServiceId.Equals(serviceId))
-                .Select(p => new {
-                    p.ServicePrice,
-                    p.ServiceDuration
-                })
-                .FirstOrDefault();
+                .Select(p => p.ServicePrice).FirstOrDefault();
 
-                return (service!.ServicePrice, service.ServiceDuration);
+                return servicePrice;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetDuration(int serviceId)
+        {
+            try
+            {
+                var serviceDuration = await context.Services
+                .Where(p => p.ServiceId.Equals(serviceId))
+                .Select(p => p.ServiceDuration).FirstOrDefaultAsync();
+
+                return serviceDuration;
             }
             catch (Exception)
             {

@@ -84,7 +84,6 @@ namespace GraduationThesis_CarServices.Models
 
         private void MultipleCascadePathFix(ModelBuilder modelBuilder)
         {
-
             //path from User to Review
             modelBuilder.Entity<User>()
             .HasMany(u => u.Garages)
@@ -228,8 +227,7 @@ namespace GraduationThesis_CarServices.Models
                         break;
                     case > 30 and <= 49:
                         mechanicFaker.RuleFor(m => m.MechanicId, ++m)
-                            .RuleFor(m => m.TotalWorkingHours, f => f.Random.Int(0, 15))
-                            .RuleFor(m => m.Specialities, f => f.Lorem.Lines());
+                            .RuleFor(m => m.TotalWorkingHours, f => f.Random.Int(0, 20));
 
                         modelBuilder.Entity<Mechanic>().HasData(mechanicFaker.Generate());
                         break;
@@ -272,16 +270,16 @@ namespace GraduationThesis_CarServices.Models
         {
             var workingScheduleFaker = new Faker<WorkingSchedule>();
 
-            for (int i = 1; i <= 30; i++)
+            for (int i = 1; i <= 60; i++)
             {
                 workingScheduleFaker.RuleFor(w => w.WorkingScheduleId, i)
                     .RuleFor(w => w.StartTime, "08:00 AM")
                     .RuleFor(w => w.EndTime, "07:00 PM")
                     .RuleFor(w => w.DaysOfTheWeek, f => f.PickRandom<DayOfWeek>().ToString())
                     .RuleFor(w => w.Description, f => f.Lorem.Lines())
-                    .RuleFor(w => w.WorkingScheduleStatus, f => f.PickRandom<WorkingScheduleStatus>())
+                    .RuleFor(w => w.WorkingScheduleStatus, f => WorkingScheduleStatus.NotAvailable)
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
-                    .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 19));
+                    .RuleFor(s => s.MechanicId, f => f.Random.Int(21, 30));
 
                 modelBuilder.Entity<WorkingSchedule>().HasData(workingScheduleFaker.Generate());
             }

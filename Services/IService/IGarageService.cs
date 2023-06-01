@@ -8,10 +8,10 @@ namespace GraduationThesis_CarServices.Services.IService
     {
        Task<List<GarageListResponseDto>?> View(PageDto page);
        Task<GarageDetailResponseDto?> Detail(int id);
-       Task<bool> Create(GarageCreateRequestDto requestDto);
-       Task<bool> Update(GarageUpdateRequestDto requestDto);
-       Task<bool> UpdateStatus(GarageStatusRequestDto requestDto);
-       Task<bool> UpdateLocation(LocationUpdateRequestDto requestDto);
+       Task Create(GarageCreateRequestDto requestDto);
+       Task Update(GarageUpdateRequestDto requestDto);
+       Task UpdateStatus(GarageStatusRequestDto requestDto);
+       Task UpdateLocation(LocationUpdateRequestDto requestDto);
        Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
        Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page);
        Task<List<GarageListResponseDto>?> Search(SearchDto search);

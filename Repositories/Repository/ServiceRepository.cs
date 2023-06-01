@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Paging;
 using Microsoft.EntityFrameworkCore;
 using GraduationThesis_CarServices.Repositories.IRepository;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
@@ -32,6 +33,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsServiceExist(int serviceId){
+            try
+            {
+                var check = await context.Services
+                .Where(s => s.ServiceId == serviceId).AnyAsync();
+
+                return check;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         public async Task<Service?> Detail(int id)
         {
             try
@@ -39,8 +55,28 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var service = await context.Services
                 .Where(s => s.ServiceId == id)
                 .Include(s => s.Products)
-                .Include(s => s.ServiceGarages).ThenInclude(g => g.Garage).FirstOrDefaultAsync();
+                .Include(s => s.ServiceGarages)
+                .ThenInclude(g => g.Garage)
+                .FirstOrDefaultAsync();
                 return service;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsDuplicatedService(Service service){
+            try
+            {
+                var check = await context.Services
+                .Where(s => s.ServiceName.Equals(service.ServiceName)
+                && s.ServiceDetailDescription.Equals(service.ServiceDetailDescription)
+                && s.ServicePrice == service.ServicePrice
+                && s.ServiceDuration == service.ServiceDuration
+                && s.ServiceStatus == Status.Activate).AnyAsync();
+
+                return check;
             }
             catch (Exception)
             {
@@ -73,7 +109,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-
+        
         //Temporary don't make delete function because there's no service status
         public float GetPrice(int serviceId)
         {

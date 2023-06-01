@@ -11,16 +11,12 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository productRepository;
-        private readonly ISubcategoryRepository subcategoryRepository;
-        private readonly IServiceRepository serviceRepository;
 
         private readonly IMapper mapper;
-        public ProductService(IMapper mapper, IProductRepository productRepository, ISubcategoryRepository subcategoryRepository, IServiceRepository serviceRepository)
+        public ProductService(IMapper mapper, IProductRepository productRepository)
         {
             this.mapper = mapper;
             this.productRepository = productRepository;
-            this.subcategoryRepository = subcategoryRepository;
-            this.serviceRepository = serviceRepository;
         }
 
         public async Task<List<ProductListResponseDto>?> View(PageDto page)
@@ -37,12 +33,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ProductListResponseDto>?> FilterAvailableServiceProduct(int ServiceId)
+        public async Task<List<ProductListResponseDto>?> FilterAvailableProductForService(int serviceId)
         {
             try
             {
                 var list = mapper
-                .Map<List<ProductListResponseDto>>(await productRepository.FilterAvailableServiceProduct(ServiceId));
+                .Map<List<ProductListResponseDto>>(await productRepository.FilterAvailableProductForService(serviceId));
 
                 return list;
             }
@@ -76,8 +72,13 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.ProductStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
-                await productRepository.Create(product);
-                return true;
+                switch (await productRepository.IsDuplicatedProduct(product))
+                {
+                    case false:
+                        await productRepository.Create(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -85,18 +86,24 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<bool> Update(ProductUpdateRequestDto requestDto)
+        public async Task<bool> UpdatePrice(ProductPriceRequestDto requestDto)
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await productRepository.Update(product);
-                return true;
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductPriceRequestDto, Product>(requestDto, p!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -108,10 +115,15 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
-                await productRepository.Update(product);
-                return true;
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
+                {
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -122,14 +134,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var p = await productRepository.Detail(requestDto.ProductId);
-                var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await productRepository.IsProductExist(requestDto.ProductId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await productRepository.Update(product);
-                return true;
+                    case true:
+                        var p = await productRepository.Detail(requestDto.ProductId);
+                        var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+                        await productRepository.Update(product);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {

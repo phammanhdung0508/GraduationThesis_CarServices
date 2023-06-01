@@ -86,6 +86,7 @@ builder.Services.AddScoped<IServiceGarageRepository, ServiceGarageRepository>();
 builder.Services.AddScoped<IServiceBookingRepository, ServiceBookingRepository>();
 builder.Services.AddScoped<ILotRepository, LotRepository>();
 builder.Services.AddScoped<IMechanicRepository, MechanicRepository>();
+builder.Services.AddScoped<IWorkingScheduleRepository, WorkingScheduleRepository>();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IGarageService, GarageService>();
@@ -99,6 +100,7 @@ builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
+builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>()
 
 var app = builder.Build();
 

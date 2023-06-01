@@ -2,6 +2,7 @@
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Service;
+using GraduationThesis_CarServices.Models.DTO.ServiceGarage;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -10,11 +11,14 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ServiceService : IServiceService
     {
         private readonly IServiceRepository serviceRepository;
+        private readonly IServiceGarageRepository serviceGarageRepository;
+
         private readonly IMapper mapper;
-        public ServiceService(IServiceRepository serviceRepository, IMapper mapper)
+        public ServiceService(IServiceRepository serviceRepository, IServiceGarageRepository serviceGarageRepository, IMapper mapper)
         {
             this.mapper = mapper;
             this.serviceRepository = serviceRepository;
+            this.serviceGarageRepository = serviceGarageRepository;
         }
 
         public async Task<List<ServiceListResponseDto>?> View(PageDto page)
@@ -23,6 +27,21 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var list = mapper
                 .Map<List<ServiceListResponseDto>>(await serviceRepository.View(page));
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int garageId)
+        {
+            try
+            {
+                var list = mapper
+                .Map<List<ServiceGarageListResponseDto>>(await serviceGarageRepository.FilterServiceByGarage(garageId));
+
                 return list;
             }
             catch (Exception)
@@ -48,15 +67,20 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var service = mapper.Map<ServiceCreateRequestDto, 
+                var service = mapper.Map<ServiceCreateRequestDto,
                 GraduationThesis_CarServices.Models.Entity.Service>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.ServiceStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
-                await serviceRepository.Create(service);
-                return true;
+                switch (await serviceRepository.IsDuplicatedService(service))
+                {
+                    case false:
+                        await serviceRepository.Create(service);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -68,15 +92,20 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var s = await serviceRepository.Detail(requestDto.ServiceId);
-                var service = mapper.Map<ServiceUpdateRequestDto,
-                GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!,
-                otp => otp.AfterMap((src, des) =>
+                switch (await serviceRepository.IsServiceExist(requestDto.ServiceId))
                 {
-                    des.UpdatedAt = DateTime.Now;
-                }));
-                await serviceRepository.Update(service);
-                return true;
+                    case true:
+                        var s = await serviceRepository.Detail(requestDto.ServiceId);
+                        var service = mapper.Map<ServiceUpdateRequestDto,
+                        GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            des.UpdatedAt = DateTime.Now;
+                        }));
+                        await serviceRepository.Update(service);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -88,11 +117,16 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var s = await serviceRepository.Detail(requestDto.ServiceId);
-                var service = mapper.Map<ServiceStatusRequestDto,
-                GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
-                await serviceRepository.Update(service);
-                return true;
+                switch (await serviceRepository.IsServiceExist(requestDto.ServiceId))
+                {
+                    case true:
+                        var s = await serviceRepository.Detail(requestDto.ServiceId);
+                        var service = mapper.Map<ServiceStatusRequestDto,
+                        GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
+                        await serviceRepository.Update(service);
+                        return true;
+                }
+                return false;
             }
             catch (Exception)
             {

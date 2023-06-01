@@ -7,8 +7,10 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IProductRepository
     {
         Task<List<Product>?> View(PageDto page);
-        Task<List<Product>?> FilterAvailableServiceProduct(int ServiceId);
+        Task<bool> IsProductExist(int productId);
+        Task<List<Product>?> FilterAvailableProductForService(int serviceId);
         Task<Product?> Detail(int id);
+        Task<bool> IsDuplicatedProduct(Product product);
         Task Create(Product product);
         Task Update(Product product);
         float GetPrice(int productId);

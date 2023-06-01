@@ -1,29 +1,28 @@
-﻿using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.Product;
+using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.DTO.Search;
+using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    [Route("api/[controller]")]
+    public class WorkingScheduleController : ControllerBase
     {
-        public readonly IProductService productService;
-
-        public ProductController(IProductService productService)
+        private readonly IWorkingScheduleService workingScheduleService;
+        public WorkingScheduleController(IWorkingScheduleService workingScheduleService)
         {
-            this.productService = productService;
-
+            this.workingScheduleService = workingScheduleService;
         }
 
-        [HttpPost("view-all-product")]
-        public async Task<IActionResult> ViewProduct(PageDto page)
+        [HttpPost("view-all-working-schedule")]
+        public async Task<IActionResult> ViewWorkingSchedule(PageDto page)
         {
             try
             {
-                var productList = await productService.View(page)!;
-                return Ok(productList);
+                var list = await workingScheduleService.View(page)!;
+                return Ok(list);
             }
             catch (Exception e)
             {
@@ -37,13 +36,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-available-products-for-service/{serviceId}")]
-        public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
+        [HttpGet("get-working-schedule-by-garage/id={garageId}&day={daysOfTheWeek}")]
+        public async Task<IActionResult> GetWorkingScheduleByGarage(int garageId, string daysOfTheWeek)
         {
             try
             {
-                var productList = await productService.FilterAvailableProductForService(serviceId)!;
-                return Ok(productList);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByGarage(garageId, daysOfTheWeek)!;
+                return Ok(workingSchedule);
             }
             catch (Exception e)
             {
@@ -57,13 +56,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("detail-product/{id}")]
-        public async Task<IActionResult> DetailProduct(int id)
+        [HttpGet("get-working-schedule-by-mechanic/{id}")]
+        public async Task<IActionResult> GetWorkingScheduleByMechanic(int id)
         {
             try
             {
-                var product = await productService.Detail(id);
-                return Ok(product);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByMechanic(id)!;
+                return Ok(workingSchedule);
             }
             catch (Exception e)
             {
@@ -77,12 +76,52 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPost("create-product")]
-        public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
+        [HttpGet("get-working-schedule-who-available/id={garageId}&day={daysOfTheWeek}")]
+        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek)
         {
             try
             {
-                if (await productService.Create(product))
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleWhoAvailable(garageId, daysOfTheWeek)!;
+                return Ok(workingSchedule);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpGet("detail-working-schedule/{id}")]
+        public async Task<IActionResult> DetailWorkingSchedule(int id)
+        {
+            try
+            {
+                var workingSchedule = await workingScheduleService.Detail(id);
+                return Ok(workingSchedule);
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
+        [HttpPost("create-working-schedule")]
+        public async Task<IActionResult> CreateWorkingSchedule(WorkingScheduleCreateRequestDto workingScheduleCreateDto)
+        {
+            try
+            {
+                if (await workingScheduleService.Create(workingScheduleCreateDto))
                 {
                     return Ok("Successfully!");
                 };
@@ -100,58 +139,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-price-product")]
-        public async Task<IActionResult> UpdatePriceProduct(ProductPriceRequestDto product)
+        [HttpPut("update-working-schedule-status")]
+        public async Task<ActionResult> UpdateWorkingScheduleStatus(WorkingScheduleUpdateStatusDto workingScheduleUpdateStatusDto)
         {
             try
             {
-                if (await productService.UpdatePrice(product))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpPut("update-status-product")]
-        public async Task<IActionResult> UpdateStatusProduct(ProductStatusRequestDto product)
-        {
-            try
-            {
-                if (await productService.UpdateStatus(product))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpPut("update-quantity-product")]
-        public async Task<IActionResult> UpdateQuantityProduct(ProductQuantityRequestDto product)
-        {
-            try
-            {
-                if (await productService.UpdateQuantity(product))
+                if (await workingScheduleService.UpdateStatus(workingScheduleUpdateStatusDto))
                 {
                     return Ok("Successfully!");
                 }
@@ -170,4 +163,3 @@ namespace GraduationThesis_CarServices.Controllers
         }
     }
 }
-

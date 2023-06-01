@@ -36,12 +36,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-working-schedule-by-garage/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleByGarage(int id)
+        [HttpGet("get-working-schedule-by-garage/id={garageId}&day={daysOfTheWeek}")]
+        public async Task<IActionResult> GetWorkingScheduleByGarage(int garageId, string daysOfTheWeek)
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByGarage(id);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByGarage(garageId, daysOfTheWeek)!;
                 return Ok(workingSchedule);
             }
             catch (Exception e)
@@ -61,7 +61,7 @@ namespace GraduationThesis_CarServices.Controllers
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByMechanic(id);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleByMechanic(id)!;
                 return Ok(workingSchedule);
             }
             catch (Exception e)
@@ -76,12 +76,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-working-schedule-who-available/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int id)
+        [HttpGet("get-working-schedule-who-available/id={garageId}&day={daysOfTheWeek}")]
+        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek)
         {
             try
             {
-                var workingSchedule = await workingScheduleService.FilterWorkingScheduleWhoAvailable(id);
+                var workingSchedule = await workingScheduleService.FilterWorkingScheduleWhoAvailable(garageId, daysOfTheWeek)!;
                 return Ok(workingSchedule);
             }
             catch (Exception e)

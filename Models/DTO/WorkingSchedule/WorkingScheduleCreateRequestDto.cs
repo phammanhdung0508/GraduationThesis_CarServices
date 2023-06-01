@@ -9,7 +9,6 @@ namespace GraduationThesis_CarServices.Models.DTO.WorkingSchedule
         public string EndTime { get; set; }
         public string DaysOfTheWeek { get; set; }
         public string Description { get; set; }
-        public WorkingScheduleStatus WorkingScheduleStatus { get; set; }
         public int GarageId { get; set; }
         public int MechanicId { get; set; }
     }

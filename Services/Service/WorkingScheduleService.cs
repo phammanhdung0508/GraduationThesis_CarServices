@@ -33,12 +33,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleByGarage(int id)
+        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleByGarage(int garageId, string daysOfTheWeek)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleByGarage(id));
+                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleByGarage(garageId, daysOfTheWeek));
 
                 return list;
             }
@@ -48,12 +48,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int id)
+        public async Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int mechanicId)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleByMechanicDto>>(await workingScheduleRepository.FilterWorkingScheduleByMechanic(id));
+                .Map<List<WorkingScheduleByMechanicDto>>(await workingScheduleRepository.FilterWorkingScheduleByMechanic(mechanicId));
 
                 return list;
             }
@@ -63,12 +63,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int id)
+        public async Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek)
         {
             try
             {
                 var list = mapper
-                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleWhoAvailable(id));
+                .Map<List<WorkingScheduleByGarageDto>>(await workingScheduleRepository.FilterWorkingScheduleWhoAvailable(garageId, daysOfTheWeek));
 
                 return list;
             }

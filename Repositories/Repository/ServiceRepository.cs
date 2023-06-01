@@ -111,7 +111,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        //Temporary don't make delete function because there's no service status
         public (float price, int duration) GetPriceAndDuration(int serviceId)
         {
             try

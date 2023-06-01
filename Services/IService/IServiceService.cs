@@ -7,7 +7,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IServiceService
     {
         Task<List<ServiceListResponseDto>?> View(PageDto page);
-        Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int GarageId);
+        Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int garageId);
         Task<ServiceDetailResponseDto?> Detail(int id);
         Task<bool> Create(ServiceCreateRequestDto requestDto);
         Task<bool> Update(ServiceUpdateRequestDto requestDto);

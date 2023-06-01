@@ -6,9 +6,9 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IWorkingScheduleService
     {
         Task<List<WorkingScheduleListResponseDto>?> View(PageDto page);
-        Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleByGarage(int id);
-        Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int id);
-        Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int id);
+        Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleByGarage(int garageId, string daysOfTheWeek);
+        Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int mechanicId);
+        Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek);
         Task<WorkingScheduleDetailResponseDto?> Detail(int id);
         Task<bool> Create(WorkingScheduleCreateRequestDto requestDto);
         Task<bool> UpdateStatus(WorkingScheduleUpdateStatusDto requestDto);

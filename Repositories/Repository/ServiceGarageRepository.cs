@@ -16,12 +16,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.mapper = mapper;
         }
 
-        public async Task<List<ServiceGarage>?> FilterServiceByGarage(int id)
+        public async Task<List<ServiceGarage>?> FilterServiceByGarage(int garageId)
         {
             try
             {
                 var list = await context.ServiceGarages
-                .Where(s => s.GarageId == id)
+                .Where(s => s.GarageId == garageId)
                 .Include(s => s.Service)
                 .ThenInclude(s => s.Products)
                 .ToListAsync();

@@ -29,12 +29,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByGarage(int garageId)
+        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleByGarage(int garageId, string daysOfTheWeek)
         {
             try
             {
                 var list = await context.WorkingSchedules
-                .Where(w => w.GarageId == garageId)
+                .Where(w => w.GarageId == garageId
+                && w.DaysOfTheWeek.Equals(daysOfTheWeek))
                 .Include(w => w.Mechanic)
                 .ThenInclude(m => m.User)
                 .ToListAsync();
@@ -62,12 +63,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleWhoAvailable(int mechanicId)
+        public async Task<List<WorkingSchedule>?> FilterWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek)
         {
             try
             {
                 var list = await context.WorkingSchedules
-                .Where(w => w.MechanicId == mechanicId
+                .Where(w => w.GarageId == garageId
+                && w.DaysOfTheWeek.Equals(daysOfTheWeek)
                 && w.WorkingScheduleStatus == WorkingScheduleStatus.Available)
                 .Include(w => w.Mechanic)
                 .ThenInclude(m => m.User)

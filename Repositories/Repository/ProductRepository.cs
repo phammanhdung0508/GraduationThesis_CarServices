@@ -54,12 +54,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Product>?> FilterAvailableProductForService(int ServiceId)
+        public async Task<List<Product>?> FilterAvailableProductForService(int serviceId)
         {
             try
             {
                 var list = await context.Products
-                .Where(p => p.ServiceId == ServiceId && p.ProductQuantity > 0)
+                .Where(p => p.ServiceId == serviceId && p.ProductQuantity > 0)
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)

@@ -35,12 +35,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int GarageId)
+        public async Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int garageId)
         {
             try
             {
                 var list = mapper
-                .Map<List<ServiceGarageListResponseDto>>(await serviceGarageRepository.FilterServiceByGarage(GarageId));
+                .Map<List<ServiceGarageListResponseDto>>(await serviceGarageRepository.FilterServiceByGarage(garageId));
 
                 return list;
             }

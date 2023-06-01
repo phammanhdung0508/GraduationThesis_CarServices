@@ -37,12 +37,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-available-products-for-service/{id}")]
-        public async Task<IActionResult> GetAvailableProductsForService(int id)
+        [HttpGet("get-available-products-for-service/{serviceId}")]
+        public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
         {
             try
             {
-                var productList = await productService.FilterAvailableProductForService(id)!;
+                var productList = await productService.FilterAvailableProductForService(serviceId)!;
                 return Ok(productList);
             }
             catch (Exception e)

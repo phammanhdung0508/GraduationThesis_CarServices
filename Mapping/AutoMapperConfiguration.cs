@@ -15,6 +15,7 @@ using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
+using GraduationThesis_CarServices.Models.DTO.ServiceGarage;
 
 namespace GraduationThesis_CarServices.Mapping
 {

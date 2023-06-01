@@ -16,6 +16,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.mapper = mapper;
         }
 
+        public async Task<List<ServiceGarage>?> FilterServiceByGarage(int garageId)
+        {
+            try
+            {
+                var list = await context.ServiceGarages
+                .Where(s => s.GarageId == garageId)
+                .Include(s => s.Service)
+                .ThenInclude(s => s.Products)
+                .ToListAsync();
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<ServiceGarage?> Detail(int id)
         {
             try
@@ -28,5 +45,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+        
     }
 }

@@ -1,19 +1,20 @@
 #nullable disable
-using GraduationThesis_CarServices.Enum;
+
+using System.ComponentModel;
 
 namespace GraduationThesis_CarServices.Models.DTO.Coupon
 {
     public class CouponCreateRequestDto
     {
-        public string CouponCode { get; set; }
         public float CouponValue { get; set; }
-        public DateTime CouponStartDate { get; set; }
-        public DateTime CouponEndDate { get; set; }
+        [DefaultValue("06/25/2023")]
+        public string CouponStartDate { get; set; }
+        [DefaultValue("06/25/2023")]
+        public string CouponEndDate { get; set; }
         public float CouponMinSpend { get; set; }
         public float CouponMaxSpend { get; set; }
         public int NumberOfTimesToTUse { get; set; }
-        public CouponStatus CouponStatus { get; set; }
-        public CouponType CouponType { get; set; }
+        public int CouponType { get; set; }
 
         public int GarageId { get; set; }
     }

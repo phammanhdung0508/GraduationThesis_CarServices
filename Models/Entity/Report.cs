@@ -22,6 +22,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual Booking Booking { get; set; }
+        // public virtual Booking Booking { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Services.IService;
@@ -40,21 +41,21 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
         {
             await reviewService.Create(reviewDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-review")]
         public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
         {
             await reviewService.Update(reviewDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {
             await reviewService.UpdateStatus(reviewDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
     }
 }

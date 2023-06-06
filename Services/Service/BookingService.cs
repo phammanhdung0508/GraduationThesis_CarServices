@@ -3,6 +3,7 @@ using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -12,7 +13,7 @@ namespace GraduationThesis_CarServices.Services.Service
 {
     public class BookingService : IBookingService
     {
-        private readonly IServiceBookingRepository serviceBookingRepository;
+        private readonly IBookingDetailRepository bookingDetailRepository;
         private readonly IBookingRepository bookingRepository;
         private readonly IProductRepository productRepository;
         private readonly ICouponRepository couponRepository;
@@ -23,13 +24,13 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICarRepository carRepository;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
-        IMapper mapper, IServiceBookingRepository serviceBookingRepository, IProductRepository productRepository,
+        IMapper mapper, IBookingDetailRepository bookingDetailRepository, IProductRepository productRepository,
         IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
         ICouponRepository couponRepository, IMechanicRepository mechanicRepository)
         {
             this.mapper = mapper;
             this.bookingRepository = bookingRepository;
-            this.serviceBookingRepository = serviceBookingRepository;
+            this.bookingDetailRepository = bookingDetailRepository;
             this.lotRepository = lotRepository;
             this.productRepository = productRepository;
             this.serviceRepository = serviceRepository;
@@ -49,14 +50,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -69,7 +76,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isGarageExist:
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                 }
 
                 var page = new PageDto
@@ -84,14 +91,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -104,7 +117,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isBookingExist:
-                        throw new NullReferenceException("The booking doesn't exist.");
+                        throw new MyException("The booking doesn't exist.", 404);
                 }
 
                 var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
@@ -119,14 +132,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -141,9 +160,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (garage != null):
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                     case var isDate when isDate == (dateSelect.Date >= currentDay.Date):
-                        throw new ArgumentOutOfRangeException("The selected date must be greater than or equal to the current date.");
+                        throw new MyException("The selected date must be greater than or equal to the current date.", 404);
                 }
 
                 var openAt = DateTime.ParseExact(garage!.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
@@ -181,14 +200,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -336,7 +361,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     if (!await couponRepository.IsCouponExist(requestDto.CouponId))
                     {
-                        throw new NullReferenceException("The coupon doesn't exist.");
+                        throw new MyException("The coupon doesn't exist.", 404);
                     }
                 }
 
@@ -355,13 +380,13 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == IsCarExist:
-                        throw new NullReferenceException("The car doesn't exist.");
+                        throw new MyException("The car doesn't exist.", 404);
                     case var isTime when isTime == (bookingTime >= currentDay):
-                        throw new ArgumentOutOfRangeException("The selected time must be greater than or equal to the current time.");
+                        throw new MyException("The selected time must be greater than or equal to the current time.", 404);
                     case var isEmpty when isEmpty == (requestDto.ServiceList.Count > 0):
-                        throw new ArgumentException("Must select the service before booking.");
+                        throw new MyException("Must select the service before booking.", 404);
                     case var isFalse when isFalse == (isAvailableHours!.IsAvailable == true && isAvailableHours.EstimatedTimeCanBeBook > totalEstimated):
-                        throw new ArgumentException("Estimated hours for service will conflict with another booking.");
+                        throw new MyException("Estimated hours for service will conflict with another booking.", 404);
                 }
 
                 var listBooking = await bookingRepository.FilterBookingByTimePerDay(bookingTime, requestDto.GarageId);
@@ -377,7 +402,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                     else
                     {
-                        throw new TaskCanceledException("Sorry, there is someone before you booked this.");
+                        throw new MyException("Sorry, there is someone before you booked this.", 409);
                     }
                 }
                 else
@@ -390,14 +415,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -427,7 +458,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 float discountedPrice = 0;
                 float originalPrice = 0;
 
-                var listService = mapper.Map<List<ServiceListDto>, List<ServiceBooking>>(requestDto.ServiceList,
+                var listService = mapper.Map<List<ServiceListDto>, List<BookingDetail>>(requestDto.ServiceList,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < requestDto.ServiceList.Count; i++)
@@ -452,7 +483,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                 }));
 
-                await serviceBookingRepository.Create(listService);
+                await bookingDetailRepository.Create(listService);
 
                 if (requestDto.CouponId > 0)
                 {
@@ -484,14 +515,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -504,7 +541,7 @@ namespace GraduationThesis_CarServices.Services.Service
             switch (false)
             {
                 case var isExist when isExist == (b != null):
-                    throw new NullReferenceException("The booking doesn't exist.");
+                    throw new MyException("The booking doesn't exist.", 404);
             }
 
             var booking = mapper.Map<BookingStatusRequestDto, Booking>(requestDto, b!);
@@ -557,25 +594,25 @@ namespace GraduationThesis_CarServices.Services.Service
 
         private async Task AssigneMechanicForBooking(Booking booking)
         {
-            var serviceBookingList = await serviceBookingRepository.FilterServiceBookingByBookingId(booking.BookingId);
+            var bookingDetailList = await bookingDetailRepository.FilterServiceBookingByBookingId(booking.BookingId);
             var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
 
             switch (false)
             {
-                case var isFalse when isFalse == (serviceBookingList.Count <= mechanicAvailableList.Count):
-                    throw new ArgumentException("There are not enough mechanic for booking.");
+                case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
+                    throw new MyException("There are not enough mechanic for booking.", 404);
             }
 
-            var minWorkingHour = mechanicAvailableList.Take(serviceBookingList.Count).ToList();
+            var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
 
-            for (int i = 0; i < serviceBookingList.Count; i++)
+            for (int i = 0; i < bookingDetailList.Count; i++)
             {
-                serviceBookingList[i].MechanicId = minWorkingHour[i].MechanicId;
-                var estimatedTime = await serviceRepository.GetDuration((int)serviceBookingList[i].ServiceId!);
+                bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
+                var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
                 minWorkingHour[i].TotalWorkingHours += estimatedTime;
             }
 
-            await serviceBookingRepository.Update(serviceBookingList);
+            await bookingDetailRepository.Update(bookingDetailList);
         }
     }
 }

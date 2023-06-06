@@ -1,9 +1,11 @@
+using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IMechanicRepository
     {
+        Task<List<Mechanic>> View(PageDto page);
         Task<List<Mechanic>> FilterMechanicsByGarageId(int garageId);
         Task<Mechanic?> Detail(int mechanicId);
         Task<bool> IsMechanicExist(int mechanicId);

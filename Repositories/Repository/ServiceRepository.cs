@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GraduationThesis_CarServices.Models.DTO.Page;
+﻿using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Paging;
@@ -12,11 +11,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class ServiceRepository : IServiceRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public ServiceRepository(DataContext context, IMapper mapper)
+        public ServiceRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
 
@@ -55,7 +52,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var service = await context.Services
                 .Where(s => s.ServiceId == id)
                 .Include(s => s.Products)
-                .Include(s => s.ServiceGarages)
+                .Include(s => s.GarageDetails)
                 .ThenInclude(g => g.Garage)
                 .FirstOrDefaultAsync();
                 return service;
@@ -72,7 +69,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var check = await context.Services
                 .Where(s => s.ServiceName.Equals(service.ServiceName)
                 && s.ServiceDetailDescription.Equals(service.ServiceDetailDescription)
-                && s.ServicePrice == service.ServicePrice
                 && s.ServiceDuration == service.ServiceDuration
                 && s.ServiceStatus == Status.Activate).AnyAsync();
 
@@ -111,12 +107,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
         
         //Temporary don't make delete function because there's no service status
-        public float GetPrice(int serviceId)
+        public float GetPrice(int serviceDetailId)
         {
             try
             {
-                var servicePrice = context.Services
-                .Where(p => p.ServiceId.Equals(serviceId))
+                var servicePrice = context.ServiceDetails
+                .Where(p => p.ServiceDetailId.Equals(serviceDetailId))
                 .Select(p => p.ServicePrice).FirstOrDefault();
 
                 return servicePrice;

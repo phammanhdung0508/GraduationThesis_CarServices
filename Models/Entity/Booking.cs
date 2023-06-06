@@ -24,12 +24,11 @@ namespace GraduationThesis_CarServices.Models.Entity
         /*-------------------------------------------------*/
         public Nullable<int> CarId { get; set; }
         public virtual Car Car { get; set; }
+        
         public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
 
-        public virtual Report Report { get; set; }
-
         /*-------------------------------------------------*/
-        public virtual ICollection<ServiceBooking> ServiceBookings { get; set; }
+        public virtual ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }

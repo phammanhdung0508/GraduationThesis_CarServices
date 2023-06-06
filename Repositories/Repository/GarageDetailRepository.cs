@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -6,21 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
-    public class ServiceGarageRepository : IServiceGarageRepository
+    public class GarageDetailRepository : IGarageDetailRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public ServiceGarageRepository(DataContext context, IMapper mapper)
+        public GarageDetailRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<List<ServiceGarage>?> FilterServiceByGarage(int garageId)
+        public async Task<List<GarageDetail>?> FilterServiceByGarage(int garageId)
         {
             try
             {
-                var list = await context.ServiceGarages
+                var list = await context.GarageDetails
                 .Where(s => s.GarageId == garageId)
                 .Include(s => s.Service)
                 .ThenInclude(s => s.Products)
@@ -33,11 +30,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<ServiceGarage?> Detail(int id)
+        public async Task<GarageDetail?> Detail(int id)
         {
             try
             {
-                ServiceGarage? serviceGarage = await context.ServiceGarages.FirstOrDefaultAsync(c => c.GarageId == id);
+                var serviceGarage = await context.GarageDetails.FirstOrDefaultAsync(c => c.GarageId == id);
                 return serviceGarage;
             }
             catch (Exception)

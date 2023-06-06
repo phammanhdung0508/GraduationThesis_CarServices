@@ -5,10 +5,10 @@ namespace GraduationThesis_CarServices.Services.IService
 {
     public interface ICategoryService
     {
-        Task<List<CategoryDto>?> View(PageDto page);
-        Task<CategoryDto?> Detail(int id);
-        Task<bool> Create(CreateCategoryDto createCategoryDto);
-        Task<bool> Update(UpdateCategoryDto updateCategoryDto);
-        Task<bool> Delete(DeleteCategoryDto deleteCategoryDto);
+        Task<List<CategoryListResponseDto>?> View(PageDto page);
+        Task<CategoryDetailResponseDto?> Detail(int id);
+        Task Create(CategoryCreateRequestDto requestDto);
+        Task Update(CategoryUpdateRequestDto requestDto);
+        Task UpdateStatus(CategoryStatusRequestDto requestDto);
     }
 }

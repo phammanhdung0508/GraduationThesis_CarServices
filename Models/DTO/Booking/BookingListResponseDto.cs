@@ -11,6 +11,5 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public PaymentStatus PaymentStatus { get; set; }
         public GarageBookingDto GarageBookingDto { get; set; }
         public CarBookingDto CarBookingDto { get; set; }
-        public ReportBookingDto ReportBookingDto { get; set; }
     }
 }

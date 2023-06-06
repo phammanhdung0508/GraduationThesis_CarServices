@@ -20,16 +20,15 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<ServiceBooking> ServiceBookings { get; set; }
-        public DbSet<ServiceGarage> ServiceGarages { get; set; }
+        public DbSet<BookingDetail> BookingDetails { get; set; }
+        public DbSet<GarageDetail> GarageDetails { get; set; }
         public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<MediaFile> MediaFiles { get; set; }
-        public DbSet<ProductMediaFile> ProductMediaFiles { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Mechanic> Mechanics { get; set; }
         public DbSet<WorkingSchedule> WorkingSchedules { get; set; }
         public DbSet<Lot> Lots { get; set; }
+        public DbSet<ServiceDetail> ServiceDetails {get; set;}
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -47,6 +46,7 @@ namespace GraduationThesis_CarServices.Models
             this.SeedCategoryData(modelBuilder);
             this.SeedSubcategoryData(modelBuilder);
             this.SeedServiceData(modelBuilder);
+            this.SeedServiceDetailData(modelBuilder);
             this.SeedRandomProductData(modelBuilder);
             this.SeedRandomUserData(modelBuilder);
             this.SeedRandomWorkingScheduleData(modelBuilder);
@@ -62,9 +62,9 @@ namespace GraduationThesis_CarServices.Models
 
         private void OneToOneRelationship(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Booking>()
-            .HasOne(b => b.Report).WithOne(r => r.Booking)
-            .HasForeignKey<Report>(e => e.ReportId)
+            // modelBuilder.Entity<Booking>()
+            // .HasOne(b => b.Report).WithOne(r => r.Booking)
+            // .HasForeignKey<Report>(e => e.ReportId)
             //.OnDelete(DeleteBehavior.Cascade)
             ;
 
@@ -100,6 +100,7 @@ namespace GraduationThesis_CarServices.Models
                 new Role{RoleId=2, RoleName="Manager"},
                 new Role{RoleId=3, RoleName="Mechanic"},
                 new Role{RoleId=4, RoleName="Admin"},
+                new Role{RoleId=5, RoleName="Staff"},
             };
             modelBuilder.Entity<Role>().HasData(list);
         }
@@ -141,45 +142,62 @@ namespace GraduationThesis_CarServices.Models
         private void SeedServiceData(ModelBuilder modelBuilder)
         {
             var list = new List<Service>{
-                //Bảo dưỡng định kỳ
-                new Service{ServiceId=1, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=2, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=3, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-
-                //Sửa chữa khẩn cấp
-                new Service{ServiceId=4, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=5, ServiceName="Sửa chữa động cơ", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=6, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=7, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                //Rửa xe, vệ Sinh
+                new Service{ServiceId=1, ServiceName="Rửa Xe Sạch, An Toàn", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=2, ServiceName="Vệ Sinh Nội Thất", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=3, ServiceName="Vệ Sinh Khoang Máy", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=4, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=5, ServiceName="Khử Mùi Hôi, Mùi Thuốc Lá", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=6, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Nâng cấp xe
-                new Service{ServiceId=8, ServiceName="Thay đổi và nâng cấp hệ thống xe", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=5, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=9, ServiceName="Sơn lại xe, cải tạo nội thất, ngoại thất", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=7, ServiceName="Phủ Ceramic", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=8, ServiceName="Sơn Phủ Gầm Xe Ô Tô", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=9, ServiceName="Cách Âm Ô Tô", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=10, ServiceName="Dán Phim Cách Nhiệt Ô Tô", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=11, ServiceName="Nâng Cấp Cửa Hít Ô Tô", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=12, ServiceName="Lắp Camera Hành Trình Ô Tô", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
 
-                //Khác
-                new Service{ServiceId=10, ServiceName="Rửa xe", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text of the printing and typesetting industry.", ServicePrice=100,
-                    ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
+                //Bảo dưỡng định kỳ
+                new Service{ServiceId=13, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=14, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=15, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+
+                //Sửa chữa khẩn cấp
+                new Service{ServiceId=16, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=17, ServiceName="Sửa chữa động cơ", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=18, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=19, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
             };
             modelBuilder.Entity<Service>().HasData(list);
+        }
+
+        private void SeedServiceDetailData(ModelBuilder modelBuilder){
+            var list = new List<ServiceDetail>{
+                new ServiceDetail{ServiceDetailId=1, MinNumberOfCarLot=2, MaxNumberOfCarLot=4, ServicePrice=800, ServiceId=2},
+                new ServiceDetail{ServiceDetailId=2, MinNumberOfCarLot=5, MaxNumberOfCarLot=6, ServicePrice=900, ServiceId=2},
+                new ServiceDetail{ServiceDetailId=3, MinNumberOfCarLot=7, MaxNumberOfCarLot=9, ServicePrice=1200000, ServiceId=2},
+            };
+            modelBuilder.Entity<ServiceDetail>().HasData(list);
         }
 
         private void SeedRandomProductData(ModelBuilder modelBuilder)
@@ -279,7 +297,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(w => w.Description, f => f.Lorem.Lines())
                     .RuleFor(w => w.WorkingScheduleStatus, f => WorkingScheduleStatus.NotAvailable)
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
-                    .RuleFor(s => s.MechanicId, f => f.Random.Int(21, 30));
+                    .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
                 modelBuilder.Entity<WorkingSchedule>().HasData(workingScheduleFaker.Generate());
             }
@@ -299,6 +317,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(c => c.CarYear, f => f.Random.Int(1935, 2023))
                     .RuleFor(c => c.CarBodyType, f => f.Vehicle.Type())
                     .RuleFor(c => c.CarFuelType, f => f.Vehicle.Fuel())
+                    .RuleFor(c => c.NumberOfCarLot, f => f.Random.Int(2, 9))
                     .RuleFor(c => c.CarStatus, Status.Activate)
                     .RuleFor(c => c.CreatedAt, now)
                     .RuleFor(c => c.CustomerId, f => f.Random.Int(1, 20));
@@ -310,7 +329,7 @@ namespace GraduationThesis_CarServices.Models
         private void SeedRandomGarageData(ModelBuilder modelBuilder)
         {
             var garageFaker = new Faker<Garage>();
-            var serviceGarageFaker = new Faker<ServiceGarage>();
+            var garageDetailFaker = new Faker<GarageDetail>();
             var lotFaker = new Faker<Lot>();
 
             for (int i = 1; i <= 25; i++)
@@ -340,11 +359,11 @@ namespace GraduationThesis_CarServices.Models
 
             for (int i = 1; i <= 70; i++)
             {
-                serviceGarageFaker.RuleFor(s => s.ServiceGaragesId, i)
+                garageDetailFaker.RuleFor(s => s.GarageDetailId, i)
                     .RuleFor(s => s.GarageId, f => f.Random.Int(1, 25))
                     .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 10));
 
-                modelBuilder.Entity<ServiceGarage>().HasData(serviceGarageFaker.Generate());
+                modelBuilder.Entity<GarageDetail>().HasData(garageDetailFaker.Generate());
             }
 
             for (int i = 1; i <= 100; i++)
@@ -413,7 +432,7 @@ namespace GraduationThesis_CarServices.Models
         private void SeedRandomBookingData(ModelBuilder modelBuilder)
         {
             var bookingFaker = new Faker<Booking>();
-            var serviceBookingFaker = new Faker<ServiceBooking>();
+            var bookingDetailFaker = new Faker<BookingDetail>();
 
             for (int i = 1; i <= 15; i++)
             {
@@ -431,15 +450,15 @@ namespace GraduationThesis_CarServices.Models
 
             for (int i = 1; i <= 50; i++)
             {
-                serviceBookingFaker.RuleFor(s => s.ServiceBookingId, i)
+                bookingDetailFaker.RuleFor(s => s.BookingDetailId, i)
                     .RuleFor(s => s.ProductCost, f => f.Random.Float(50, 200))
                     .RuleFor(s => s.ServiceCost, f => f.Random.Float(50, 200))
                     .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
-                    .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 10))
+                    .RuleFor(s => s.ServiceDetailId, f => f.Random.Int(1, 3))
                     .RuleFor(s => s.ProductId, f => f.Random.Int(1, 30))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 19));
 
-                modelBuilder.Entity<ServiceBooking>().HasData(serviceBookingFaker.Generate());
+                modelBuilder.Entity<BookingDetail>().HasData(bookingDetailFaker.Generate());
             }
         }
 

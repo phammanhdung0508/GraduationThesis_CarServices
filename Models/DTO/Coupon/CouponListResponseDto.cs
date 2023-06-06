@@ -5,6 +5,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Coupon
     {
         public int CouponId { get; set; }
         public string CouponCode { get; set; }
-        public DateTime CouponEndDate { get; set; }
+        public string CouponEndDate { get; set; }
+        public string CouponStatus { get; set; }
     }
 }

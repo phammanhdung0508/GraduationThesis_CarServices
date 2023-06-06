@@ -1,4 +1,3 @@
-using AutoMapper;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -11,7 +10,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class ReviewRepository : IReviewRepository
     {
         private readonly DataContext context;
-        public ReviewRepository(IMapper mapper, DataContext context)
+        public ReviewRepository(DataContext context)
         {
             this.context = context;
         }

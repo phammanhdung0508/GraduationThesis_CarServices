@@ -21,9 +21,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await PagingConfiguration<Garage>
-                .Get(context.Garages.Include(g => g.User)
-                .ThenInclude(u => u.Role), page);
+                var list = await PagingConfiguration<Garage>.Get(context.Garages, page);
 
                 return list;
             }
@@ -36,8 +34,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         public async Task<bool> IsGarageExist(int garageId){
             try
             {
-                var isExist = await context.Garages
-                .Where(g => g.GarageId == garageId).AnyAsync();
+                var isExist = await context.Garages.Where(g => g.GarageId == garageId).AnyAsync();
 
                 return isExist;
             }
@@ -51,8 +48,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await context.Garages
-                .Include(g => g.Reviews).ToListAsync();
+                var list = await context.Garages.Include(g => g.Reviews).ToListAsync();
 
                 return list;
             }
@@ -104,7 +100,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(g => g.Reviews)
                 .Include(g => g.Coupons)
                 .Include(g => g.User).ThenInclude(u => u.Role)
-                .Include(g => g.ServiceGarages).ThenInclude(s => s.Service)
+                .Include(g => g.GarageDetails).ThenInclude(s => s.Service)
                 .FirstOrDefaultAsync();
 
                 return garage;

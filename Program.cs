@@ -48,6 +48,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Car Services", Version = "v1" });
+});
+
 builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 {
     //build.WithOrigins("https://localhost:7091");
@@ -105,11 +110,14 @@ builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/*if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}*/
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

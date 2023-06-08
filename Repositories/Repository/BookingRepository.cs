@@ -20,8 +20,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await PagingConfiguration<Booking>
-                .Get(context.Bookings.Include(b => b.Car)
-                .Include(b => b.Report).Include(b => b.Garage), page);
+                .Get(context.Bookings.Include(b => b.Car).Include(b => b.Garage), page);
+
                 return list;
             }
             catch (Exception)
@@ -49,7 +49,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await PagingConfiguration<Booking>
-                .Get(context.Bookings.Where(b => b.GarageId == garageId), page);
+                .Get(context.Bookings.Where(b => b.GarageId == garageId).Include(b => b.Garage).Include(b => b.Car), page);
 
                 return list;
             }
@@ -94,8 +94,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var booking = await context.Bookings.Include(b => b.Car)
-                .Include(b => b.Report).Include(b => b.Garage)
+                var booking = await context.Bookings.Include(b => b.Car).Include(b => b.Garage)
                 .FirstOrDefaultAsync(c => c.BookingId == id);
                 return booking;
             }

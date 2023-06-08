@@ -1,14 +1,13 @@
-﻿using GraduationThesis_CarServices.Models.DTO.Category;
-using GraduationThesis_CarServices.Models.DTO.Page;
+﻿using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 
 namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface ICategoryRepository
     {
-        Task<List<CategoryDto>?> View(PageDto page);
-        Task<CategoryDto?> Detail(int id);
-        Task Create(CreateCategoryDto categoryDto);
-        Task Update(UpdateCategoryDto categoryDto);
-        Task Delete(DeleteCategoryDto categoryDto);
+        Task<List<Category>> View(PageDto page);
+        Task<Category?> Detail(int id);
+        Task Create(Category category);
+        Task Update(Category category);
     }
 }

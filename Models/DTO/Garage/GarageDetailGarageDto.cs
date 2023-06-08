@@ -1,10 +1,9 @@
 #nullable disable
-
 namespace GraduationThesis_CarServices.Models.DTO.Garage
 {
-    public class ServiceGarageGarageDto
+    public class GarageDetailGarageDto
     {
-        public int ServiceGaragesId { get; set; }
+        public int GarageDetailId { get; set; }
         public ServiceGarageDto ServiceGarageDto { get; set; }
     }
 }

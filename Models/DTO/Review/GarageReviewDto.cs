@@ -1,7 +1,4 @@
 #nullable disable
-
-using GraduationThesis_CarServices.Enum;
-
 namespace GraduationThesis_CarServices.Models.DTO.Review
 {
     public class GarageReviewDto

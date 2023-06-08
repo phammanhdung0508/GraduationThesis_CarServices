@@ -16,8 +16,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string ServiceImage { get; set; }
         [MaxLength(200)]
         public string ServiceDetailDescription { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float ServicePrice { get; set; }
         [MaxLength(20)]
         public int ServiceDuration { get; set; }
         [Column(TypeName = "tinyint")]
@@ -27,7 +25,7 @@ namespace GraduationThesis_CarServices.Models.Entity
 
         /*-------------------------------------------------*/
         public virtual ICollection<Product> Products { get; set; }
-        public virtual ICollection<ServiceBooking> ServiceBookings { get; set; }
-        public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }
+        public virtual ICollection<ServiceDetail> ServiceDetails { get; set; }
+        public virtual ICollection<GarageDetail> GarageDetails { get; set; }
     }
 }

@@ -11,14 +11,14 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ServiceService : IServiceService
     {
         private readonly IServiceRepository serviceRepository;
-        private readonly IServiceGarageRepository serviceGarageRepository;
+        private readonly IGarageDetailRepository garageDetailRepository;
 
         private readonly IMapper mapper;
-        public ServiceService(IServiceRepository serviceRepository, IServiceGarageRepository serviceGarageRepository, IMapper mapper)
+        public ServiceService(IServiceRepository serviceRepository, IGarageDetailRepository garageDetailRepository, IMapper mapper)
         {
             this.mapper = mapper;
             this.serviceRepository = serviceRepository;
-            this.serviceGarageRepository = serviceGarageRepository;
+            this.garageDetailRepository = garageDetailRepository;
         }
 
         public async Task<List<ServiceListResponseDto>?> View(PageDto page)
@@ -40,7 +40,7 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var list = mapper
-                .Map<List<ServiceGarageListResponseDto>>(await serviceGarageRepository.FilterServiceByGarage(garageId));
+                .Map<List<ServiceGarageListResponseDto>>(await garageDetailRepository.FilterServiceByGarage(garageId));
 
                 return list;
             }

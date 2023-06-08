@@ -1,6 +1,8 @@
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +14,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         public MechanicRepository(DataContext context)
         {
             this.context = context;
+        }
+
+        public async Task<List<Mechanic>> View(PageDto page){
+            try
+            {
+                var list = await PagingConfiguration<Mechanic>.Get(context.Mechanics.Include(m => m.User), page);
+
+                return list;
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
         }
 
         public async Task<List<Mechanic>> FilterMechanicsByGarageId(int garageId)

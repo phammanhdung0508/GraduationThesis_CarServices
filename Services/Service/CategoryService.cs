@@ -1,6 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Category;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -16,68 +20,169 @@ namespace GraduationThesis_CarServices.Services.Service
             this.categoryRepository = categoryRepository;
         }
 
-        public async Task<List<CategoryDto>?> View(PageDto page)
+        public async Task<List<CategoryListResponseDto>?> View(PageDto page)
         {
             try
             {
-                List<CategoryDto>? list = await categoryRepository.View(page);
+                var list = mapper.Map<List<CategoryListResponseDto>>(await categoryRepository.View(page));
+
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<CategoryDto?> Detail(int id)
+        public async Task<CategoryDetailResponseDto?> Detail(int id)
         {
             try
             {
-                CategoryDto? _category = mapper.Map<CategoryDto>(await categoryRepository.Detail(id));
-                return _category;
+                var category = mapper.Map<CategoryDetailResponseDto>(await categoryRepository.Detail(id));
+
+                switch (false)
+                {
+                    case var isExist when isExist == (category != null):
+                        throw new MyException("The category doesn't exist.", 404);
+                }
+
+                return category;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(CreateCategoryDto createCategoryDto)
+        public async Task Create(CategoryCreateRequestDto requestDto)
         {
             try
             {
-                await categoryRepository.Create(createCategoryDto);
-                return true;
+                var category = mapper.Map<CategoryCreateRequestDto, Category>(requestDto,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.CategoryStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                }));
+
+                await categoryRepository.Create(category);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Update(UpdateCategoryDto updateCategoryDto)
+        public async Task Update(CategoryUpdateRequestDto requestDto)
         {
             try
             {
-                await categoryRepository.Update(updateCategoryDto);
-                return true;
+                var c = await categoryRepository.Detail(requestDto.CategoryId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new MyException("The category doesn't exist.", 404);
+                }
+
+                var category = mapper.Map<CategoryUpdateRequestDto, Category>(requestDto, c!,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+
+                await categoryRepository.Update(category);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Delete(DeleteCategoryDto deleteCategoryDto)
+        public async Task UpdateStatus(CategoryStatusRequestDto requestDto)
         {
             try
             {
-                await categoryRepository.Delete(deleteCategoryDto);
-                return true;
+                var c = await categoryRepository.Detail(requestDto.CategoryId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new MyException("The category doesn't exist.", 404);
+                }
+
+                var category = mapper.Map<CategoryStatusRequestDto, Category>(requestDto, c!);
+
+                await categoryRepository.Update(category);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
     }

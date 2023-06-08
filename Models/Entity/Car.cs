@@ -24,6 +24,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CarBodyType { get; set; }
         [MaxLength(20)]
         public string CarFuelType { get; set; }
+        public int NumberOfCarLot {get; set;}
         [Column(TypeName = "tinyint")]
         public Status CarStatus { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }

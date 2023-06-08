@@ -3,6 +3,7 @@ using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Search;
@@ -29,20 +30,33 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper.Map<List<GarageListResponseDto>>(await garageRepository.View(page));
+                var list = mapper.Map<List<Garage>?, List<GarageListResponseDto>>(await garageRepository.View(page),
+                otp => otp.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        des[i].GarageStatus = src![i].GarageStatus.ToString();
+                    }
+                }));
 
                 return list;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -52,7 +66,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var list = await garageRepository.Search(search);
 
-                return mapper.Map<List<GarageListResponseDto>>
+                return mapper.Map<List<Garage>?, List<GarageListResponseDto>>
                 (list, opt => opt.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < list?.Count; i++)
@@ -61,19 +75,26 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
                         }
+                        des[i].GarageStatus = src![i].GarageStatus.ToString();
                     }
                 }));
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -82,13 +103,13 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var garage = await garageRepository.Detail(id);
-                
+
                 switch (false)
                 {
                     case var isExist when isExist == (garage != null):
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                 }
-                
+
                 return mapper.Map<Garage?, GarageDetailResponseDto>(garage,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -102,7 +123,6 @@ namespace GraduationThesis_CarServices.Services.Service
                     switch (presentTime)
                     {
                         case var time when TimeSpan.Compare(time, openAt).Equals(1) && TimeSpan.Compare(time, closeAt).Equals(-1):
-
                             des.IsOpen = "Open";
                             break;
                         case var time when TimeSpan.Compare(time, closeAt).Equals(1) || TimeSpan.Compare(midnight, openAt).Equals(-1):
@@ -110,27 +130,24 @@ namespace GraduationThesis_CarServices.Services.Service
                             des.IsOpen = "Closed";
                             break;
                     }
-                    switch (src.Lots.All(l => l.LotStatus.Equals(LotStatus.BeingUsed)))
-                    {
-                        case var source when source == true:
-                            des.IsFull = "Being Used";
-                            break;
-                        case var source when source == false:
-                            des.IsFull = "Free";
-                            break;
-                    }
                 }));
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -140,6 +157,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 (double Latitude, double Longitude) = await geocoderConfiguration
                 .GeocodeAsync(requestDto.GarageAddress, requestDto.GarageCity, requestDto.GarageDistrict, requestDto.GarageWard);
+
                 var garage = mapper.Map<GarageCreateRequestDto, Garage>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -148,18 +166,25 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLatitude = Latitude;
                     des.GarageLongitude = Longitude;
                 }));
+
                 await garageRepository.Create(garage);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -168,23 +193,37 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var g = await garageRepository.Detail(requestDto.GarageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (g != null):
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
                 var garage = mapper.Map<GarageUpdateRequestDto, Garage>(requestDto, g!,
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.UpdatedAt = DateTime.Now;
                 }));
+
                 await garageRepository.Update(garage);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -192,9 +231,16 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                (double Latitude, double Longitude) = await geocoderConfiguration
-                .GeocodeAsync(requestDto.GarageAddress, requestDto.GarageCity, requestDto.GarageDistrict, requestDto.GarageWard);
                 var g = await garageRepository.Detail(requestDto.GarageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (g != null):
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
+                (double Latitude, double Longitude) = await geocoderConfiguration.GeocodeAsync(requestDto.GarageAddress, requestDto.GarageCity, requestDto.GarageDistrict, requestDto.GarageWard);
+
                 var garage = mapper.Map<LocationUpdateRequestDto, Garage>(requestDto, g!,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -202,39 +248,60 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.GarageLatitude = Latitude;
                     des.GarageLongitude = Longitude;
                 }));
+
                 await garageRepository.Update(garage);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
-
+ 
         public async Task UpdateStatus(GarageStatusRequestDto requestDto)
         {
             try
             {
                 var g = await garageRepository.Detail(requestDto.GarageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (g != null):
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
                 var garage = mapper.Map<GarageStatusRequestDto, Garage>(requestDto, g!);
+
                 await garageRepository.Update(garage);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -277,14 +344,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -307,14 +380,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
     }

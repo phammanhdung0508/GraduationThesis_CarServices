@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using AutoMapper;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
+using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
@@ -20,6 +22,33 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
+        public async Task<List<MechanicListResponseDto>> View(PageDto page)
+        {
+            try
+            {
+                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.View(page));
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
         public async Task<List<MechanicListResponseDto>> FilterMechanicsByGarageId(int garageId)
         {
             try
@@ -29,7 +58,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isGarageExist:
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                 }
 
                 var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.FilterMechanicsByGarageId(garageId));
@@ -38,14 +67,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -58,21 +93,27 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (mechanic != null):
-                        throw new NullReferenceException("The mechanic doesn't exist.");
+                        throw new MyException("The mechanic doesn't exist.", 404);
                 }
 
                 return mechanic;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -85,7 +126,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isMechanicExist:
-                        throw new NullReferenceException("The mechanic doesn't exist.");
+                        throw new MyException("The mechanic doesn't exist.", 404);
                 }
 
                 var list = mapper.Map<List<WorkingScheduleListResponseDto>>(await mechanicRepository.FilterWorkingSchedulesByMechanicId(mechanicId));
@@ -94,14 +135,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
     }

@@ -48,6 +48,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Car Services", Version = "v1" });
+});
+
 builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 {
     //build.WithOrigins("https://localhost:7091");
@@ -58,8 +63,8 @@ builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Connect Sql Server
-var connectionString = builder.Configuration.GetConnectionString("DataContextConection") ??
-    throw new InvalidOperationException("Connection string 'DataContextConection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
+    throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -82,8 +87,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IServiceGarageRepository, ServiceGarageRepository>();
-builder.Services.AddScoped<IServiceBookingRepository, ServiceBookingRepository>();
+builder.Services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
+builder.Services.AddScoped<IGarageDetailRepository, GarageDetailRepository>();
 builder.Services.AddScoped<ILotRepository, LotRepository>();
 builder.Services.AddScoped<IMechanicRepository, MechanicRepository>();
 builder.Services.AddScoped<IWorkingScheduleRepository, WorkingScheduleRepository>();

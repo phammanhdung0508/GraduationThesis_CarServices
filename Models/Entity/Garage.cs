@@ -49,7 +49,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         /*-------------------------------------------------*/
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<Coupon> Coupons { get; set; }
-        public virtual ICollection<ServiceGarage> ServiceGarages { get; set; }
+        public virtual ICollection<GarageDetail> GarageDetails { get; set; }
         public virtual ICollection<Lot> Lots { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<WorkingSchedule> WorkingSchedules { get; set; }

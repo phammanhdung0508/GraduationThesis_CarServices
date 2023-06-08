@@ -2,6 +2,7 @@ using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Car;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
@@ -29,7 +30,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isCustomerExist:
-                        throw new NullReferenceException("The customer doesn't exist.");
+                        throw new MyException("The customer doesn't exist.", 404);
                 }
 
                 var list = mapper
@@ -39,14 +40,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -60,21 +67,27 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (car != null):
-                        throw new NullReferenceException("The car doesn't exist.");
+                        throw new MyException("The car doesn't exist.", 404);
                 }
 
                 return car;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -88,9 +101,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isCustomerExist:
-                        throw new NullReferenceException("The customer doesn't exist.");
+                        throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist != isLicensePlateExist:
-                        throw new NullReferenceException("The license plate already exists.");
+                        throw new MyException("The license plate already exists.", 404);
                 }
 
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
@@ -104,14 +117,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -124,7 +143,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (c != null):
-                        throw new NullReferenceException("The car doesn't exist.");
+                        throw new MyException("The car doesn't exist.", 404);
                 }
 
                 var car = mapper.Map<CarUpdateRequestDto, Car>(requestDto, c!,
@@ -137,14 +156,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -157,7 +182,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (c != null):
-                        throw new NullReferenceException("The car doesn't exist.");
+                        throw new MyException("The car doesn't exist.", 404);
                 }
 
                 var car = mapper.Map<CarStatusRequestDto, Car>(requestDto, c!);
@@ -166,14 +191,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
     }

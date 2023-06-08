@@ -1,6 +1,5 @@
 #nullable disable
 using GraduationThesis_CarServices.Models.DTO.Role;
-using static Bogus.DataSets.Name;
 
 namespace GraduationThesis_CarServices.Models.DTO.Mechanic
 {
@@ -11,7 +10,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Mechanic
         public string FullName { get; set; }
         public string UserImage { get; set; }
         public string UserPhone { get; set; }
-        public Gender UserGender { get; set; }
+        public string UserGender { get; set; }
         public RoleDto RoleDto { get; set; }
     }
 }

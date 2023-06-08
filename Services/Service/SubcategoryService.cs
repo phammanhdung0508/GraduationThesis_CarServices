@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Subcategory;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -24,12 +24,26 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                List<SubcategoryDto>? list = await subcategoryRepository.View(page);
+                var list = mapper.Map<List<SubcategoryDto>>(await subcategoryRepository.View(page));
+
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -37,51 +51,102 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                SubcategoryDto? subcategory = mapper.Map<SubcategoryDto>(await subcategoryRepository.Detail(id));
+                var subcategory = mapper.Map<SubcategoryDto>(await subcategoryRepository.Detail(id));
+
+                switch (false)
+                {
+                    case var isExist when isExist == (subcategory != null):
+                        throw new MyException("The subcategory doesn't exist.", 404);
+                }
+
                 return subcategory;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(CreateSubcategoryDto createSubcategoryDto)
+        public async Task Create(CreateSubcategoryDto requestDto)
         {
             try
             {
-                await subcategoryRepository.Create(createSubcategoryDto);
-                return true;
+                var subcategory = mapper.Map<CreateSubcategoryDto, Subcategory>(requestDto,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.SubcategoryStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                }));
+
+                await subcategoryRepository.Create(subcategory);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Update(UpdateSubcategoryDto updateSubcategoryDto)
+        public async Task Update(UpdateSubcategoryDto requestDto)
         {
             try
             {
-                await subcategoryRepository.Update(updateSubcategoryDto);
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+                var s = await subcategoryRepository.Detail(requestDto.SubcategoryId);
 
-        public async Task<bool> Delete(DeleteSubcategoryDto deleteSubcategoryDto)
-        {
-            try
-            {
-                await subcategoryRepository.Delete(deleteSubcategoryDto);
-                return true;
+                switch (false)
+                {
+                    case var isExist when isExist == (s != null):
+                        throw new MyException("The subcategory doesn't exist.", 404);
+                }
+
+                var subcategory = mapper.Map<UpdateSubcategoryDto, Subcategory>(requestDto, s!,
+                otp => otp.AfterMap((src, des) => {
+                    des.UpdatedAt = DateTime.Now;
+                }));
+
+                await subcategoryRepository.Update(subcategory);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
     }

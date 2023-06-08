@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GraduationThesis_CarServices.Models.DTO.Page;
+﻿using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Paging;
@@ -12,11 +11,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
     public class ProductRepository : IProductRepository
     {
         private readonly DataContext context;
-        private readonly IMapper mapper;
-        public ProductRepository(DataContext context, IMapper mapper)
+        public ProductRepository(DataContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
 
@@ -29,8 +26,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles)
-                .ThenInclude(m => m.MediaFile)
                 , page);
                 return list;
             }
@@ -63,8 +58,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles)
-                .ThenInclude(m => m.MediaFile)
                 .ToListAsync();
 
                 return list;
@@ -84,8 +77,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)
-                .Include(p => p.ProductMediaFiles)
-                .ThenInclude(m => m.MediaFile)
                 .FirstOrDefaultAsync();
                 return product;
             }

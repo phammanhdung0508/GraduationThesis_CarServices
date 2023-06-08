@@ -1,7 +1,7 @@
 #nullable disable
 namespace GraduationThesis_CarServices.Models.DTO.Category
 {
-    public class CategoryDto
+    public class CategoryCreateRequestDto
     {
         public string CategoryName { get; set; }
     }

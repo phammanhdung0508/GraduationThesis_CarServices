@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,22 +11,8 @@ namespace GlobalErrorHandling.Controllers
         // [HttpGet]
         public IActionResult Error()
         {
-            Exception? exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
-            switch (exception)
-            {
-                case NullReferenceException:
-                    return Problem(title: exception?.Message, statusCode: 404);
-                case ArgumentOutOfRangeException:
-                    return Problem(title: exception?.Message, statusCode: 404);
-                case ArgumentException:
-                    return Problem(title: exception?.Message, statusCode: 404);
-                case TaskCanceledException:
-                    return Problem(title: exception?.Message, statusCode: 409);
-                case var ex when ex!.Message.Equals("Successfully."):
-                    return Problem(title: exception?.Message, statusCode: 200);
-                default:
-                    return Problem(title: exception?.Message, statusCode: 500);
-            }
+            var exception = (MyException) HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error!;
+            return Problem(title: exception.Message, statusCode: exception.StatusCode);
         }
     }
 }

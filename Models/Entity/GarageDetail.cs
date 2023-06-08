@@ -4,16 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
-    public class ProductMediaFile
+    public class GarageDetail
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int ProductMediaFileId { get; set; }
+        public int GarageDetailId { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> ProductId { get; set; }
-        public virtual Product Product { get; set; }
-        public Nullable<int> MediaFileId { get; set; }
-        public virtual MediaFile MediaFile { get; set; }
+        public Nullable<int> GarageId { get; set; }
+        public virtual Garage Garage { get; set; }
+        
+        public Nullable<int> ServiceId { get; set; }
+        public virtual Service Service { get; set; }
     }
 }

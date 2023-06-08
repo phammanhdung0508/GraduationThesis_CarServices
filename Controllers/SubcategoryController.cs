@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Subcategory;
 using GraduationThesis_CarServices.Services.IService;
@@ -16,113 +17,32 @@ namespace GraduationThesis_CarServices.Controllers
             this.subcategoryService = subcategoryService;
         }
 
-        [HttpPost("view-all-subcategory")]
-        public async Task<ActionResult<List<SubcategoryDto>>> ViewCategory(PageDto page)
+        [HttpGet("detail-subcategory/{id}")]
+        public async Task<IActionResult> DetailSubcategory(int id)
         {
-            try
-            {
-                var list = await subcategoryService.View(page)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var schedule = await subcategoryService.Detail(id);
+            return Ok(schedule);
         }
 
-        [HttpGet("detail-subcategory/{id}")]
-        public async Task<ActionResult<SubcategoryDto>> DetailCategory(int id)
+        [HttpPost("view-all-subcategory")]
+        public async Task<IActionResult> ViewSubcategory(PageDto page)
         {
-            try
-            {
-                var schedule = await subcategoryService.Detail(id);
-                return Ok(schedule);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await subcategoryService.View(page)!;
+            return Ok(list);
         }
 
         [HttpPost("create-subcategory")]
-        public async Task<ActionResult<bool>> CreateCategory(CreateSubcategoryDto SubcategoryDto)
+        public async Task<IActionResult> CreateSubcategory(CreateSubcategoryDto createSubcategoryDto)
         {
-            try
-            {
-                if (await subcategoryService.Create(SubcategoryDto))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await subcategoryService.Create(createSubcategoryDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-subcategory")]
-        public async Task<ActionResult<bool>> UpdateCategory(UpdateSubcategoryDto SubcategoryDto)
+        public async Task<IActionResult> UpdateSubcategory(UpdateSubcategoryDto updateSubcategoryDto)
         {
-            try
-            {
-                if (await subcategoryService.Update(SubcategoryDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpPut("delete-subcategory")]
-        public async Task<ActionResult<bool>> DeleteCategory(DeleteSubcategoryDto SubcategoryDto)
-        {
-            try
-            {
-                if (await subcategoryService.Delete(SubcategoryDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await subcategoryService.Update(updateSubcategoryDto);
+            throw new MyException("Successfully.", 200);
         }
     }
 }

@@ -1,5 +1,7 @@
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,18 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
+        public async Task<List<Coupon>?> View(PageDto page){
+            try
+            {
+                var list = await PagingConfiguration<Coupon>.Get(context.Coupons, page);
+                
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<List<Coupon>?> FilterGarageCoupon(int garageId)
         {

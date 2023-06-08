@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Search;
@@ -55,28 +56,28 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
             await garageService.Create(garageCreateRequestDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-garage")]
         public async Task<IActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
             await garageService.Update(garageUpdateRequestDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-garage-status")]
         public async Task<IActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
             await garageService.UpdateStatus(garageStatusRequestDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-location")]
         public async Task<IActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {
             await garageService.UpdateLocation(locationUpdateRequestDto);
-            throw new Exception("Successfully.");
+            throw new MyException("Successfully.", 200);
         }
     }
 }

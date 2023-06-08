@@ -35,11 +35,20 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //Coupon
-            CreateMap<CouponGarageDto, Coupon>()
-                .ForMember(des => des.Garage, obj => obj.Ignore()).ReverseMap();
-            CreateMap<Coupon, CouponListResponseDto>().ReverseMap();
-            CreateMap<Coupon, CouponDetailResponseDto>().ReverseMap();
-            CreateMap<Coupon, CouponCreateRequestDto>().ReverseMap();
+            CreateMap<Coupon, CouponGarageDto>()
+                .ForMember(des => des.CouponEndDate, obj => obj.MapFrom(src => src.CouponEndDate.ToString("MM/dd/yyyy")))
+                .ReverseMap()
+                .ForMember(des => des.Garage, obj => obj.Ignore());
+            //----------------------------------------------------------------------------------------------------------------------
+            CreateMap<Coupon, CouponListResponseDto>()
+                .ForMember(des => des.CouponStatus, obj => obj.MapFrom(src => src.CouponStatus.ToString()))
+                .ForMember(des => des.CouponEndDate, obj => obj.MapFrom(src => src.CouponEndDate.ToString("MM/dd/yyyy")));
+            CreateMap<Coupon, CouponDetailResponseDto>()
+                .ForMember(des => des.CouponType, obj => obj.MapFrom(src => src.CouponType.ToString()))
+                .ForMember(des => des.CouponStatus, obj => obj.MapFrom(src => src.CouponStatus.ToString()))
+                .ForMember(des => des.CouponStartDate, obj => obj.MapFrom(src => src.CouponStartDate.ToString("MM/dd/yyyy")))
+                .ForMember(des => des.CouponEndDate, obj => obj.MapFrom(src => src.CouponEndDate.ToString("MM/dd/yyyy")));
+            CreateMap<CouponCreateRequestDto, Coupon>().ReverseMap();
             CreateMap<Coupon, CouponUpdateRequestDto>()
                 .ForMember(des => des.CouponId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Coupon, CouponStatusRequestDto>().ReverseMap();
@@ -50,13 +59,12 @@ namespace GraduationThesis_CarServices.Mapping
                 .ReverseMap().ForMember(des => des.Bookings, obj => obj.Ignore());
             CreateMap<Garage, GarageReviewDto>();
             //----------------------------------------------------------------------------------------------------------------------
-            CreateMap<Garage, GarageListResponseDto>()
-                .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User)).ReverseMap();
+            CreateMap<Garage, GarageListResponseDto>();
             CreateMap<Garage, GarageDetailResponseDto>()
                 .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User))
-                .ForMember(des => des.ReviewGarageDtos, obj => obj.MapFrom(src => src.Reviews))
-                .ForMember(des => des.CouponGarageDtos, obj => obj.MapFrom(src => src.Coupons))
-                .ForMember(des => des.ServiceGarageGarageDtos, obj => obj.MapFrom(src => src.ServiceGarages)).ReverseMap();
+                .ForMember(des => des.ReviewGarageDto, obj => obj.MapFrom(src => src.Reviews))
+                .ForMember(des => des.CouponGarageDto, obj => obj.MapFrom(src => src.Coupons))
+                .ForMember(des => des.GarageDetailGarageDto, obj => obj.MapFrom(src => src.GarageDetails));
             CreateMap<Garage, GarageCreateRequestDto>().ReverseMap();
             CreateMap<Garage, GarageUpdateRequestDto>()
                 .ForMember(des => des.GarageId, obj => obj.Ignore()).ReverseMap();
@@ -75,7 +83,8 @@ namespace GraduationThesis_CarServices.Mapping
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName));
             CreateMap<User, UserDetailMechanicDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
-                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
+                .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role))
+                .ForMember(des => des.UserGender, obj => obj.MapFrom(src => src.UserGender.ToString()));
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<User, UserListResponseDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
@@ -135,8 +144,8 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<WorkingSchedule, WorkingScheduleListResponseDto>();
 
             //Review
-            CreateMap<ReviewGarageDto, Review>()
-                .ForMember(des => des.Garage, obj => obj.Ignore()).ReverseMap();
+            CreateMap<Review, ReviewGarageDto>().ReverseMap()
+                .ForMember(des => des.Garage, obj => obj.Ignore());
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<Review, ReviewListResponseDto>();
             CreateMap<Review, ReviewDetailResponseDto>()
@@ -150,15 +159,16 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //ServiceGarage
-            CreateMap<ServiceGarage, ServiceGarageGarageDto>()
+            CreateMap<GarageDetail, GarageDetailGarageDto>()
                 .ForMember(des => des.ServiceGarageDto, obj => obj.MapFrom(src => src.Service));
-            CreateMap<ServiceGarage, ServiceGarageServiceDto>()
+            //----------------------------------------------------------------------------------------------------------------------
+            CreateMap<GarageDetail, ServiceGarageServiceDto>()
                 .ForMember(des => des.GarageServiceDto, obj => obj.MapFrom(src => src.Garage));
-            CreateMap<ServiceGarage, ServiceGarageListResponseDto>()
+            CreateMap<GarageDetail, ServiceGarageListResponseDto>()
                 .ForMember(des => des.ServiceOfServiceGarageDto, obj => obj.MapFrom(src => src.Service));
 
             //ServiceBooking
-            CreateMap<ServiceBooking, ServiceListDto>()
+            CreateMap<BookingDetail, ServiceListDto>()
                 .ReverseMap()
                 .ForMember(des => des.MechanicId, obj => obj.Ignore());
 
@@ -171,7 +181,7 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Service, ServiceListResponseDto>().ReverseMap();
             CreateMap<Service, ServiceDetailResponseDto>()
                 .ForMember(des => des.ProductServiceDtos, obj => obj.MapFrom(src => src.Products))
-                .ForMember(des => des.ServiceGarageServiceDtos, obj => obj.MapFrom(src => src.ServiceGarages))
+                .ForMember(des => des.ServiceGarageServiceDtos, obj => obj.MapFrom(src => src.GarageDetails))
                 .ReverseMap();
             CreateMap<Service, ServiceCreateRequestDto>().ReverseMap();
             CreateMap<Service, ServiceUpdateRequestDto>().ForMember(des => des.ServiceId, obj => obj.Ignore()).ReverseMap();
@@ -206,24 +216,26 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Subcategory, UpdateSubcategoryDto>().ForMember(des => des.SubcategoryId, obj => obj.Ignore()).ReverseMap();
             CreateMap<Subcategory, DeleteSubcategoryDto>().ReverseMap();
 
+
             // Category
-            CreateMap<Category, CategoryDto>().ReverseMap();
-            CreateMap<Category, CategoryProductDto>();
-            CreateMap<Category, CreateCategoryDto>().ReverseMap();
-            CreateMap<Category, UpdateCategoryDto>().ForMember(des => des.CategoryId, obj => obj.Ignore()).ReverseMap();
-            CreateMap<Category, DeleteCategoryDto>().ReverseMap();
+            CreateMap<Category, CategoryListResponseDto>();
+            CreateMap<Category, CategoryDetailResponseDto>();
+            CreateMap<CategoryCreateRequestDto, Category>();
+            CreateMap<CategoryUpdateRequestDto, Category>()
+                .ForMember(des => des.CategoryId, obj => obj.Ignore());
+            CreateMap<CategoryStatusRequestDto, Category>()
+                .ForMember(des => des.CategoryId, obj => obj.Ignore());
+
 
             // Product
             CreateMap<Product, ProductServiceDto>().ReverseMap();
             CreateMap<Product, ProductListResponseDto>()
                 .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
                 .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
-                .ForMember(des => des.ProductMediaFileProductDtos, obj => obj.MapFrom(src => src.ProductMediaFiles))
                 .ReverseMap();
             CreateMap<Product, ProductDetailResponseDto>()
                 .ForMember(des => des.SubcategoryProductDto, obj => obj.MapFrom(src => src.Subcategory))
                 .ForMember(des => des.ServiceProductDto, obj => obj.MapFrom(src => src.Service))
-                .ForMember(des => des.ProductMediaFileProductDtos, obj => obj.MapFrom(src => src.ProductMediaFiles))
                 .ReverseMap();
             CreateMap<Product, ProductCreateRequestDto>().ReverseMap();
             CreateMap<Product, ProductPriceRequestDto>().ForMember(des => des.ProductId, obj => obj.Ignore()).ReverseMap();
@@ -233,25 +245,14 @@ namespace GraduationThesis_CarServices.Mapping
             //Booking
             CreateMap<Booking, BookingListResponseDto>()
                 .ForMember(des => des.CarBookingDto, obj => obj.MapFrom(src => src.Car))
-                .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage))
-                .ForMember(des => des.ReportBookingDto, obj => obj.MapFrom(src => src.Report))
-                .ReverseMap();
+                .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage));
             CreateMap<Booking, BookingDetailResponseDto>()
                 .ForMember(des => des.CarBookingDto, obj => obj.MapFrom(src => src.Car))
-                .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage))
-                .ForMember(des => des.ReportBookingDto, obj => obj.MapFrom(src => src.Report));
+                .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage));
             CreateMap<Booking, BookingCreateRequestDto>()
                 .ReverseMap();
             CreateMap<Booking, BookingStatusRequestDto>()
                 .ForMember(des => des.BookingId, obj => obj.Ignore()).ReverseMap();
-
-            // ProductMediaFile
-            CreateMap<ProductMediaFile, ProductMediaFileProductDto>()
-                .ForMember(des => des.MediaFileProductDto, obj => obj.MapFrom(src => src.MediaFile))
-                .ReverseMap();
-
-            // MediaFile
-            CreateMap<MediaFile, MediaFileProductDto>().ReverseMap();
         }
     }
 }

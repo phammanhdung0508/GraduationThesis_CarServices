@@ -12,6 +12,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ProductId { get; set; }
         [MaxLength(100)]
         public string ProductName { get; set; }
+        [MaxLength(1024)]
+        public string ProductImage { get; set; }
         [MaxLength(200)]
         public string ProductDetailDescription { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
@@ -28,11 +30,11 @@ namespace GraduationThesis_CarServices.Models.Entity
         /*-------------------------------------------------*/
         public Nullable<int> SubcategoryId { get; set; }
         public virtual Subcategory Subcategory { get; set; }
+
         public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<ProductMediaFile> ProductMediaFiles { get; set; }
-        public virtual ICollection<ServiceBooking> ServiceBookings { get; set; }
+        public virtual ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }

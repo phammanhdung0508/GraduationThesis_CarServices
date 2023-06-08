@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,13 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
         {
             var list = await mechanicService.FilterWorkingSchedulesByMechanicId(mechanicId);
+            return Ok(list);
+        }
+
+        [HttpPost("view-all-mechanic")]
+        public async Task<IActionResult> View(PageDto page)
+        {
+            var list = await mechanicService.View(page)!;
             return Ok(list);
         }
     }

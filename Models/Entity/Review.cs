@@ -22,6 +22,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         /*-------------------------------------------------*/
         public Nullable<int> CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
+        
         public Nullable<int> GarageId { get; set; }
         public virtual Garage Garage { get; set; }
     }

@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -10,33 +12,76 @@ namespace GraduationThesis_CarServices.Services.Service
 {
     public class CouponService : ICouponService
     {
+        private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private readonly ICouponRepository couponRepository;
+        private readonly IGarageRepository garageRepository;
         private readonly IMapper mapper;
-        public CouponService(ICouponRepository couponRepository, IMapper mapper)
+        public CouponService(ICouponRepository couponRepository, IGarageRepository garageRepository, IMapper mapper)
         {
             this.mapper = mapper;
             this.couponRepository = couponRepository;
+            this.garageRepository = garageRepository;
+        }
+
+        public async Task<List<CouponListResponseDto>?> View(PageDto page)
+        {
+            try
+            {
+                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.View(page));
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
         }
 
         public async Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId)
         {
             try
             {
-                var list = mapper
-                .Map<List<CouponListResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
+                var isGarageExist = await garageRepository.IsGarageExist(garageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isGarageExist:
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
+                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
 
                 return list;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -44,21 +89,32 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var coupon = mapper
-                .Map<CouponDetailResponseDto>(await couponRepository.Detail(id));
+                var coupon = mapper.Map<CouponDetailResponseDto>(await couponRepository.Detail(id));
+
+                switch (false)
+                {
+                    case var isExist when isExist == (coupon != null):
+                        throw new MyException("The coupon doesn't exist.", 404);
+                }
 
                 return coupon;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -66,22 +122,37 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                Random random = new Random();
+                string code = new string(Enumerable.Repeat(chars, 10).Select(s => s[random.Next(s.Length)]).ToArray());
+
                 var coupon = mapper.Map<CouponCreateRequestDto, Coupon>(requestDto,
-                otp => otp.AfterMap((src, des) => {
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.CouponCode = code;
+                    des.CouponStartDate = DateTime.Parse(requestDto.CouponStartDate);
+                    des.CouponEndDate = DateTime.Parse(requestDto.CouponEndDate);
+                    des.CouponStatus = CouponStatus.Active;
                     des.CreatedAt = DateTime.Now;
                 }));
+
                 await couponRepository.Create(coupon);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -90,22 +161,37 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var c = await couponRepository.Detail(requestDto.CouponId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new MyException("The coupon doesn't exist.", 404);
+                }
+
                 var coupon = mapper.Map<CouponUpdateRequestDto, Coupon>(requestDto, c!,
-                otp => otp.AfterMap((src, des) => {
+                otp => otp.AfterMap((src, des) =>
+                {
                     des.UpdatedAt = DateTime.Now;
                 }));
+
                 await couponRepository.Update(coupon);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -114,19 +200,33 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var c = await couponRepository.Detail(requestDto.CouponId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (c != null):
+                        throw new MyException("The coupon doesn't exist.", 404);
+                }
+
                 var coupon = mapper.Map<CouponStatusRequestDto, Coupon>(requestDto, c!);
+
                 await couponRepository.Update(coupon);
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
     }

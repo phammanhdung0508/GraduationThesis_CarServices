@@ -16,5 +16,6 @@ namespace GraduationThesis_CarServices.Models.Entity
 
         /*-------------------------------------------------*/
         public virtual ICollection<WorkingSchedule> WorkingSchedules { get; set; }
+        public virtual ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }

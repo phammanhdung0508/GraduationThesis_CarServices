@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Models.Entity;
@@ -35,14 +36,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -55,7 +62,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isGarageExist:
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                 }
 
                 var page = new PageDto
@@ -70,14 +77,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -90,21 +103,27 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (review != null):
-                        throw new NullReferenceException("The review doesn't exist.");
+                        throw new MyException("The review doesn't exist.", 404);
                 }
 
                 return review;
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -123,11 +142,11 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == isCustomerExist:
-                        throw new NullReferenceException("The customer doesn't exist.");
+                        throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist == isGarageExist:
-                        throw new NullReferenceException("The garage doesn't exist.");
+                        throw new MyException("The garage doesn't exist.", 404);
                     case var isRange when isRange == isInRange:
-                        throw new ArgumentOutOfRangeException("Rating is outside of the range allowed.");
+                        throw new MyException("Rating is outside of the range allowed.", 404);
                 }
 
                 var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
@@ -141,14 +160,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -161,9 +186,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (r != null):
-                        throw new NullReferenceException("The review doesn't exist.");
+                        throw new MyException("The review doesn't exist.", 404);
                     case var isRange when isRange == (requestDto.Rating >= 0 && requestDto.Rating <= 5):
-                        throw new ArgumentOutOfRangeException("Rating is outside of the range allowed.");
+                        throw new MyException("Rating is outside of the range allowed.", 404);
                 }
 
                 var review = mapper.Map<ReviewUpdateRequestDto, Review>(requestDto, r!,
@@ -176,14 +201,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
 
@@ -196,7 +227,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isExist when isExist == (r != null):
-                        throw new NullReferenceException("The review doesn't exist.");
+                        throw new MyException("The review doesn't exist.", 404);
                 }
 
                 var review = mapper.Map<ReviewStatusRequestDto, Review>(requestDto, r!);
@@ -205,14 +236,20 @@ namespace GraduationThesis_CarServices.Services.Service
             }
             catch (Exception e)
             {
-                var inner = e.InnerException;
-                while (inner != null)
+                switch (e)
                 {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                throw;
             }
         }
     }

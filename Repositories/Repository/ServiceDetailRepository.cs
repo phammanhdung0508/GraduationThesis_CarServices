@@ -7,24 +7,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
-    public class GarageDetailRepository : IGarageDetailRepository
+    public class ServiceDetailRepository : IServiceDetailRepository
     {
         private readonly DataContext context;
-        public GarageDetailRepository(DataContext context)
+        public ServiceDetailRepository(DataContext context)
         {
             this.context = context;
         }
 
-        public async Task<List<GarageDetail>?> View(PageDto page)
+        public async Task<List<ServiceDetail>?> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<GarageDetail>.Get(context.GarageDetails
-                .Include(g => g.Garage)
-                .Include(g => g.Service)
-                .ThenInclude(s => s.Products)
-                .Include(g => g.Service)
-                .ThenInclude(s => s.ServiceDetails), page);
+                var list = await PagingConfiguration<ServiceDetail>.Get(context.ServiceDetails
+                .Include(g => g.Service), page);
                 return list;
             }
             catch (Exception)
@@ -33,15 +29,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<GarageDetail>?> FilterServiceByGarage(int garageId)
+        public async Task<List<ServiceDetail>?> FilterService(int serviceId)
         {
             try
             {
-                var list = await context.GarageDetails
-                .Where(s => s.GarageId == garageId)
+                var list = await context.ServiceDetails
+                .Where(s => s.ServiceId == serviceId)
                 .Include(s => s.Service)
-                .ThenInclude(s => s.Products)
                 .ToListAsync();
+
                 return list;
             }
             catch (Exception)
@@ -50,17 +46,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<GarageDetail?> Detail(int id)
+        public async Task<ServiceDetail?> Detail(int id)
         {
             try
             {
-                var serviceGarage = await context.GarageDetails
-                .Where(g => g.GarageDetailId == id)
-                .Include(g => g.Garage)
+                var serviceGarage = await context.ServiceDetails
+                .Where(g => g.ServiceDetailId == id)
                 .Include(g => g.Service)
-                .ThenInclude(s => s.Products)
-                .Include(g => g.Service)
-                .ThenInclude(s => s.ServiceDetails)
                 .FirstOrDefaultAsync();
                 return serviceGarage;
             }
@@ -70,11 +62,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(GarageDetail garageDetail)
+        public async Task Create(ServiceDetail serviceDetail)
         {
             try
             {
-                context.GarageDetails.Add(garageDetail);
+                context.ServiceDetails.Add(serviceDetail);
                 await context.SaveChangesAsync();
             }
             catch (Exception)
@@ -83,11 +75,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Update(GarageDetail garageDetail)
+        public async Task Update(ServiceDetail serviceDetail)
         {
             try
             {
-                context.GarageDetails.Update(garageDetail);
+                context.ServiceDetails.Update(serviceDetail);
                 await context.SaveChangesAsync();
             }
             catch (Exception)

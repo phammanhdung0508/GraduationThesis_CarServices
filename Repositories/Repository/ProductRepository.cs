@@ -23,6 +23,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await PagingConfiguration<Product>
                 .Get(context.Products
+                .Where(p => p.ProductStatus == Status.Activate)
                 .Include(p => p.Subcategory)
                 .ThenInclude(s => s.Category)
                 .Include(p => p.Service)

@@ -2,7 +2,7 @@
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Service;
-using GraduationThesis_CarServices.Models.DTO.ServiceGarage;
+using GraduationThesis_CarServices.Models.DTO.GarageDetail;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -35,12 +35,12 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ServiceGarageListResponseDto>?> FilterServiceByGarage(int garageId)
+        public async Task<List<GarageDetailListResponseDto>?> FilterServiceByGarage(int garageId)
         {
             try
             {
                 var list = mapper
-                .Map<List<ServiceGarageListResponseDto>>(await garageDetailRepository.FilterServiceByGarage(garageId));
+                .Map<List<GarageDetailListResponseDto>>(await garageDetailRepository.FilterServiceByGarage(garageId));
 
                 return list;
             }

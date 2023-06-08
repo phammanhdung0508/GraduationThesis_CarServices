@@ -21,7 +21,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await PagingConfiguration<Service>.Get(context.Services, page);
+                var list = await PagingConfiguration<Service>.Get(context.Services
+                .Where(s => s.ServiceStatus == Status.Activate), page);
                 return list;
             }
             catch (Exception)
@@ -54,6 +55,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Include(s => s.Products)
                 .Include(s => s.GarageDetails)
                 .ThenInclude(g => g.Garage)
+                .Include(s => s.ServiceDetails)
                 .FirstOrDefaultAsync();
                 return service;
             }

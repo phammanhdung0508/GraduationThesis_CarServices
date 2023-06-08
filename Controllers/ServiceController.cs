@@ -40,8 +40,8 @@ namespace GraduationThesis_CarServices.Controllers
         {
             try
             {
-                var productList = await serviceService.FilterServiceByGarage(garageId)!;
-                return Ok(productList);
+                var serviceList = await serviceService.FilterServiceByGarage(garageId)!;
+                return Ok(serviceList);
             }
             catch (Exception e)
             {

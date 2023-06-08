@@ -63,8 +63,8 @@ builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Connect Sql Server
-var connectionString = builder.Configuration.GetConnectionString("DataContextConection") ??
-    throw new InvalidOperationException("Connection string 'DataContextConection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
+    throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -110,14 +110,11 @@ builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-/*if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}*/
-
-app.UseSwagger();
-app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 

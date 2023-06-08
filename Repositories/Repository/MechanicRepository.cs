@@ -19,7 +19,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         public async Task<List<Mechanic>> View(PageDto page){
             try
             {
-                var list = await PagingConfiguration<Mechanic>.Get(context.Mechanics, page);
+                var list = await PagingConfiguration<Mechanic>.Get(context.Mechanics.Include(m => m.User), page);
 
                 return list;
             }

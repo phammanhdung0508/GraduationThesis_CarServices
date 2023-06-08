@@ -1,28 +1,29 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.Search;
-using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
+using GraduationThesis_CarServices.Models.DTO.ServiceDetail;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class WorkingScheduleController : ControllerBase
+    [ApiController]
+    public class ServiceDetailController : ControllerBase
     {
-        private readonly IWorkingScheduleService workingScheduleService;
-        public WorkingScheduleController(IWorkingScheduleService workingScheduleService)
+        public readonly IServiceDetailService serviceDetailService;
+
+        public ServiceDetailController(IServiceDetailService serviceDetailService)
         {
-            this.workingScheduleService = workingScheduleService;
+            this.serviceDetailService = serviceDetailService;
+
         }
 
-        [HttpPost("view-all-working-schedule")]
-        public async Task<IActionResult> ViewWorkingSchedule(PageDto page)
+        [HttpPost("view-all-service-detail")]
+        public async Task<IActionResult>ViewServiceDetail(PageDto page)
         {
             try
             {
-                var workingScheduleList = await workingScheduleService.View(page)!;
-                return Ok(workingScheduleList);
+                var serviceDetailList = await serviceDetailService.View(page)!;
+                return Ok(serviceDetailList);
             }
             catch (Exception e)
             {
@@ -36,13 +37,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-working-schedule-by-garage/id={garageId}&day={daysOfTheWeek}")]
-        public async Task<IActionResult> GetWorkingScheduleByGarage(int garageId, string daysOfTheWeek)
+        [HttpGet("filter-service-detail-by-service/{serviceId}")]
+        public async Task<IActionResult> FilterServiceDetailByService(int serviceId)
         {
             try
             {
-                var workingScheduleList = await workingScheduleService.FilterWorkingScheduleByGarage(garageId, daysOfTheWeek)!;
-                return Ok(workingScheduleList);
+                var serviceDetailList = await serviceDetailService.FilterService(serviceId);
+                return Ok(serviceDetailList);
             }
             catch (Exception e)
             {
@@ -56,13 +57,13 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-working-schedule-by-mechanic/{id}")]
-        public async Task<IActionResult> GetWorkingScheduleByMechanic(int id)
+        [HttpGet("detail-service-detail/{id}")]
+        public async Task<IActionResult> DetailGarageDetail(int id)
         {
             try
             {
-                var workingScheduleList = await workingScheduleService.FilterWorkingScheduleByMechanic(id)!;
-                return Ok(workingScheduleList);
+                var serviceDetail = await serviceDetailService.Detail(id);
+                return Ok(serviceDetail);
             }
             catch (Exception e)
             {
@@ -76,52 +77,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpGet("get-working-schedule-who-available/id={garageId}&day={daysOfTheWeek}")]
-        public async Task<IActionResult> GetWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek)
+        [HttpPost("create-service-detail")]
+        public async Task<IActionResult> CreateServiceDetail(ServiceDetailCreateRequestDto serviceDetail)
         {
             try
             {
-                var workingScheduleList = await workingScheduleService.FilterWorkingScheduleWhoAvailable(garageId, daysOfTheWeek)!;
-                return Ok(workingScheduleList);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpGet("detail-working-schedule/{id}")]
-        public async Task<IActionResult> DetailWorkingSchedule(int id)
-        {
-            try
-            {
-                var workingSchedule = await workingScheduleService.Detail(id);
-                return Ok(workingSchedule);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
-        }
-
-        [HttpPost("create-working-schedule")]
-        public async Task<IActionResult> CreateWorkingSchedule(WorkingScheduleCreateRequestDto workingScheduleCreateDto)
-        {
-            try
-            {
-                if (await workingScheduleService.Create(workingScheduleCreateDto))
+                if (await serviceDetailService.Create(serviceDetail))
                 {
                     return Ok("Successfully!");
                 };
@@ -139,12 +100,12 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
-        [HttpPut("update-working-schedule-status")]
-        public async Task<ActionResult> UpdateWorkingScheduleStatus(WorkingScheduleUpdateStatusDto workingScheduleUpdateStatusDto)
+        [HttpPut("update-service-detail")]
+        public async Task<IActionResult> UpdateServiceDetail(ServiceDetailUpdateRequestDto serviceDetail)
         {
             try
             {
-                if (await workingScheduleService.UpdateStatus(workingScheduleUpdateStatusDto))
+                if (await serviceDetailService.Update(serviceDetail))
                 {
                     return Ok("Successfully!");
                 }
@@ -161,5 +122,30 @@ namespace GraduationThesis_CarServices.Controllers
                 return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
             }
         }
+
+        [HttpPut("update-price-service-detail")]
+        public async Task<IActionResult> UpdatePriceServiceDetail(ServiceDetailPriceRequestDto serviceDetail)
+        {
+            try
+            {
+                if (await serviceDetailService.UpdatePrice(serviceDetail))
+                {
+                    return Ok("Successfully!");
+                }
+                return BadRequest("Fail!");
+            }
+            catch (Exception e)
+            {
+                var inner = e.InnerException;
+                while (inner != null)
+                {
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
+                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+            }
+        }
+
     }
 }
+

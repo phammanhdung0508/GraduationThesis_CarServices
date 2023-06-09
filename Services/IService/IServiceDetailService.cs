@@ -8,9 +8,9 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ServiceDetailListResponseDto>?> View(PageDto page);
         Task<List<ServiceDetailListResponseDto>?> FilterService(int serviceId);
         Task<ServiceDetailDetailResponseDto?> Detail(int id);
-        Task<bool> Create(ServiceDetailCreateRequestDto requestDto);
-        Task<bool> Update(ServiceDetailUpdateRequestDto requestDto);
-        Task<bool> UpdatePrice(ServiceDetailPriceRequestDto requestDto);
+        Task Create(ServiceDetailCreateRequestDto requestDto);
+        Task Update(ServiceDetailUpdateRequestDto requestDto);
+        Task UpdatePrice(ServiceDetailPriceRequestDto requestDto);
 
     }
 }

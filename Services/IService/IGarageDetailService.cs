@@ -7,8 +7,8 @@ namespace GraduationThesis_CarServices.Services.IService
     {
         Task<List<GarageDetailDetailResponseDto>?> View(PageDto page);
         Task<GarageDetailDetailResponseDto?> Detail(int id);
-        Task<bool> Create(GarageDetailCreateRequestDto requestDto);
-        Task<bool> Update(GarageDetailUpdateRequestDto requestDto);
+        Task Create(GarageDetailCreateRequestDto requestDto);
+        Task Update(GarageDetailUpdateRequestDto requestDto);
 
     }
 }

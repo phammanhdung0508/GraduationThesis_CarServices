@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.Entity;
@@ -27,9 +29,22 @@ namespace GraduationThesis_CarServices.Services.Service
                 .Map<List<ProductListResponseDto>>(await productRepository.View(page));
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -42,11 +57,25 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
+
 
         public async Task<ProductDetailResponseDto?> Detail(int id)
         {
@@ -56,13 +85,26 @@ namespace GraduationThesis_CarServices.Services.Service
                 .Map<ProductDetailResponseDto>(await productRepository.Detail(id));
                 return product;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(ProductCreateRequestDto requestDto)
+        public async Task Create(ProductCreateRequestDto requestDto)
         {
             try
             {
@@ -72,85 +114,125 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.ProductStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
-                switch (await productRepository.IsDuplicatedProduct(product))
+                if (!await productRepository.IsDuplicatedProduct(product))
                 {
-                    case false:
-                        await productRepository.Create(product);
-                        return true;
+                    await productRepository.Create(product);
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
-            }
-        }
-
-        public async Task<bool> UpdatePrice(ProductPriceRequestDto requestDto)
-        {
-            try
-            {
-                switch (await productRepository.IsProductExist(requestDto.ProductId))
+                switch (e)
                 {
-                    case true:
-                        var p = await productRepository.Detail(requestDto.ProductId);
-                        var product = mapper.Map<ProductPriceRequestDto, Product>(requestDto, p!,
-                        otp => otp.AfterMap((src, des) =>
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
                         {
-                            des.UpdatedAt = DateTime.Now;
-                        }));
-
-                        await productRepository.Update(product);
-                        return true;
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                return false;
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
 
-        public async Task<bool> UpdateStatus(ProductStatusRequestDto requestDto)
+        public async Task UpdatePrice(ProductPriceRequestDto requestDto)
         {
             try
             {
-                switch (await productRepository.IsProductExist(requestDto.ProductId))
+                if (await productRepository.IsProductExist(requestDto.ProductId))
                 {
-                    case true:
-                        var p = await productRepository.Detail(requestDto.ProductId);
-                        var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
-                        await productRepository.Update(product);
-                        return true;
+                    var p = await productRepository.Detail(requestDto.ProductId);
+                    var product = mapper.Map<ProductPriceRequestDto, Product>(requestDto, p!,
+                    otp => otp.AfterMap((src, des) =>
+                    {
+                        des.UpdatedAt = DateTime.Now;
+                    }));
+
+                    await productRepository.Update(product);
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
-            }
-        }
-        public async Task<bool> UpdateQuantity(ProductQuantityRequestDto requestDto)
-        {
-            try
-            {
-                switch (await productRepository.IsProductExist(requestDto.ProductId))
+                switch (e)
                 {
-                    case true:
-                        var p = await productRepository.Detail(requestDto.ProductId);
-                        var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
-                        otp => otp.AfterMap((src, des) =>
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
                         {
-                            des.UpdatedAt = DateTime.Now;
-                        }));
-                        await productRepository.Update(product);
-                        return true;
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                return false;
             }
-            catch (Exception)
+        }
+
+        public async Task UpdateStatus(ProductStatusRequestDto requestDto)
+        {
+            try
             {
-                throw;
+                if (await productRepository.IsProductExist(requestDto.ProductId))
+                {
+                    var p = await productRepository.Detail(requestDto.ProductId);
+                    var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
+                    await productRepository.Update(product);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+        public async Task UpdateQuantity(ProductQuantityRequestDto requestDto)
+        {
+            try
+            {
+                if (await productRepository.IsProductExist(requestDto.ProductId))
+                {
+                    var p = await productRepository.Detail(requestDto.ProductId);
+                    var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
+                    otp => otp.AfterMap((src, des) =>
+                    {
+                        des.UpdatedAt = DateTime.Now;
+                    }));
+                    await productRepository.Update(product);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
     }

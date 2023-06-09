@@ -9,9 +9,9 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ServiceListResponseDto>?> View(PageDto page);
         Task<List<GarageDetailListResponseDto>?> FilterServiceByGarage(int garageId);
         Task<ServiceDetailResponseDto?> Detail(int id);
-        Task<bool> Create(ServiceCreateRequestDto requestDto);
-        Task<bool> Update(ServiceUpdateRequestDto requestDto);
-        Task<bool> UpdateStatus(ServiceStatusRequestDto requestDto);
+        Task Create(ServiceCreateRequestDto requestDto);
+        Task Update(ServiceUpdateRequestDto requestDto);
+        Task UpdateStatus(ServiceStatusRequestDto requestDto);
 
     }
 }

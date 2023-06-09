@@ -8,10 +8,10 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ProductListResponseDto>?> View(PageDto page);
         Task<List<ProductListResponseDto>?> FilterAvailableProductForService(int serviceId);
         Task<ProductDetailResponseDto?> Detail(int id);
-        Task<bool> Create(ProductCreateRequestDto requestDto);
-        Task<bool> UpdatePrice(ProductPriceRequestDto requestDto);
-        Task<bool> UpdateStatus(ProductStatusRequestDto requestDto);
-        Task<bool> UpdateQuantity(ProductQuantityRequestDto requestDto);
+        Task Create(ProductCreateRequestDto requestDto);
+        Task UpdatePrice(ProductPriceRequestDto requestDto);
+        Task UpdateStatus(ProductStatusRequestDto requestDto);
+        Task UpdateQuantity(ProductQuantityRequestDto requestDto);
 
     }
 }

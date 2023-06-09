@@ -10,7 +10,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<WorkingScheduleByMechanicDto>?> FilterWorkingScheduleByMechanic(int mechanicId);
         Task<List<WorkingScheduleByGarageDto>?> FilterWorkingScheduleWhoAvailable(int garageId, string daysOfTheWeek);
         Task<WorkingScheduleDetailResponseDto?> Detail(int id);
-        Task<bool> Create(WorkingScheduleCreateRequestDto requestDto);
-        Task<bool> UpdateStatus(WorkingScheduleUpdateStatusDto requestDto);
+        Task Create(WorkingScheduleCreateRequestDto requestDto);
+        Task UpdateStatus(WorkingScheduleUpdateStatusDto requestDto);
     }
 }

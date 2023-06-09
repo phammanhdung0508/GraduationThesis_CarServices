@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
 using GraduationThesis_CarServices.Models.Entity;
@@ -27,9 +29,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -42,9 +57,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -57,9 +85,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -72,9 +113,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -87,13 +141,26 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return workingSchedule;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(WorkingScheduleCreateRequestDto requestDto)
+        public async Task Create(WorkingScheduleCreateRequestDto requestDto)
         {
             try
             {
@@ -104,28 +171,51 @@ namespace GraduationThesis_CarServices.Services.Service
                 }));
                 if (checkValidatedDaysOfTheWeek(requestDto.DaysOfTheWeek)) {
                     await workingScheduleRepository.Create(workingSchedule);
-                    return true;
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> UpdateStatus(WorkingScheduleUpdateStatusDto requestDto)
+        public async Task UpdateStatus(WorkingScheduleUpdateStatusDto requestDto)
         {
             try
             {
                 var w = await workingScheduleRepository.Detail(requestDto.WorkingScheduleId);
                 var workingSchedule = mapper.Map<WorkingScheduleUpdateStatusDto, WorkingSchedule>(requestDto, w!);
                 await workingScheduleRepository.Update(workingSchedule);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 

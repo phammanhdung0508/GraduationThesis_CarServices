@@ -5,6 +5,8 @@ using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.DTO.GarageDetail;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
+using GraduationThesis_CarServices.Models.DTO.Exception;
+using System.Diagnostics;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
@@ -29,9 +31,22 @@ namespace GraduationThesis_CarServices.Services.Service
                 .Map<List<ServiceListResponseDto>>(await serviceRepository.View(page));
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -44,9 +59,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -57,13 +85,26 @@ namespace GraduationThesis_CarServices.Services.Service
                 var service = mapper.Map<ServiceDetailResponseDto>(await serviceRepository.Detail(id));
                 return service;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(ServiceCreateRequestDto requestDto)
+        public async Task Create(ServiceCreateRequestDto requestDto)
         {
             try
             {
@@ -74,63 +115,93 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.ServiceStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
-                switch (await serviceRepository.IsDuplicatedService(service))
+                if (!await serviceRepository.IsDuplicatedService(service))
                 {
-                    case false:
-                        await serviceRepository.Create(service);
-                        return true;
+                    await serviceRepository.Create(service);
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
-            }
-        }
-
-        public async Task<bool> Update(ServiceUpdateRequestDto requestDto)
-        {
-            try
-            {
-                switch (await serviceRepository.IsServiceExist(requestDto.ServiceId))
+                switch (e)
                 {
-                    case true:
-                        var s = await serviceRepository.Detail(requestDto.ServiceId);
-                        var service = mapper.Map<ServiceUpdateRequestDto,
-                        GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!,
-                        otp => otp.AfterMap((src, des) =>
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
                         {
-                            des.UpdatedAt = DateTime.Now;
-                        }));
-                        await serviceRepository.Update(service);
-                        return true;
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
                 }
-                return false;
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
 
-        public async Task<bool> UpdateStatus(ServiceStatusRequestDto requestDto)
+        public async Task Update(ServiceUpdateRequestDto requestDto)
         {
             try
             {
-                switch (await serviceRepository.IsServiceExist(requestDto.ServiceId))
+                if (await serviceRepository.IsServiceExist(requestDto.ServiceId))
                 {
-                    case true:
-                        var s = await serviceRepository.Detail(requestDto.ServiceId);
-                        var service = mapper.Map<ServiceStatusRequestDto,
-                        GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
-                        await serviceRepository.Update(service);
-                        return true;
+                    var s = await serviceRepository.Detail(requestDto.ServiceId);
+                    var service = mapper.Map<ServiceUpdateRequestDto,
+                    GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!,
+                    otp => otp.AfterMap((src, des) =>
+                    {
+                        des.UpdatedAt = DateTime.Now;
+                    }));
+                    await serviceRepository.Update(service);
                 }
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
+        public async Task UpdateStatus(ServiceStatusRequestDto requestDto)
+        {
+            try
+            {
+                if (await serviceRepository.IsServiceExist(requestDto.ServiceId))
+                {
+                    var s = await serviceRepository.Detail(requestDto.ServiceId);
+                    var service = mapper.Map<ServiceStatusRequestDto,
+                    GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
+                    await serviceRepository.Update(service);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 

@@ -2,6 +2,7 @@ using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.GarageDetail;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 
 namespace GraduationThesis_CarServices.Controllers
 {
@@ -18,89 +19,31 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-garage-detail")]
-        public async Task<IActionResult>ViewGarageDetail(PageDto page)
+        public async Task<IActionResult> ViewGarageDetail(PageDto page)
         {
-            try
-            {
-                var garageDetailList = await garageDetailService.View(page)!;
-                return Ok(garageDetailList);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var garageDetailList = await garageDetailService.View(page)!;
+            return Ok(garageDetailList);
         }
 
         [HttpGet("detail-garage-detail/{id}")]
         public async Task<IActionResult> DetailGarageDetail(int id)
         {
-            try
-            {
-                var garageDetail = await garageDetailService.Detail(id);
-                return Ok(garageDetail);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var garageDetail = await garageDetailService.Detail(id);
+            return Ok(garageDetail);
         }
 
         [HttpPost("create-garage-detail")]
         public async Task<IActionResult> CreateGarageDetail(GarageDetailCreateRequestDto garageDetail)
         {
-            try
-            {
-                if (await garageDetailService.Create(garageDetail))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageDetailService.Create(garageDetail);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-garage-detail")]
         public async Task<IActionResult> UpdateGarageDetail(GarageDetailUpdateRequestDto garageDetail)
         {
-            try
-            {
-                if (await garageDetailService.Update(garageDetail))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await garageDetailService.Update(garageDetail);
+            throw new MyException("Successfully.", 200);
         }
 
     }

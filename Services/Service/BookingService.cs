@@ -265,8 +265,6 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             for (int i = 0; i <= isAvailableList.Count - 1; i++)
             {
-                var currentHour = isAvailableList[i];
-
                 if (isAvailableList[i + 1] - isAvailableList[i] == 1)
                 {
                     sequenceLength++;
@@ -281,9 +279,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     sequenceLength = 1;
                 }
 
-                var isLastNumber = isAvailableList[i] + 1;
-
-                if (isLastNumber.Equals(isAvailableList.Last()))
+                if (isAvailableList[i + 1].Equals(isAvailableList.Last()))
                 {
                     EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours);
                     break;
@@ -324,8 +320,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         }
                         break;
                     case var bookingCout when bookingCout != lotCount && bookingCount > 0:
-                        var lastHour = closeAt;
-                        var remainHour = lastHour - i;
+                        var remainHour = closeAt - i;
 
                         var minEstimatedTimePerHour = GetMinEstimatedTime(i, listBooking!);
 
@@ -335,7 +330,21 @@ namespace GraduationThesis_CarServices.Services.Service
 
                             if (bookingInFirstHourCout + bookingInNextHourCout == lotCount && minEstimatedTimePerHour > 1)
                             {
-                                UpdateListHours(i + z, listHours);
+                                var durationFirstHour = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).FirstOrDefault()!.TotalEstimatedCompletionTime;
+                                if(durationFirstHour > 1){
+                                    for (int b = i + 1; b < i + durationFirstHour; b++)
+                                    {
+                                        UpdateListHours(b, listHours);
+                                    }
+                                    z = (int)durationFirstHour;
+                                    i = i + z - 1;
+                                    var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && b.TotalEstimatedCompletionTime > 1).Count();
+                                    if(isBookin + (int)bookingInFirstHourCout! == lotCount){
+                                        UpdateListHours(i + 1, listHours);
+                                    }
+                                }else{
+                                    UpdateListHours(i + z, listHours);
+                                }
                             }
                         }
                         break;
@@ -369,7 +378,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 for (int i = 0; i < requestDto.ServiceList.Count; i++)
                 {
-                    var serviceDuration = await serviceRepository.GetDuration(requestDto.ServiceList[i].ServiceId);
+                    var serviceDuration = await serviceRepository.GetDuration(requestDto.ServiceList[i].ServiceDetailId);
                     totalEstimated += serviceDuration;
                 }
 
@@ -472,9 +481,9 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             productCost = productRepository.GetPrice(src[i].ProductId);
                         }
-                        if (requestDto.ServiceList[i].ServiceId > 0)
+                        if (requestDto.ServiceList[i].ServiceDetailId > 0)
                         {
-                            serviceCost = serviceRepository.GetPrice(src[i].ServiceId);
+                            serviceCost = serviceRepository.GetPrice(src[i].ServiceDetailId);
                         }
                         originalPrice += productCost + serviceCost;
                         des[i].BookingId = bookingId;

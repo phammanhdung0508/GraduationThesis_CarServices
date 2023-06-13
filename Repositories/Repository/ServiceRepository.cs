@@ -108,7 +108,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
         
-        //Temporary don't make delete function because there's no service status
         public float GetPrice(int serviceDetailId)
         {
             try
@@ -125,14 +124,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<int> GetDuration(int serviceId)
+        public async Task<int> GetDuration(int serviceDetailId)
         {
             try
             {
-                var serviceDuration = await context.Services
-                .Where(p => p.ServiceId.Equals(serviceId))
-                .Select(p => p.ServiceDuration).FirstOrDefaultAsync();
-
+                var serviceDuration = await context.ServiceDetails
+                .Include(p => p.Service)
+                .Where(p => p.ServiceDetailId.Equals(serviceDetailId))
+                .Select(p => p.Service.ServiceDuration)
+                .FirstOrDefaultAsync();
+                
                 return serviceDuration;
             }
             catch (Exception)

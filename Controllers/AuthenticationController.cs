@@ -3,6 +3,7 @@ using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Models.DTO.Authentication;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 
 namespace GraduationThesis_CarServices.Controllers
 {
@@ -22,84 +23,61 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserLoginDto>> Login(LoginDto request)
         {
-            try
-            {
-                var _user = await authenticationRepository.CheckLogin(request);
-                user = _user;
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var _user = await authenticationRepository.CheckLogin(request);
+            user = _user;
+            return Ok(user);
         }
 
         [HttpPost("refresh-token")]
         public ActionResult<string> Refresh()
         {
-            try
+            var refreshToken = Request.Cookies["refreshtoken"];
+            if (user!.RefreshToken.Equals(refreshToken))
             {
-                var refreshToken = Request.Cookies["refreshtoken"];
-                if (user!.RefreshToken.Equals(refreshToken))
-                {
-                    return Unauthorized("Invalid refresh token.");
-                }
-                else if (user.TokenExpires < DateTime.Now)
-                {
-                    return Unauthorized("Token expired.");
-                }
-
-                var newRefreshToken = authenticationRepository.RefreshToken();
-
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = newRefreshToken!.Expires
-                };
-                Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
-
-                user.RefreshToken = newRefreshToken.Token;
-                user.TokenCreated = newRefreshToken.Created;
-                user.TokenExpires = newRefreshToken.Expires;
-
-                return Ok(user);
+                return Unauthorized("Invalid refresh token.");
             }
-            catch (Exception e)
+            else if (user.TokenExpires < DateTime.Now)
             {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                return Unauthorized("Token expired.");
             }
+
+            var newRefreshToken = authenticationRepository.RefreshToken();
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = newRefreshToken!.Expires
+            };
+            Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+
+            user.RefreshToken = newRefreshToken.Token;
+            user.TokenCreated = newRefreshToken.Created;
+            user.TokenExpires = newRefreshToken.Expires;
+
+            return Ok(user);
         }
 
-        // [HttpPost("verify-access-token/{access-token}")]
-        // public async Task<IActionResult> VerifyAccessToken(string request)
-        // {
-        //     try
-        //     {
-        //         return Ok();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         var inner = e.InnerException;
-        //         while (inner != null)
-        //         {
-        //             Console.WriteLine(inner.StackTrace);
-        //             inner = inner.InnerException;
-        //         }
-        //         return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-        //     }
-        // }
+        [HttpPost("verify-access-token/{access_token}")]
+        public async Task<IActionResult> VerifyAccessToken(string access_token)
+        {
+            var result = await authenticationRepository.AuthenFirebase(access_token);
+            return Ok(result);
+        }
+
+        [HttpPost("send-otp/{recipientEmail}")]
+        public async Task<IActionResult> SendOTP(string recipientEmail)
+        {
+            await authenticationRepository.SendOTP(recipientEmail);
+            throw new MyException("Successfully.", 200);
+        }
+
+        [HttpPost("validate-otp/{otp}")]
+        public async Task<IActionResult> ValidateOTP(string otp){
+            if(authenticationRepository.ValidateOTP(otp)){
+                throw new MyException("Successfully.", 200);
+            }
+            throw new MyException("Wrong OTP.", 404);
+        }
 
         // [HttpPost("register")]
         // public async Task<ActionResult> Register(CreateUserDto request)

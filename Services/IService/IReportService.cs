@@ -8,8 +8,8 @@ namespace GraduationThesis_CarServices.Services.IService
     {
         Task<List<ReportDto>?> View(PageDto page);
         Task<ReportDto?> Detail(int id);
-        Task<bool> Create(CreateReportDto createReportDto);
-        Task<bool> Update(UpdateReportDto updateReportDto);
-        Task<bool> Delete(DeleteReportDto deleteReportDto);
+        Task Create(CreateReportDto requestDto);
+        Task Update(UpdateReportDto requestDto);
+        Task UpdateStatus(DeleteReportDto requestDto);
     }
 }

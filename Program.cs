@@ -1,4 +1,6 @@
 using System.Text;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Models;
@@ -69,6 +71,12 @@ var connectionString = builder.Configuration.GetConnectionString("DataContextLoc
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(connectionString);
+});
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("D:\\project\\GraduationThesis_CarServices\\carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json"),
+    ProjectId = "carservices-868c3",
 });
 
 builder.Services.AddSingleton<TokenConfiguration>();

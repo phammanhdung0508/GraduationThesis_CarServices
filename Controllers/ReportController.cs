@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Report;
 using GraduationThesis_CarServices.Services.IService;
@@ -16,112 +17,38 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-report")]
-        public async Task<ActionResult<List<ReportDto>>> ViewCoupon(PageDto page)
+        public async Task<IActionResult> ViewCoupon(PageDto page)
         {
-            try
-            {
-                var list = await reportService.View(page)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await reportService.View(page)!;
+            return Ok(list);
         }
 
         [HttpGet("detail-report/{id}")]
-        public async Task<ActionResult<ReportDto>> DetailCoupon(int id)
+        public async Task<IActionResult> DetailCoupon(int id)
         {
-            try
-            {
-                var report = await reportService.Detail(id);
-                return Ok(report);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var report = await reportService.Detail(id);
+            return Ok(report);
         }
 
         [HttpPost("create-report")]
-        public async Task<ActionResult<bool>> CreateCoupon(CreateReportDto reportDto)
+        public async Task<IActionResult> CreateCoupon(CreateReportDto reportDto)
         {
-            try
-            {
-                if (await reportService.Create(reportDto))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reportService.Create(reportDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-report")]
-        public async Task<ActionResult<bool>> UpdateCoupon(UpdateReportDto reportDto)
+        public async Task<IActionResult> UpdateCoupon(UpdateReportDto reportDto)
         {
-            try
-            {
-                if (await reportService.Update(reportDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reportService.Update(reportDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("delete-report")]
-        public async Task<ActionResult<bool>> DeleteCoupon(DeleteReportDto reportDto)
+        public async Task<IActionResult> DeleteCoupon(DeleteReportDto reportDto)
         {
-            try
-            {
-                if (await reportService.Delete(reportDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await reportService.UpdateStatus(reportDto);
+            throw new MyException("Successfully.", 200);
         }
     }
 }

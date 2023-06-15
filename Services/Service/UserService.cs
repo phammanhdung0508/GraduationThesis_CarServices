@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Models.Entity;
@@ -30,14 +32,26 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper
-                .Map<List<UserListResponseDto>>(await userRepository.View(page));
+                var list = mapper.Map<List<UserListResponseDto>>(await userRepository.View(page));
 
                 return list;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
@@ -46,88 +60,182 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var user = mapper.Map<UserDetailResponseDto>(await userRepository.Detail(id));
+
+                switch (false)
+                {
+                    case var isExist when isExist == (user != null):
+                        throw new MyException("The user doesn't exist.", 404);
+                }
+
                 return user;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Create(UserCreateRequestDto requestDto)
+        public async Task UserRegister(UserCreateRequestDto requestDto)
         {
             try
             {
-                if (requestDto.UserPassword.Equals(requestDto.PasswordConfirm))
+                switch (false)
                 {
-                    encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
-                    var user = mapper.Map<UserCreateRequestDto, User>(requestDto,
-                    opt => opt.AfterMap((src, des) =>
-                    {
-                        des.PasswordHash = password_hash;
-                        des.PasswordSalt = password_salt;
-                        des.UserGender = Gender.Male;
-                        des.UserStatus = Status.Activate;
-                        des.CreatedAt = DateTime.Now;
-                        des.RoleId = 2;
-                    }));
-                    await userRepository.Create(user);
-                    return true;
+                    case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
+                        throw new MyException("Your password and confirm password isn't match.", 404);
                 }
-                return false;
+
+                encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
+                var encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
+
+                var user = mapper.Map<UserCreateRequestDto, User>(requestDto,
+                opt => opt.AfterMap((src, des) =>
+                {
+                    des.UserEmail = encryptEmail;
+                    des.PasswordHash = password_hash;
+                    des.PasswordSalt = password_salt;
+                    des.UserStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                    des.RoleId = 2;
+                }));
+
+                await userRepository.Create(user);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> Update(UserUpdateRequestDto requestDto)
+        public async Task Update(UserUpdateRequestDto requestDto)
         {
             try
             {
                 var u = await userRepository.Detail(requestDto.UserId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (u != null):
+                        throw new MyException("The user doesn't exist.", 404);
+                }
+
                 var user = mapper.Map<UserUpdateRequestDto, User>(requestDto, u!,
                 opt => opt.AfterMap((src, des) =>
                 {
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await userRepository.Update(user);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> UpdateRole(UserRoleRequestDto requestDto)
+        public async Task UpdateRole(UserRoleRequestDto requestDto)
         {
             try
             {
                 var u = await userRepository.Detail(requestDto.UserId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (u != null):
+                        throw new MyException("The user doesn't exist.", 404);
+                }
+
                 var user = mapper.Map<UserRoleRequestDto, User>(requestDto, u!);
                 await userRepository.Update(user);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
 
-        public async Task<bool> UpdateStatus(UserStatusRequestDto requestDto)
+        public async Task UpdateStatus(UserStatusRequestDto requestDto)
         {
             try
             {
                 var u = await userRepository.Detail(requestDto.UserId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (u != null):
+                        throw new MyException("The user doesn't exist.", 404);
+                }
+
                 var user = mapper.Map<UserStatusRequestDto, User>(requestDto, u!);
                 await userRepository.Update(user);
-                return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
             }
         }
     }

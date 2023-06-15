@@ -455,6 +455,7 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 ## Add following file to .gitignore
+/carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json
 /firebaseconfig.json
 /appsettings.json
 /appsettings.Development.json

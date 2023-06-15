@@ -35,13 +35,11 @@ namespace GraduationThesis_CarServices.Controllers
         {
             await carService.Create(carCreateRequestDto);
             throw new MyException("Successfully.", 200);
-
         }
 
         [HttpPut("update-car")]
         public async Task<IActionResult> UpdateCar(CarUpdateRequestDto carUpdateRequestDto)
         {
-
             await carService.Update(carUpdateRequestDto);
             throw new MyException("Successfully.", 200);
 

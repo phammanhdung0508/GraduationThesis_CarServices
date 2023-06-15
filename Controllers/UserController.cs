@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Services.IService;
@@ -16,135 +17,45 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [HttpPost("view-all-user")]
-        public async Task<ActionResult> ViewUser(PageDto page)
+        public async Task<IActionResult> ViewUser(PageDto page)
         {
-            try
-            {
-                var list = await userService.View(page)!;
-                return Ok(list);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var list = await userService.View(page)!;
+            return Ok(list);
         }
 
         [HttpGet("detail-user/{id}")]
-        public async Task<ActionResult> DetailUser(int id)
+        public async Task<IActionResult> DetailUser(int id)
         {
-            try
-            {
-                var user = await userService.Detail(id);
-                return Ok(user);
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            var user = await userService.Detail(id);
+            return Ok(user);
         }
 
         [HttpPost("create-user")]
-        public async Task<ActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
+        public async Task<IActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
         {
-            try
-            {
-                if (await userService.Create(userCreateRequestDto))
-                {
-                    return Ok("Successfully!");
-                };
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await userService.UserRegister(userCreateRequestDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-user")]
-        public async Task<ActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
+        public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
         {
-            try
-            {
-                if (await userService.Update(userUpdateRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await userService.Update(userUpdateRequestDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-role")]
-        public async Task<ActionResult> UpdateRole(UserRoleRequestDto userRoleRequestDto)
+        public async Task<IActionResult> UpdateRole(UserRoleRequestDto userRoleRequestDto)
         {
-            try
-            {
-                if (await userService.UpdateRole(userRoleRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await userService.UpdateRole(userRoleRequestDto);
+            throw new MyException("Successfully.", 200);
         }
 
         [HttpPut("update-status")]
-        public async Task<ActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
+        public async Task<IActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
         {
-            try
-            {
-                if (await userService.UpdateStatus(userStatusRequestDto))
-                {
-                    return Ok("Successfully!");
-                }
-                return BadRequest("Fail!");
-            }
-            catch (Exception e)
-            {
-                var inner = e.InnerException;
-                while (inner != null)
-                {
-                    Console.WriteLine(inner.StackTrace);
-                    inner = inner.InnerException;
-                }
-                return BadRequest(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-            }
+            await userService.UpdateStatus(userStatusRequestDto);
+            throw new MyException("Successfully.", 200);
         }
     }
 }

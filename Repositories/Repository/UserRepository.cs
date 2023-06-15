@@ -21,6 +21,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await PagingConfiguration<User>
                 .Get(context.Users.Include(u => u.Role), page);
+
                 return list;
             }
             catch (Exception)
@@ -50,6 +51,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var user = await context.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(g => g.UserId == id);
+                
                 return user;
             }
             catch (Exception)

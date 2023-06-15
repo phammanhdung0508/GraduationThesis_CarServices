@@ -4,7 +4,6 @@ namespace GraduationThesis_CarServices.Enum
     {
         NotAvailable,
         Available,
-        Busy,
         Leave
     }
 }

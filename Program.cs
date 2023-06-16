@@ -75,7 +75,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile("D:\\project\\GraduationThesis_CarServices\\carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json"),
+    Credential = GoogleCredential.FromFile("carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json"),
     ProjectId = "carservices-868c3",
 });
 
@@ -121,11 +121,14 @@ builder.Services.AddScoped<IServiceDetailService, ServiceDetailService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

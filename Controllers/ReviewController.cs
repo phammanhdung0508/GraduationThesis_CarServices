@@ -2,12 +2,13 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/review")]
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService reviewService;
@@ -16,6 +17,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.reviewService = reviewService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-review")]
         public async Task<IActionResult> ViewAllReview(PageDto page)
         {
@@ -23,6 +25,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("get-garage-reviews")]
         public async Task<IActionResult> GerReviewPerGarage(PagingReviewPerGarageRequestDto requestDto)
         {
@@ -30,6 +33,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-review/{id}")]
         public async Task<IActionResult> DetailReview(int id)
         {
@@ -37,6 +41,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(review);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-review")]
         public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
         {
@@ -44,6 +49,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut("update-review")]
         public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
         {
@@ -51,6 +57,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {

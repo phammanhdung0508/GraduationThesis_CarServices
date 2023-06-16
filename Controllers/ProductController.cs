@@ -2,11 +2,12 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -18,6 +19,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-product")]
         public async Task<IActionResult> ViewProduct(PageDto page)
         {
@@ -26,6 +28,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("get-available-products-for-service/{serviceId}")]
         public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
         {
@@ -33,6 +36,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(productList);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("detail-product/{id}")]
         public async Task<IActionResult> DetailProduct(int id)
         {
@@ -40,6 +44,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(product);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-product")]
         public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
         {
@@ -48,6 +53,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-price-product")]
         public async Task<IActionResult> UpdatePriceProduct(ProductPriceRequestDto product)
         {
@@ -56,6 +62,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-status-product")]
         public async Task<IActionResult> UpdateStatusProduct(ProductStatusRequestDto product)
         {
@@ -64,6 +71,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-quantity-product")]
         public async Task<IActionResult> UpdateQuantityProduct(ProductQuantityRequestDto product)
         {

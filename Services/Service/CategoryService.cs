@@ -42,7 +42,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -146,7 +146,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

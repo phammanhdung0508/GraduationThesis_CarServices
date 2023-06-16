@@ -8,7 +8,7 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/authentication")]
     public class AuthenticationController : ControllerBase
     {
         private static UserLoginDto? user;
@@ -71,26 +71,18 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
-        [HttpPost("validate-otp/{otp}")]
-        public async Task<IActionResult> ValidateOTP(string otp){
-            if(authenticationRepository.ValidateOTP(otp)){
-                throw new MyException("Successfully.", 200);
-            }
-            throw new MyException("Wrong OTP.", 404);
+        [HttpPost("validate-otp/{otp}&{recipientEmail}")]
+        public async Task<IActionResult> ValidateOTP(string otp, string recipientEmail)
+        {
+            await authenticationRepository.ValidateOTP(otp, recipientEmail);
+            throw new MyException("Successfully.", 200);
         }
 
-        // [HttpPost("register")]
-        // public async Task<ActionResult> Register(CreateUserDto request)
-        // {
-        //     try
-        //     {
-        //         await authenticationRepository.CreateUser(request);
-        //         return Ok(context.Users.FirstOrDefault(u => u.UserEmail == request.user_email));
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         return BadRequest(e.Message);
-        //     }
-        // }
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(UserCreateRequestDto requestDto)
+        {
+            await authenticationRepository.UserRegister(requestDto);
+            throw new MyException("Successfully.", 200);
+        }
     }
 }

@@ -2,11 +2,12 @@
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -14,9 +15,9 @@ namespace GraduationThesis_CarServices.Controllers
         public CategoryController(ICategoryService categoryService)
         {
             this.categoryService = categoryService;
-
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-category")]
         public async Task<IActionResult> ViewCategory(PageDto page)
         {
@@ -24,6 +25,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(categoryList);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("detail-category/{id}")]
         public async Task<IActionResult> DetailCategory(int id)
         {
@@ -31,6 +33,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(category);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-category")]
         public async Task<IActionResult> CreateCategory(CategoryCreateRequestDto categoryCreateRequestDto)
         {
@@ -38,6 +41,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-category")]
         public async Task<IActionResult> UpdateCategory(CategoryUpdateRequestDto categoryUpdateRequestDto)
         {
@@ -45,6 +49,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-category-status")]
         public async Task<IActionResult> UpdateStatus(CategoryStatusRequestDto categoryStatusRequestDto)
         {

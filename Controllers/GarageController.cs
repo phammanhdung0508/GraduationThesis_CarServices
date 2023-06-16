@@ -3,12 +3,13 @@ using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/garage")]
     public class GarageController : ControllerBase
     {
         private readonly IGarageService garageService;
@@ -17,6 +18,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageService = garageService;
         }
 
+        [AllowAnonymous]
         [HttpPost("get-nearby-garages-location")]
         public async Task<IActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
@@ -24,6 +26,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("get-garages-with-coupon")]
         public async Task<IActionResult> FilterGaragesWithCoupon(PageDto page)
         {
@@ -31,6 +34,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-garage")]
         public async Task<IActionResult> ViewGarage(PageDto page)
         {
@@ -38,6 +42,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("search-garage")]
         public async Task<IActionResult> SearchGarage(SearchDto search)
         {
@@ -45,6 +50,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage/{id}")]
         public async Task<IActionResult> DetailGarage(int id)
         {
@@ -52,6 +58,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(garage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-garage")]
         public async Task<IActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
@@ -59,6 +66,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-garage")]
         public async Task<IActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
@@ -66,6 +74,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-garage-status")]
         public async Task<IActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
@@ -73,6 +82,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-location")]
         public async Task<IActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {

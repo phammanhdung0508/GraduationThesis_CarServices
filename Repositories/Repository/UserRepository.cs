@@ -51,7 +51,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var user = await context.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(g => g.UserId == id);
-                
+
                 return user;
             }
             catch (Exception)
@@ -81,6 +81,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 await context.SaveChangesAsync();
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<User>> FilterByRole(int roleId)
+        {
+            try
+            {
+                var list = await context.Users.Include(u => u.Role).Where(u => u.RoleId == roleId).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
             {
                 throw;
             }

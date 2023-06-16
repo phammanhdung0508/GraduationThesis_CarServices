@@ -9,6 +9,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Service
         public string ServiceImage { get; set; }
         public string ServiceDetailDescription { get; set; }
         public int ServiceDuration { get; set; }
+        public string ServiceStatus {get; set;}
 
         /*-------------------------------------------------*/
         public ICollection<ProductServiceDto> ProductServiceDtos { get; set; }

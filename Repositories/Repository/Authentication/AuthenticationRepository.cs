@@ -42,8 +42,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             {
                 UserLoginDto? user = null;
                 bool check = true;
-                string email = encryptConfiguration.Base64Decode(login.Email);
-                var _user = await context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.UserEmail == email);
+                string email = encryptConfiguration.Base64Encode(login.Email);
+
+                var _user = await context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.UserEmail.Equals(email));
                 if (_user == null)
                 {
                     check = false;
@@ -88,7 +89,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -101,11 +102,28 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 var totp = new Totp(secretBytes, step: 60);
                 // Time step of 1 minute (60 seconds)
 
-                DateTime currentTime = DateTime.UtcNow;
-                currentTime = currentTime.AddSeconds(-currentTime.Second);
+                var currentTime = DateTime.UtcNow;
+                var expiredTime = currentTime.AddSeconds(60);
                 // Round down to the nearest minute
 
-                var otp = totp.ComputeTotp();
+                var otp = totp.ComputeTotp(currentTime);
+
+                string email = encryptConfiguration.Base64Encode(recipientEmail);
+
+                var user = await context.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+
+                switch (false)
+                {
+                    case var isExist when isExist == (user != null):
+                        throw new MyException("The user doesn't exist.", 404);
+                    case var isFalse when isFalse == (user!.EmailConfirmed == 1):
+                        throw new MyException("The email are already confirmed.", 404);
+                }
+
+                user!.OTP = otp;
+                user.ExpiredIn = expiredTime;
+
+                await userRepository.Update(user);
 
                 await tokenConfiguration.Send(otp, recipientEmail);
             }
@@ -128,11 +146,27 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public bool ValidateOTP(string otp)
+        public async Task ValidateOTP(string otp, string recipientEmail)
         {
-            byte[] secretBytes = Base32Encoding.ToBytes(secretKey);
-            var totp = new Totp(secretBytes);
-            return totp.VerifyTotp(otp, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
+            string email = encryptConfiguration.Base64Encode(recipientEmail);
+
+            var user = context.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
+
+            var currentTime = DateTime.UtcNow;
+
+            switch (false)
+            {
+                case var isExist when isExist == (user != null):
+                    throw new MyException("The user doesn't exist.", 404);
+                case var isFalse when isFalse == (user!.OTP == otp):
+                    throw new MyException("Your OTP don't correct.", 404);
+                case var isFalse when isFalse == (currentTime < user.ExpiredIn):
+                    throw new MyException("Your OTP is expored.", 404);
+            }
+
+            user.EmailConfirmed = 1;
+
+            await userRepository.Update(user);
         }
 
         public RefreshTokenDto? RefreshToken()
@@ -156,7 +190,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -184,6 +218,52 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 jwt = tokenConfiguration.ReCreateFirebaseToken(tagetAccount, uid);
                 jwtDto = new JWTDto(tagetAccount.UserId, email, true, tagetAccount.UserFirstName + tagetAccount.UserLastName, user.PhotoUrl, jwt, tagetAccount.Role.RoleName);
                 return (jwtDto);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task UserRegister(UserCreateRequestDto requestDto)
+        {
+            try
+            {
+                switch (false)
+                {
+                    case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
+                        throw new MyException("Your password and confirm password isn't match.", 404);
+                }
+
+                encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
+                var encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
+
+                var user = mapper.Map<UserCreateRequestDto, GraduationThesis_CarServices.Models.Entity.User>(requestDto,
+                opt => opt.AfterMap((src, des) =>
+                {
+                    des.UserEmail = encryptEmail;
+                    des.PasswordHash = password_hash;
+                    des.PasswordSalt = password_salt;
+                    des.UserStatus = Status.Activate;
+                    des.EmailConfirmed = 0;
+                    des.CreatedAt = DateTime.Now;
+                    des.RoleId = 2;
+                }));
+
+                await userRepository.Create(user);
             }
             catch (Exception e)
             {

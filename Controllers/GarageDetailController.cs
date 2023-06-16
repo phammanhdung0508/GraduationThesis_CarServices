@@ -3,10 +3,11 @@ using GraduationThesis_CarServices.Models.DTO.GarageDetail;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using GraduationThesis_CarServices.Models.DTO.Exception;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/garage-detail")]
     [ApiController]
     public class GarageDetailController : ControllerBase
     {
@@ -15,9 +16,9 @@ namespace GraduationThesis_CarServices.Controllers
         public GarageDetailController(IGarageDetailService garageDetailService)
         {
             this.garageDetailService = garageDetailService;
-
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-garage-detail")]
         public async Task<IActionResult> ViewGarageDetail(PageDto page)
         {
@@ -25,6 +26,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(garageDetailList);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage-detail/{id}")]
         public async Task<IActionResult> DetailGarageDetail(int id)
         {
@@ -32,6 +34,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(garageDetail);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-garage-detail")]
         public async Task<IActionResult> CreateGarageDetail(GarageDetailCreateRequestDto garageDetail)
         {
@@ -39,6 +42,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-garage-detail")]
         public async Task<IActionResult> UpdateGarageDetail(GarageDetailUpdateRequestDto garageDetail)
         {

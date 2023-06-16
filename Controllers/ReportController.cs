@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/report")]
     public class ReportController : ControllerBase
     {
         private readonly IReportService reportService;

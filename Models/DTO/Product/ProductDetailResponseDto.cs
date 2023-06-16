@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
         public string ProductDetailDescription { get; set; }
         public float ProductPrice { get; set; }
         public int ProductQuantity { get; set; }
-        public Status ProductStatus { get; set; }
+        public string ProductStatus { get; set; }
         public SubcategoryProductDto SubcategoryProductDto { get; set; }
         public ServiceProductDto ServiceProductDto { get; set; }
     }

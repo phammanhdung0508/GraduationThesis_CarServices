@@ -2,12 +2,13 @@ using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_bookingServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/booking")]
     public class BookingController : ControllerBase
     {
         public readonly IBookingService bookingService;
@@ -17,6 +18,7 @@ namespace GraduationThesis_bookingServices.Controllers
             this.bookingService = bookingService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-booking")]
         public async Task<IActionResult> ViewAllBooking(PageDto page)
         {
@@ -24,6 +26,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("get-garage-bookings")]
         public async Task<IActionResult> GerReviewPerGarage(PagingBookingPerGarageRequestDto requestDto)
         {
@@ -31,6 +34,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPost("check-booking")]
         public async Task<IActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto)
         {
@@ -39,6 +43,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-booking/{id}")]
         public async Task<IActionResult> DetailBooking(int id)
         {
@@ -46,6 +51,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(car);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {

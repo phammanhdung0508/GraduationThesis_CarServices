@@ -254,7 +254,7 @@ namespace GraduationThesis_CarServices.Models
                 userFaker.RuleFor(u => u.UserId, i)
                     .RuleFor(u => u.UserFirstName, f => f.Name.FirstName())
                     .RuleFor(u => u.UserLastName, f => f.Name.LastName())
-                    .RuleFor(u => u.UserEmail, (f, u) => f.Internet.Email(u.UserFirstName, u.UserLastName))
+                    .RuleFor(u => u.UserEmail, (f, u) => encryptConfiguration.Base64Encode(f.Internet.Email(u.UserFirstName, u.UserLastName)))
                     .RuleFor(u => u.PasswordHash, password_hash)
                     .RuleFor(u => u.PasswordSalt, password_salt)
                     .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
@@ -263,6 +263,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                     .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                     .RuleFor(u => u.UserStatus, Status.Activate)
+                    .RuleFor(u => u.EmailConfirmed, 0)
                     .RuleFor(u => u.CreatedAt, now)
                     .RuleFor(u => u.RoleId, f =>
                     {
@@ -339,7 +340,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(g => g.GarageAbout, f => f.Lorem.Paragraph())
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
                     .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
-                    .RuleFor(g => g.FromTo, "Monday to Saturday")
+                    // .RuleFor(g => g.FromTo, "Monday to Saturday")
                     .RuleFor(g => g.OpenAt, "08:00 AM")
                     .RuleFor(g => g.CloseAt, "05:00 PM")
                     .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())

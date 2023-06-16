@@ -16,11 +16,11 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserDistrict { get; set; }
         public string UserWard { get; set; }
         public string UserPhone { get; set; }
-        public Gender UserGender { get; set; }
-        public Nullable<DateTime> UserDateOfBirth { get; set; }
+        public string UserGender { get; set; }
+        public string UserDateOfBirth { get; set; }
         public string UserImage { get; set; }
         public string UserBio { get; set; }
-        public Status UserStatus { get; set; }
+        public string UserStatus { get; set; }
         public RoleDto RoleDto { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

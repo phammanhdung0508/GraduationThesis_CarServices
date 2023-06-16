@@ -14,7 +14,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserFirstName { get; set; }
         [MaxLength(20)]
         public string UserLastName { get; set; }
-        [MaxLength(50)]
+        [MaxLength(200)]
         public string UserEmail { get; set; }
         [MaxLength(1024)]
         [Required]
@@ -36,6 +36,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
         public Status UserStatus { get; set; }
+        public string OTP {get; set;}
+        public DateTime ExpiredIn {get; set;}
+        [Column(TypeName = "tinyint")]
+        public int EmailConfirmed {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }
         [MaxLength(1024)]

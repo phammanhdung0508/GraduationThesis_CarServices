@@ -2,11 +2,12 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/service")]
     [ApiController]
     public class ServiceController : ControllerBase
     {
@@ -16,6 +17,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.serviceService = serviceService;
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("view-all-service")]
         public async Task<IActionResult> ViewService(PageDto page)
         {
@@ -23,6 +25,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(serviceList);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("get-available-services-for-garage/{garageId}")]
         public async Task<IActionResult> GetAvailableServicesForGarage(int garageId)
         {
@@ -30,6 +33,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(serviceList);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-service/{id}")]
         public async Task<IActionResult> DetailService(int id)
         {
@@ -37,6 +41,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(service);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)
         {
@@ -45,6 +50,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-service")]
         public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
         {
@@ -52,6 +58,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-status-service")]
         public async Task<IActionResult> UpdateStatusService(ServiceStatusRequestDto service)
         {

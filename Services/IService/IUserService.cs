@@ -6,6 +6,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IUserService
     {
         Task<List<UserListResponseDto>?> View(PageDto page);
+        Task<List<UserListResponseDto>?> FilterByRole(int roleId);
         Task<UserDetailResponseDto?> Detail(int id);
         Task UserRegister(UserCreateRequestDto createUserDto);
         Task Update(UserUpdateRequestDto updateUserDto);

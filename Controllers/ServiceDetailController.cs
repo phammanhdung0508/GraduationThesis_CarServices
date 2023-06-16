@@ -2,11 +2,12 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.ServiceDetail;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/service-detail")]
     [ApiController]
     public class ServiceDetailController : ControllerBase
     {
@@ -18,6 +19,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("view-all-service-detail")]
         public async Task<IActionResult> ViewServiceDetail(PageDto page)
         {
@@ -25,6 +27,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(serviceDetailList);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("filter-service-detail-by-service/{serviceId}")]
         public async Task<IActionResult> FilterServiceDetailByService(int serviceId)
         {
@@ -32,6 +35,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(serviceDetailList);
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-service-detail/{id}")]
         public async Task<IActionResult> DetailGarageDetail(int id)
         {
@@ -39,6 +43,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(serviceDetail);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create-service-detail")]
         public async Task<IActionResult> CreateServiceDetail(ServiceDetailCreateRequestDto serviceDetail)
         {
@@ -46,6 +51,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-service-detail")]
         public async Task<IActionResult> UpdateServiceDetail(ServiceDetailUpdateRequestDto serviceDetail)
         {
@@ -53,6 +59,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-price-service-detail")]
         public async Task<IActionResult> UpdatePriceServiceDetail(ServiceDetailPriceRequestDto serviceDetail)
         {

@@ -8,6 +8,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository{
         RefreshTokenDto? RefreshToken();
         Task<JWTDto> AuthenFirebase(string idToken);
         Task SendOTP(string recipientEmail);
-        bool ValidateOTP(string otp);
+        Task ValidateOTP(string otp, string recipientEmail);
+        Task UserRegister(UserCreateRequestDto requestDto);
     }
 }

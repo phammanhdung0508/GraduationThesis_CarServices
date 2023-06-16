@@ -1,12 +1,13 @@
 using GraduationThesis_CarServices.Models.DTO.Car;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/car")]
     public class CarController : ControllerBase
     {
         public readonly ICarService carService;
@@ -16,6 +17,7 @@ namespace GraduationThesis_CarServices.Controllers
             this.carService = carService;
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpGet("get-user-car/{userId}")]
         public async Task<IActionResult> GetUserCar(int userId)
         {
@@ -23,6 +25,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(car);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpGet("detail-car/{id}")]
         public async Task<IActionResult> DetailCar(int id)
         {
@@ -30,6 +33,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(car);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-car")]
         public async Task<IActionResult> CreateCar(CarCreateRequestDto carCreateRequestDto)
         {
@@ -37,6 +41,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut("update-car")]
         public async Task<IActionResult> UpdateCar(CarUpdateRequestDto carUpdateRequestDto)
         {
@@ -45,6 +50,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut("update-car-status")]
         public async Task<IActionResult> UpdateStatus(CarStatusRequestDto carStatusRequestDto)
         {

@@ -10,5 +10,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<User?> Detail(int id);
         Task Create(User user);
         Task Update(User user);
+        Task<List<User>> FilterByRole(int roleId);
     }
 }

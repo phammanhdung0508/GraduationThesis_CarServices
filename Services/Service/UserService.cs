@@ -29,11 +29,36 @@ namespace GraduationThesis_CarServices.Services.Service
 
         public async Task<List<UserListResponseDto>?> View(PageDto page)
         {
-
             try
             {
                 var list = mapper.Map<List<UserListResponseDto>>(await userRepository.View(page));
 
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
+        public async Task<List<UserListResponseDto>?> FilterByRole(int roleId){
+            try
+            {
+                var list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(roleId));
+                
                 return list;
             }
             catch (Exception e)
@@ -108,6 +133,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.PasswordHash = password_hash;
                     des.PasswordSalt = password_salt;
                     des.UserStatus = Status.Activate;
+                    des.EmailConfirmed = 0;
                     des.CreatedAt = DateTime.Now;
                     des.RoleId = 2;
                 }));

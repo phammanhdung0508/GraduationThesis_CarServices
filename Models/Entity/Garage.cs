@@ -18,8 +18,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string GarageImage { get; set; }
         [MaxLength(20)]
         public string GarageContactInformation { get; set; }
-        [MaxLength(20)]
-        public string FromTo { get; set; }
+        // [MaxLength(20)]
+        // public string FromTo { get; set; }
         [MaxLength(10)]
         public string OpenAt { get; set; }
         [MaxLength(10)]

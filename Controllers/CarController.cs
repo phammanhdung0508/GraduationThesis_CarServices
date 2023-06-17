@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Models.DTO.Car;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Services.IService;
@@ -18,9 +19,16 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpGet("get-user-car/{userId}")]
-        public async Task<IActionResult> GetUserCar(int userId)
+        [HttpGet("get-user-car")]
+        public async Task<IActionResult> GetUserCar()
         {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+
             var car = await carService.FilterUserCar(userId);
             return Ok(car);
         }
@@ -33,11 +41,18 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(car);
         }
 
-        // [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-car")]
         public async Task<IActionResult> CreateCar(CarCreateRequestDto carCreateRequestDto)
         {
-            await carService.Create(carCreateRequestDto);
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+
+            await carService.Create(carCreateRequestDto, userId);
             throw new MyException("Successfully.", 200);
         }
 

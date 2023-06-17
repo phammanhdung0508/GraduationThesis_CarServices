@@ -3,6 +3,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Geocoder;
+using GraduationThesis_CarServices.Middleware;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Repositories.Repository;
@@ -37,16 +38,31 @@ builder.Services.AddSwaggerGen(
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     });
 
+var key = builder.Configuration["Jwt:Key"];
+var issuer = builder.Configuration["Jwt:Issuer"];
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:TokenSecret").Value!)),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidIssuer = "localhost:7006",
-        ValidAudience = "localhost:7006",
+        ValidIssuer = issuer,
+        ValidAudience = issuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!)),
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            {
+                context.Response.Headers.Add("Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -78,6 +94,8 @@ FirebaseApp.Create(new AppOptions()
     Credential = GoogleCredential.FromFile("carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json"),
     ProjectId = "carservices-868c3",
 });
+
+builder.Services.AddTransient<StorageMiddleware>();
 
 builder.Services.AddSingleton<TokenConfiguration>();
 builder.Services.AddSingleton<EncryptConfiguration>();
@@ -142,5 +160,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<StorageMiddleware>();
 
 app.Run();

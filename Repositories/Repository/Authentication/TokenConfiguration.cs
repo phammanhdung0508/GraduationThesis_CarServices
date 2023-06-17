@@ -25,15 +25,18 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             try
             {
                 List<Claim> claims = new List<Claim>{
-                new Claim(ClaimTypes.Name, user.UserFirstName + user.UserLastName),
-                new Claim(ClaimTypes.Email, user.UserEmail),
-                new Claim(ClaimTypes.Role, user.RoleDto.RoleName)};
+                    new Claim("userId", user.UserId.ToString()),
+                    new Claim("name", user.UserFirstName + user.UserLastName),
+                    new Claim("email", user.UserEmail),
+                    new Claim(ClaimTypes.Role, user.RoleDto.RoleName)};
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:TokenSecret").Value!));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 
                 var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
                 var token = new JwtSecurityToken(
+                    _configuration["Jwt:Key"],
+                    _configuration["Jwt:Key"],
                     claims: claims,
                     expires: DateTime.Now.AddHours(12),
                     signingCredentials: cred

@@ -7,6 +7,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     {
         Task<List<User>?> View(PageDto page);
         Task<bool> IsCustomerExist(int customerId);
+        Task<int> GetCustomerId(int userId);
         Task<User?> Detail(int id);
         Task<int> Create(User user);
         Task Update(User user);

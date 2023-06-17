@@ -4,10 +4,10 @@ namespace GraduationThesis_CarServices.Services.IService
 {
     public interface ICarService
     {
-        Task<List<CarListResponseDto>?> FilterUserCar(int customerId);
+        Task<List<CarListResponseDto>?> FilterUserCar(int userId);
         Task<CarDetailResponseDto?> Detail(int id);
-        Task<bool> Create(CarCreateRequestDto requestDto);
-        Task<bool> Update(CarUpdateRequestDto requestDto);
-        Task<bool> UpdateStatus(CarStatusRequestDto requestDto);
+        Task Create(CarCreateRequestDto requestDto, int userId);
+        Task Update(CarUpdateRequestDto requestDto);
+        Task UpdateStatus(CarStatusRequestDto requestDto);
     }
 }

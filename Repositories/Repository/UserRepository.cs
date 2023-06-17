@@ -45,6 +45,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<int> GetCustomerId(int userId){
+            try
+            {
+                var customerId = await context.Users.Include(u => u.Customer).Where(u => u.UserId == userId).Select(u => u.Customer.CustomerId).FirstOrDefaultAsync();
+
+                return customerId;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<User?> Detail(int id)
         {
             try

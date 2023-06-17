@@ -289,32 +289,5 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
-
-        // public async Task<CustomerDetailResponseDto> DetailCustomer(int customerId)
-        // {
-        //     try
-        //     {
-        //         var customer = mapper.Map<CustomerDetailResponseDto>(await customerRepository.Detail(customerId));
-
-        //         return customer;
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         switch (e)
-        //         {
-        //             case MyException:
-        //                 throw;
-        //             default:
-        //                 var inner = e.InnerException;
-        //                 while (inner != null)
-        //                 {
-        //                     Console.WriteLine(inner.StackTrace);
-        //                     inner = inner.InnerException;
-        //                 }
-        //                 Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-        //                 throw;
-        //         }
-        //     }
-        // }
     }
 }

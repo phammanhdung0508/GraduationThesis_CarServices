@@ -1,10 +1,9 @@
 #nullable disable
-using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Role;
 
 namespace GraduationThesis_CarServices.Models.DTO.User
 {
-    public class UserListResponseDto
+    public class CustomerListResponseDto
     {
         public int UserId { get; set; }
         public string UserFirstName { get; set; }
@@ -14,6 +13,5 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserImage { get; set; }
         public string UserStatus { get; set; }
         public RoleDto RoleDto { get; set; }
-        public int TotalBooking { get; set; }
     }
 }

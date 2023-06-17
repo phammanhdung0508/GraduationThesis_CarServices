@@ -16,11 +16,14 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IUserRepository userRepository;
+        private readonly ICustomerRepository customerRepository;
         private readonly EncryptConfiguration encryptConfiguration;
         private readonly GeocoderConfiguration geocoderConfiguration;
+
         public UserService(IMapper mapper, IUserRepository userRepository,
-        EncryptConfiguration encryptConfiguration, GeocoderConfiguration geocoderConfiguration)
+        EncryptConfiguration encryptConfiguration, GeocoderConfiguration geocoderConfiguration, ICustomerRepository customerRepository)
         {
+            this.customerRepository = customerRepository;
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.encryptConfiguration = encryptConfiguration;
@@ -49,16 +52,32 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<UserListResponseDto>?> FilterByRole(int roleId){
+        public async Task<List<UserListResponseDto>?> FilterByRole(PageDto page, int roleId)
+        {
             try
             {
-                var list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(roleId));
-                
+                var list = new List<UserListResponseDto>();
+                switch (roleId)
+                {
+                    case 1:
+                    list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId),
+                    otp => otp.AfterMap((src, des) => {
+                        for (int i = 0; i < src.Count; i++)
+                        {
+                            des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
+                        }
+                    }));
+                    break;
+                    default:
+                    list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
+                    break;
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -75,7 +94,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -84,7 +103,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var user = mapper.Map<UserDetailResponseDto>(await userRepository.Detail(id));
+                var user = await userRepository.Detail(id);
 
                 switch (false)
                 {
@@ -92,7 +111,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The user doesn't exist.", 404);
                 }
 
-                return user;
+                switch (user)
+                {
+                    case var userCustomer when userCustomer!.Customer != null:
+                        return  mapper.Map<UserDetailResponseDto>(user);
+                }
+
+                return mapper.Map<UserDetailResponseDto>(user);
             }
             catch (Exception e)
             {
@@ -108,7 +133,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -154,7 +179,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -192,7 +217,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -226,7 +251,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -260,9 +285,36 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
+
+        // public async Task<CustomerDetailResponseDto> DetailCustomer(int customerId)
+        // {
+        //     try
+        //     {
+        //         var customer = mapper.Map<CustomerDetailResponseDto>(await customerRepository.Detail(customerId));
+
+        //         return customer;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         switch (e)
+        //         {
+        //             case MyException:
+        //                 throw;
+        //             default:
+        //                 var inner = e.InnerException;
+        //                 while (inner != null)
+        //                 {
+        //                     Console.WriteLine(inner.StackTrace);
+        //                     inner = inner.InnerException;
+        //                 }
+        //                 Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+        //                 throw;
+        //         }
+        //     }
+        // }
     }
 }

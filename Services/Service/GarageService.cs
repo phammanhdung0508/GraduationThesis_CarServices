@@ -30,16 +30,20 @@ namespace GraduationThesis_CarServices.Services.Service
 
             try
             {
-                var list = mapper.Map<List<Garage>?, List<GarageListResponseDto>>(await garageRepository.View(page),
+                var list = await garageRepository.View(page);
+                
+                return mapper.Map<List<Garage>?, List<GarageListResponseDto>>(list,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < des.Count; i++)
                     {
+                        if (list![i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                        }
                         des[i].GarageStatus = src![i].GarageStatus.ToString();
                     }
                 }));
-
-                return list;
             }
             catch (Exception e)
             {

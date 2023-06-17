@@ -28,34 +28,34 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(user);
         }
 
-        [HttpPost("refresh-token")]
-        public ActionResult<string> Refresh()
-        {
-            var refreshToken = Request.Cookies["refreshtoken"];
-            if (user!.RefreshToken.Equals(refreshToken))
-            {
-                return Unauthorized("Invalid refresh token.");
-            }
-            else if (user.TokenExpires < DateTime.Now)
-            {
-                return Unauthorized("Token expired.");
-            }
+        // [HttpPost("refresh-token")]
+        // public ActionResult<string> Refresh()
+        // {
+        //     var refreshToken = Request.Cookies["refreshtoken"];
+        //     if (user!.RefreshToken.Equals(refreshToken))
+        //     {
+        //         return Unauthorized("Invalid refresh token.");
+        //     }
+        //     else if (user.TokenExpires < DateTime.Now)
+        //     {
+        //         return Unauthorized("Token expired.");
+        //     }
 
-            var newRefreshToken = authenticationRepository.RefreshToken();
+        //     var newRefreshToken = authenticationRepository.RefreshToken();
 
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = newRefreshToken!.Expires
-            };
-            Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+        //     var cookieOptions = new CookieOptions
+        //     {
+        //         HttpOnly = true,
+        //         Expires = newRefreshToken!.Expires
+        //     };
+        //     Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
 
-            user.RefreshToken = newRefreshToken.Token;
-            user.TokenCreated = newRefreshToken.Created;
-            user.TokenExpires = newRefreshToken.Expires;
+        //     user.RefreshToken = newRefreshToken.Token;
+        //     user.TokenCreated = newRefreshToken.Created;
+        //     user.TokenExpires = newRefreshToken.Expires;
 
-            return Ok(user);
-        }
+        //     return Ok(user);
+        // }
 
         [HttpPost("verify-access-token/{access_token}")]
         public async Task<IActionResult> VerifyAccessToken(string access_token)

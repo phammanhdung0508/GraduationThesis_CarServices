@@ -33,11 +33,11 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("filter-by-role/{roleId}")]
-        public async Task<IActionResult> FilterByRole(int roleId)
+        // [Authorize(Roles = "Admin")]
+        [HttpPost("filter-by-role/{roleId}")]
+        public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
         {
-            var list = await userService.FilterByRole(roleId);
+            var list = await userService.FilterByRole(page, roleId);
             return Ok(list);
         }
 

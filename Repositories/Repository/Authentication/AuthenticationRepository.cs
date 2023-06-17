@@ -22,10 +22,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         private readonly TokenConfiguration tokenConfiguration;
         private readonly EncryptConfiguration encryptConfiguration;
         private readonly IUserRepository userRepository;
+        private readonly ICustomerRepository customerRepository;
 
         public AuthenticationRepository(DataContext context, IMapper mapper,
-        TokenConfiguration tokenConfiguration, EncryptConfiguration encryptConfiguration, IUserRepository userRepository)
+        TokenConfiguration tokenConfiguration, EncryptConfiguration encryptConfiguration, IUserRepository userRepository, ICustomerRepository customerRepository)
         {
+            this.customerRepository = customerRepository;
             this.userRepository = userRepository;
             this.encryptConfiguration = encryptConfiguration;
             this.tokenConfiguration = tokenConfiguration;
@@ -71,6 +73,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                     string token = tokenConfiguration.CreateToken(user);
                     user.UserToken = token;
+                    user.UserEmail = encryptConfiguration.Base64Decode(user.UserEmail);
                     return user;
                 }
                 return null;
@@ -116,7 +119,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 {
                     case var isExist when isExist == (user != null):
                         throw new MyException("The user doesn't exist.", 404);
-                    case var isFalse when isFalse == (user!.EmailConfirmed == 1):
+                    case var isFalse when isFalse == (user!.EmailConfirmed != 1):
                         throw new MyException("The email are already confirmed.", 404);
                 }
 
@@ -263,7 +266,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     des.RoleId = 2;
                 }));
 
-                await userRepository.Create(user);
+                var userId = await userRepository.Create(user);
+
+                var customer = new Models.Entity.Customer(){
+                    User = user
+                };
+
+                await customerRepository.Create(customer);
             }
             catch (Exception e)
             {

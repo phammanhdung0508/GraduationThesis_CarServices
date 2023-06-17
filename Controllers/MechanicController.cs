@@ -23,7 +23,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        // [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-mechanic/{mechanicId}")]
         public async Task<IActionResult> DetailMechanic(int mechanicId)
         {
@@ -31,7 +31,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(mechanic);
         }
 
-        [Authorize(Roles = "Staff")]
+        // [Authorize(Roles = "Staff")]
         [HttpGet("get-working-schedule-mechanic/{mechanicId}")]
         public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
         {

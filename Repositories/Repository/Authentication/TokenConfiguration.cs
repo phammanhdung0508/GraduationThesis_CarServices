@@ -77,7 +77,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 //new Claim(ClaimTypes.Name, account.Owner),
                 new Claim(ClaimTypes.Email, user.UserEmail),
                 new Claim(ClaimTypes.Uri, user.UserImage),
-                new Claim(ClaimTypes.PostalCode, user.UserId + "RandomString"),
+                new Claim(ClaimTypes.PostalCode, user.UserId.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.RoleName),
                 new Claim(ClaimTypes.GivenName, uid)
             };
@@ -113,15 +113,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             {
                 string senderEmail = _configuration.GetSection("EmailUserName").Value!; // Replace with your Gmail address
                 string senderPassword = _configuration.GetSection("EmailPassword").Value!; // Replace with your Gmail password
-
-                // Get the current timestamp
-                // DateTime currentTimestamp = DateTime.Now;
-
-                // Set the OTP validity duration (1 minute in this example)
-                // TimeSpan validityDuration = TimeSpan.FromMinutes(1);
-
-                // Calculate the OTP expiration timestamp
-                // DateTime otpExpiration = currentTimestamp.Add(validityDuration);
 
                 string subject = "OTP Verification";
                 string body = $"Your OTP is: {otp}";

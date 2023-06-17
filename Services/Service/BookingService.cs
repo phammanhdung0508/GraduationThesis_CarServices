@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
@@ -8,6 +10,7 @@ using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
+using QRCoder;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
@@ -22,6 +25,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMechanicRepository mechanicRepository;
         private readonly ILotRepository lotRepository;
         private readonly ICarRepository carRepository;
+        private readonly HttpClient httpClient;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IBookingDetailRepository bookingDetailRepository, IProductRepository productRepository,
@@ -29,6 +33,7 @@ namespace GraduationThesis_CarServices.Services.Service
         ICouponRepository couponRepository, IMechanicRepository mechanicRepository)
         {
             this.mapper = mapper;
+            this.httpClient = new HttpClient();
             this.bookingRepository = bookingRepository;
             this.bookingDetailRepository = bookingDetailRepository;
             this.lotRepository = lotRepository;
@@ -331,7 +336,8 @@ namespace GraduationThesis_CarServices.Services.Service
                             if (bookingInFirstHourCout + bookingInNextHourCout == lotCount && minEstimatedTimePerHour > 1)
                             {
                                 var durationFirstHour = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).FirstOrDefault()!.TotalEstimatedCompletionTime;
-                                if(durationFirstHour > 1){
+                                if (durationFirstHour > 1)
+                                {
                                     for (int b = i + 1; b < i + durationFirstHour; b++)
                                     {
                                         UpdateListHours(b, listHours);
@@ -339,10 +345,13 @@ namespace GraduationThesis_CarServices.Services.Service
                                     z = (int)durationFirstHour;
                                     i = i + z - 1;
                                     var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && b.TotalEstimatedCompletionTime > 1).Count();
-                                    if(isBookin + (int)bookingInFirstHourCout! == lotCount){
+                                    if (isBookin + (int)bookingInFirstHourCout! == lotCount)
+                                    {
                                         UpdateListHours(i + 1, listHours);
                                     }
-                                }else{
+                                }
+                                else
+                                {
                                     UpdateListHours(i + z, listHours);
                                 }
                             }
@@ -541,33 +550,34 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UpdateStatus(BookingStatusRequestDto requestDto)
+        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            var b = await bookingRepository.Detail(requestDto.BookingId);
+            var booking = await bookingRepository.Detail(bookingId);
 
             switch (false)
             {
-                case var isExist when isExist == (b != null):
+                case var isExist when isExist == (booking != null):
                     throw new MyException("The booking doesn't exist.", 404);
             }
 
-            var booking = mapper.Map<BookingStatusRequestDto, Booking>(requestDto, b!);
-            await bookingRepository.Update(booking);
+            booking!.BookingStatus = bookingStatus;
 
-            switch (requestDto.BookingStatus)
-            {
-                case BookingStatus.CheckIn:
-                    await UpdateLotStatus(LotStatus.Assigned, booking);
-                    break;
-                case BookingStatus.Processing:
-                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
-                    break;
-                case BookingStatus.Completed:
-                    await UpdateLotStatus(LotStatus.Free, booking);
-                    break;
-            }
+            //await bookingRepository.Update(booking);
+
+            // switch (bookingStatus)
+            // {
+            //     case BookingStatus.CheckIn:
+            //         await UpdateLotStatus(LotStatus.Assigned, booking);
+            //         break;
+            //     case BookingStatus.Processing:
+            //         await UpdateLotStatus(LotStatus.BeingUsed, booking);
+            //         break;
+            //     case BookingStatus.Completed:
+            //         await UpdateLotStatus(LotStatus.Free, booking);
+            //         break;
+            // }
 
             watch.Stop();
             Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -622,6 +632,48 @@ namespace GraduationThesis_CarServices.Services.Service
             }
 
             await bookingDetailRepository.Update(bookingDetailList);
+        }
+
+        public async Task<String> GenerateQRCode(int bookingId)
+        {
+            try
+            {
+                // Generate the QR code
+                string url = $"https://localhost:7006/api/booking/run-qr-code/{bookingId}";
+
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                var qrCodeImage = qrCode.GetGraphic(10);
+
+                string qrCodeImageBase64;
+                using (var ms = new MemoryStream())
+                {
+                    qrCodeImage.Save(ms, ImageFormat.Png);
+                    byte[] imageBytes = ms.ToArray();
+                    qrCodeImageBase64 = "data:image/png;base64," + Convert.ToBase64String(imageBytes);
+                }
+
+                string qrCodeImageUrl = qrCodeImageBase64;
+                return qrCodeImageUrl;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
         }
     }
 }

@@ -95,13 +95,13 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
+                //var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
                 var isLicensePlateExist = await carRepository.IsLicensePlate(requestDto.CarLicensePlate);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isCustomerExist:
-                        throw new MyException("The customer doesn't exist.", 404);
+                    //case var isExist when isExist == isCustomerExist:
+                        //throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist != isLicensePlateExist:
                         throw new MyException("The license plate already exists.", 404);
                 }

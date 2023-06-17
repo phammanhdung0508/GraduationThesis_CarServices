@@ -49,7 +49,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var user = await context.Users.Include(u => u.Role)
+                var user = await context.Users.Include(u => u.Role).Include(u => u.Customer)
                 .FirstOrDefaultAsync(g => g.UserId == id);
 
                 return user;
@@ -60,12 +60,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task Create(User user)
+        public async Task<int> Create(User user)
         {
             try
             {
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
+
+                return context.Users
+                .OrderByDescending(b => b.UserId)
+                .Select(b => b.UserId).First();
             }
             catch (Exception)
             {
@@ -86,16 +90,37 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<User>> FilterByRole(int roleId)
+        public async Task<List<User>> FilterByRole(PageDto page, int roleId)
         {
             try
             {
-                var list = await context.Users.Include(u => u.Role).Where(u => u.RoleId == roleId).ToListAsync();
+                var list = await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer).Include(u => u.Role).Where(u => u.RoleId == roleId), page);
 
                 return list;
             }
             catch (System.Exception)
             {
+                throw;
+            }
+        }
+
+        public int TotalBooking(int customerId)
+        {
+            try
+            {
+                var totalBooking = 0;
+                var listCars = context.Cars.Where(c => c.CustomerId == customerId).Include(c => c.Bookings).ToList();
+                for (int i = 0; i < listCars.Count; i++)
+                {
+                    var bookingCount = listCars[i].Bookings.Count;
+                    totalBooking += bookingCount;
+                }
+
+                return totalBooking;
+            }
+            catch (System.Exception)
+            {
+
                 throw;
             }
         }

@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -51,7 +52,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(car);
         }
 
-        [Authorize(Roles = "Customer")]
+        // [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
@@ -59,11 +60,18 @@ namespace GraduationThesis_bookingServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
-        // [HttpPut("update-status-booking")]
-        // public async Task<IActionResult> UpdateBooking(BookingStatusRequestDto bookingStatusRequestDto)
-        // {
-        //     await bookingService.UpdateStatus(bookingStatusRequestDto);
-        //     throw new MyException("Successfully.", 200);
-        // }
+        [HttpPost("generate-qr-code/{bookingId}")]
+        public async Task<IActionResult> GenerateQRCode(int bookingId)
+        {
+            var qrString = await bookingService.GenerateQRCode(bookingId);
+            return Ok(qrString);
+        }
+
+        [HttpPut("update-status-booking/{bookingId}&{bookingStatus}")]
+        public async Task<IActionResult> UpdateBooking(int bookingId, BookingStatus bookingStatus)
+        {
+            await bookingService.UpdateStatus(bookingId, bookingStatus);
+            throw new MyException("Successfully.", 200);
+        }
     }
 }

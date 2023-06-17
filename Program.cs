@@ -43,10 +43,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:TokenSecret").Value!)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        // ValidIssuer = "mytest.com",
-        // ValidAudience = "mytest.com",
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = "localhost:7006",
+        ValidAudience = "localhost:7006",
     };
 });
 
@@ -87,6 +87,7 @@ builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>(
 builder.Services.AddScoped<IGarageRepository, GarageRepository>();
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

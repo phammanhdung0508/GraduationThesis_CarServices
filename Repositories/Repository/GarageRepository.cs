@@ -21,7 +21,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await PagingConfiguration<Garage>.Get(context.Garages, page);
+                var list = await PagingConfiguration<Garage>.Get(context.Garages.Include(g => g.Reviews), page);
 
                 return list;
             }
@@ -62,8 +62,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await context.Garages
-                .Where(g => g.GarageDistrict.Contains(search.SearchString))
+                var list = await context.Garages.Where(g => g.GarageName.Contains(search.SearchString))
                 .Include(g => g.Reviews).ToListAsync();
 
                 return list;

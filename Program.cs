@@ -36,6 +36,14 @@ builder.Services.AddSwaggerGen(
         });
 
         options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Car Services API",
+            Description = "A simple example ASP.NET Core Web API",
+            //TermsOfService = new Uri("https://example.com/terms"),
+        });
     });
 
 var key = builder.Configuration["Jwt:Key"];
@@ -66,11 +74,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Car Services", Version = "v1" });
-});
-
 builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 {
     //build.WithOrigins("https://localhost:7091");
@@ -81,7 +84,7 @@ builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Connect Sql Server
-var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
+var connectionString = builder.Configuration.GetConnectionString("DataContextServerConection") ??
     throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -146,8 +149,18 @@ var app = builder.Build();
 //     app.UseSwaggerUI();
 // }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (string.IsNullOrEmpty(app.Configuration.GetValue<String>("WEBSITE_NODE_DEFAULT_VERSION")))
+    throw new Exception("Error at Azure Environment Variable.");
+
+app.UseSwagger(//options => {
+    //options.SerializeAsV2 = true;
+//}
+);
+
+app.UseSwaggerUI(options => {
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 

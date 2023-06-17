@@ -52,7 +52,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(car);
         }
 
-        // [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
@@ -67,10 +67,11 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(qrString);
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPut("update-status-booking/{bookingId}&{bookingStatus}")]
-        public async Task<IActionResult> UpdateBooking(int bookingId, BookingStatus bookingStatus)
+        public async Task<IActionResult> UpdateBooking(int bookingId, int bookingStatus)
         {
-            await bookingService.UpdateStatus(bookingId, bookingStatus);
+            await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus);
             throw new MyException("Successfully.", 200);
         }
     }

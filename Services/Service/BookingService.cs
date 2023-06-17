@@ -647,7 +647,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 var qrCodeImage = qrCode.GetGraphic(10);
 
                 string qrCodeImageBase64;
-                using (var ms = new MemoryStream())
+                await using (var ms = new MemoryStream())
                 {
                     qrCodeImage.Save(ms, ImageFormat.Png);
                     byte[] imageBytes = ms.ToArray();

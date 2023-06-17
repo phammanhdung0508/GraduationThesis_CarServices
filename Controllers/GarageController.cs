@@ -34,7 +34,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("view-all-garage")]
         public async Task<IActionResult> ViewGarage(PageDto page)
         {
@@ -42,7 +42,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("search-garage")]
         public async Task<IActionResult> SearchGarage(SearchDto search)
         {
@@ -50,7 +50,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        //[Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage/{id}")]
         public async Task<IActionResult> DetailGarage(int id)
         {

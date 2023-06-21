@@ -29,22 +29,28 @@ namespace GraduationThesis_bookingServices.Controllers
 
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("get-garage-bookings")]
-        public async Task<IActionResult> GerReviewPerGarage(PagingBookingPerGarageRequestDto requestDto)
+        public async Task<IActionResult> GetReviewPerGarage(PagingBookingPerGarageRequestDto requestDto)
         {
             var list = await bookingService.FilterBookingByGarageId(requestDto)!;
             return Ok(list);
         }
 
-        [Authorize(Roles = "Customer")]
+        [HttpPost("filter-booking-by-customer")]
+        public async Task<IActionResult> FilterBookingByCustomer(FilterByCustomerRequestDto requestDto)
+        {
+            var list = await bookingService.FilterBoookingByCustomer(requestDto);
+            return Ok(list);
+        }
+
+        // [Authorize(Roles = "Customer")]
         [HttpPost("check-booking")]
         public async Task<IActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto)
         {
-
             var list = await bookingService.IsBookingAvailable(bookingCheckRequestDto);
             return Ok(list);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
+        // [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-booking/{id}")]
         public async Task<IActionResult> DetailBooking(int id)
         {
@@ -52,7 +58,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(car);
         }
 
-        [Authorize(Roles = "Customer")]
+        // [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {

@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
@@ -33,6 +34,14 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("filter-all-review")]
+        public async Task<IActionResult> FilterAllReview(ReviewFilterRequestDto requestDto)
+        {
+            var list = await reviewService.FilterAllReview(requestDto)!;
+            return Ok(list);
+        }
+
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-review/{id}")]
         public async Task<IActionResult> DetailReview(int id)
@@ -45,7 +54,14 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("create-review")]
         public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
         {
-            await reviewService.Create(reviewDto);
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+            
+            await reviewService.Create(reviewDto, userId);
             throw new MyException("Successfully.", 200);
         }
 

@@ -84,7 +84,9 @@ builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Connect Sql Server
-var connectionString = builder.Configuration.GetConnectionString("DataContextServerConection") ??
+//"https://project20230606170014.azurewebsites.net/"
+//"https://localhost:7006/"
+var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
     throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -152,12 +154,13 @@ var app = builder.Build();
 if (string.IsNullOrEmpty(app.Configuration.GetValue<String>("WEBSITE_NODE_DEFAULT_VERSION")))
     throw new Exception("Error at Azure Environment Variable.");
 
-app.UseSwagger(//options => {
-    //options.SerializeAsV2 = true;
-//}
-);
+app.UseSwagger(options =>
+{
+    options.SerializeAsV2 = true;
+});
 
-app.UseSwaggerUI(options => {
+app.UseSwaggerUI(options =>
+{
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     options.RoutePrefix = string.Empty;
 });

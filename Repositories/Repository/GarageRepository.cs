@@ -137,7 +137,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }

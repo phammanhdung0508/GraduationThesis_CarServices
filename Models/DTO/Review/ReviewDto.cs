@@ -1,6 +1,4 @@
 #nullable disable
-using GraduationThesis_CarServices.Models.DTO.User;
-using GraduationThesis_CarServices.Models.DTO.Garage;
 
 namespace GraduationThesis_CarServices.Models.DTO.Review
 {

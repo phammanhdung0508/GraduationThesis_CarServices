@@ -8,8 +8,9 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ReviewListResponseDto>?> View(PageDto page);
         Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(PagingReviewPerGarageRequestDto requestDto);
         Task<ReviewDetailResponseDto?> Detail(int garageId);
-        Task Create(ReviewCreateRequestDto requestDto);
+        Task Create(ReviewCreateRequestDto requestDto, int userId);
         Task Update(ReviewUpdateRequestDto requestDto);
         Task UpdateStatus(ReviewStatusRequestDto requestDto);
+        Task<List<ReviewListResponseDto>?> FilterAllReview(ReviewFilterRequestDto requestDto);
     }
 }

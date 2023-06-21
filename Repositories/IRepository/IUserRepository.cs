@@ -13,5 +13,9 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task Update(User user);
         Task<List<User>> FilterByRole(PageDto page, int roleId);
         int TotalBooking(int customerId);
+        Task<bool> IsEmailExist(string userEmail);
+        Task<bool> IsEmailVerifyOtp(string userEmail);
+        Task<User?> CustomerDetail(int userId);
+        Task<User?> GetUserByEmail(string userEmail);
     }
 }

@@ -10,5 +10,8 @@ namespace GraduationThesis_CarServices.Repositories.IRepository{
         Task SendOTP(string recipientEmail);
         Task ValidateOTP(string otp, string recipientEmail);
         Task UserRegister(UserCreateRequestDto requestDto);
+        Task<int> Count(string entity);
+        Task ChangePassword(ChangePasswordDto requestDto);
+        Task<string> IsEmailExist(string entityName);
     }
 }

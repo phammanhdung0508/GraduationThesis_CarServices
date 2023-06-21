@@ -1,16 +1,16 @@
 {
   "dependencies": {
-    "apis1": {
-      "apiEndpoint": "https://carserviceapi.azure-api.net/",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/carserviceapi/apis/carservices",
-      "type": "apis.azure"
-    },
     "mssql1": {
       "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/project20230606170014/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsDataContextServerConect_7E5D5B3E03",
       "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/carservices/databases/CarServices",
       "type": "mssql.azure",
       "connectionId": "ConnectionStrings:DataContextServerConection"
+    },
+    "apis1": {
+      "apiEndpoint": "https://carserviceapi.azure-api.net/",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/carserviceapi/apis/carservices",
+      "type": "apis.azure"
     }
   }
 }

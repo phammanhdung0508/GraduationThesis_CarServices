@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using AutoMapper;
@@ -113,6 +112,39 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<FilterByCustomerResponseDto>?> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                var list = mapper.Map<List<FilterByCustomerResponseDto>>(await bookingRepository.FilterBookingByCustomer(requestDto.UserId, page));
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<BookingDetailResponseDto?> Detail(int id)
         {
             try
@@ -125,13 +157,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The booking doesn't exist.", 404);
                 }
 
-                var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
-                otp => otp.AfterMap((src, des) =>
-                {
-                    des.BookingStatus = src!.BookingStatus.ToString();
-                    des.PaymentStatus = src.PaymentStatus.ToString();
-                    des.BookingStatus = src.BookingStatus.ToString();
-                }));
+                var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id));
 
                 return booking;
             }
@@ -186,7 +212,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await Task.Run(() =>
                 {
-                    CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours);
+                    CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours, dateSelect);
                 });
 
                 var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
@@ -292,10 +318,24 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours)
+        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours, DateTime dateSelect)
         {
             for (int i = openAt; i <= closeAt; i++)
             {
+                var current = DateTime.Now;
+                var convertHour = 0;
+                var selectedHour = i;
+
+                switch (current.Hour)
+                {
+                    case var hour when hour > 12:
+                        convertHour = hour - 12;
+                        break;
+                    default:
+                        convertHour = current.Hour;
+                        break;
+                }
+
                 var bookingCount = listBooking?
                 .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i)).Count();
 
@@ -304,8 +344,10 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 switch (bookingCount)
                 {
+                    case var bookingCout when i - convertHour <= 3 && (current.Date == dateSelect.Date):
+                        UpdateListHours(i, listHours);
+                        break;
                     case var bookingCout when bookingCout == lotCount:
-                        var selectedHour = i;
                         var minEstimatedTime = GetMinEstimatedTime(i, listBooking!);
 
                         //If all Booking have estimated time all > 2 skip to the next available Hour

@@ -45,7 +45,51 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<int> GetCustomerId(int userId){
+        public async Task<bool> IsEmailExist(string userEmail)
+        {
+            try
+            {
+                var isExist = await context.Users.Where(u => u.UserEmail.Equals(userEmail)).AnyAsync();
+
+                return isExist;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<User?> GetUserByEmail(string userEmail)
+        {
+            try
+            {
+                var user = await context.Users.Where(u => u.UserEmail.Equals(userEmail)).FirstOrDefaultAsync();
+
+                return user;
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+
+        public async Task<bool> IsEmailVerifyOtp(string userEmail)
+        {
+            try
+            {
+                var isVerify = await context.Users.Where(u => u.UserEmail.Equals(userEmail) && u.EmailConfirmed == 1).AnyAsync();
+
+                return isVerify;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetCustomerId(int userId)
+        {
             try
             {
                 var customerId = await context.Users.Include(u => u.Customer).Where(u => u.UserId == userId).Select(u => u.Customer.CustomerId).FirstOrDefaultAsync();
@@ -69,6 +113,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<User?> CustomerDetail(int userId)
+        {
+            try
+            {
+                var customer = await context.Users
+                .Include(c => c.Customer).ThenInclude(c => c.Cars)
+                .Where(c => c.UserId == userId).FirstOrDefaultAsync();
+
+                return customer;
+            }
+            catch (System.Exception)
+            {
+
                 throw;
             }
         }
@@ -133,7 +194,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }

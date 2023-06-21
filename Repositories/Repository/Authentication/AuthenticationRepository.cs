@@ -9,6 +9,7 @@ using GraduationThesis_CarServices.Models.DTO.Authentication;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Jwt;
 using GraduationThesis_CarServices.Models.DTO.User;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
 using OtpNet;
@@ -46,24 +47,31 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 bool check = true;
                 string email = encryptConfiguration.Base64Encode(login.Email);
 
+                var isEmailVerify = await userRepository.IsEmailVerifyOtp(email);
+
+                if (!isEmailVerify)
+                {
+                    throw new MyException("Tài khoản này chưa được xác thực.", 404);
+                }
+
                 var _user = await context.Users.Include(r => r.Role).FirstOrDefaultAsync(u => u.UserEmail.Equals(email));
                 if (_user == null)
                 {
                     check = false;
-                    throw new MyException("Your email don't exist.", 404);
+                    throw new MyException("Tài khoản đăng nhập không tồn tại.", 404);
                 }
                 else
                 {
                     if (!encryptConfiguration.VerifyPasswordHash(login.Password, _user.PasswordHash, _user.PasswordSalt))
                     {
                         check = false;
-                        throw new MyException("Your password is not correct.", 404);
+                        throw new MyException("Mật khẩu xác nhận không khớp.", 404);
                     }
                 }
                 if (_user?.UserStatus == 0)
                 {
                     check = false;
-                    throw new MyException("Sorry your account have been disable.", 404);
+                    throw new MyException("Xin lỗi, tài khoản của bạn đã bị khóa.", 404);
                 }
                 if (check == true)
                 {
@@ -118,9 +126,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 switch (false)
                 {
                     case var isExist when isExist == (user != null):
-                        throw new MyException("The user doesn't exist.", 404);
+                        throw new MyException("Tài khoản không tồn tại.", 404);
                     case var isFalse when isFalse == (user!.EmailConfirmed != 1):
-                        throw new MyException("The email are already confirmed.", 404);
+                        throw new MyException("Tài khoản này đã được xác thực.", 404);
                 }
 
                 user!.OTP = otp;
@@ -160,11 +168,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             switch (false)
             {
                 case var isExist when isExist == (user != null):
-                    throw new MyException("The user doesn't exist.", 404);
+                    throw new MyException("Tài khoản không tồn tại.", 404);
                 case var isFalse when isFalse == (user!.OTP == otp):
-                    throw new MyException("Your OTP don't correct.", 404);
+                    throw new MyException("OTP của bạn không đúng.", 404);
                 case var isFalse when isFalse == (currentTime < user.ExpiredIn):
-                    throw new MyException("Your OTP is expored.", 404);
+                    throw new MyException("OTP đã hết hạn có thể xác thực.", 404);
             }
 
             user.EmailConfirmed = 1;
@@ -245,10 +253,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
+                var encodeEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
+                var isEmailExist = await userRepository.IsEmailExist(encodeEmail);
+
                 switch (false)
                 {
+                    case var isExist when isExist != isEmailExist:
+                        throw new MyException("Tài khoản đăng kí của bạn đã toàn tại.", 404);
                     case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
-                        throw new MyException("Your password and confirm password isn't match.", 404);
+                        throw new MyException("Mật khẩu của bạn không khớp với mật khẩu xác nhận.", 404);
                 }
 
                 encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
@@ -263,16 +276,117 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     des.UserStatus = Status.Activate;
                     des.EmailConfirmed = 0;
                     des.CreatedAt = DateTime.Now;
-                    des.RoleId = 2;
+                    des.RoleId = 1;
                 }));
 
                 var userId = await userRepository.Create(user);
 
-                var customer = new Models.Entity.Customer(){
+                var customer = new Models.Entity.Customer()
+                {
                     User = user
                 };
 
                 await customerRepository.Create(customer);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
+        public async Task<string> IsEmailExist(string entityName)
+        {
+            try
+            {
+                var encodeEmail = encryptConfiguration.Base64Encode(entityName);
+                var isEmailExist = await userRepository.IsEmailExist(encodeEmail);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isEmailExist:
+                        throw new MyException("Tài khoản của bạn không tồn tại.", 404);
+                }
+
+                return entityName;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
+        public async Task ChangePassword(ChangePasswordDto requestDto)
+        {
+            try
+            {
+                var encodeEmail = encryptConfiguration.Base64Encode(requestDto.Email);
+                var user = await userRepository.GetUserByEmail(encodeEmail);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (user != null):
+                        throw new MyException("Tài khoản của bạn không tồn tại.", 404);
+                    case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
+                        throw new MyException("Mật khẩu của bạn không khớp với mật khẩu xác nhận.", 404);
+                }
+
+                encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
+
+                user!.PasswordHash = password_hash;
+                user.PasswordSalt = password_salt;
+
+                await userRepository.Update(user);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw new MyException("Internal Server Error", 500);
+                }
+            }
+        }
+
+        public async Task<int> Count(string entityName)
+        {
+            try
+            {
+                return await EntityCountConfiguration<int>.Count(context, entityName);
             }
             catch (Exception e)
             {

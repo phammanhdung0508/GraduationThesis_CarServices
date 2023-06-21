@@ -94,6 +94,43 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<ReviewListResponseDto>?> FilterAllReview(ReviewFilterRequestDto requestDto)
+        {
+            try
+            {
+                DateTime? dateFrom = null;
+                DateTime? dateTo = null;
+
+                if (requestDto.DateFrom != null && requestDto.DateTo != null)
+                {
+                    dateFrom = DateTime.Parse(requestDto.DateFrom!);
+                    dateTo = DateTime.Parse(requestDto.DateTo!);
+
+                    switch (false)
+                    {
+                        case var isExist when isExist == (dateFrom < dateTo):
+                            throw new MyException("To date must greater from date.", 404);
+                    }
+                }
+
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterAllReview(requestDto.GarageId, requestDto.CustomerId, requestDto.ReviewStatus, dateFrom, dateTo, page));
+
+                return list;
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<ReviewDetailResponseDto?> Detail(int reviewId)
         {
             try
@@ -127,13 +164,15 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task Create(ReviewCreateRequestDto requestDto)
+        public async Task Create(ReviewCreateRequestDto requestDto, int userId)
         {
             try
             {
+                int customerId = await userRepository.GetCustomerId(userId);
+
                 var isInRange = false;
-                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
                 var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
+
                 if (requestDto.Rating >= 0 && requestDto.Rating <= 5)
                 {
                     isInRange = true;
@@ -141,7 +180,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 switch (false)
                 {
-                    case var isExist when isExist == isCustomerExist:
+                    case var isExist when isExist == (customerId != 0):
                         throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist == isGarageExist:
                         throw new MyException("The garage doesn't exist.", 404);
@@ -150,11 +189,12 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
-                            otp => otp.AfterMap((src, des) =>
-                            {
-                                des.ReviewStatus = Status.Activate;
-                                des.CreatedAt = DateTime.Now;
-                            }));
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.ReviewStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                    des.CustomerId = customerId;
+                }));
 
                 await reviewRepository.Create(review);
             }

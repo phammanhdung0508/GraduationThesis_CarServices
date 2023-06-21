@@ -1,5 +1,4 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
-using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Paging
 {

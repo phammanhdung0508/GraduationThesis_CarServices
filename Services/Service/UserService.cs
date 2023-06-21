@@ -65,20 +65,49 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (roleId)
                 {
                     case 1:
-                    list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId),
-                    otp => otp.AfterMap((src, des) => {
-                        for (int i = 0; i < src.Count; i++)
+                        list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId),
+                        otp => otp.AfterMap((src, des) =>
                         {
-                            des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
-                        }
-                    }));
-                    break;
+                            for (int i = 0; i < src.Count; i++)
+                            {
+                                des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
+                            }
+                        }));
+                        break;
                     default:
-                    list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
-                    break;
+                        list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
+                        break;
                 }
 
                 return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<CustomerDetailResponseDto> CustomerDetail(int userId)
+        {
+            try
+            {
+                var c =  await userRepository.CustomerDetail(userId);
+                var customer = mapper.Map<CustomerDetailResponseDto>(c);
+
+                return customer;
             }
             catch (Exception e)
             {
@@ -114,7 +143,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (user)
                 {
                     case var userCustomer when userCustomer!.Customer != null:
-                        return  mapper.Map<UserDetailResponseDto>(user);
+                        return mapper.Map<UserDetailResponseDto>(user);
                 }
 
                 return mapper.Map<UserDetailResponseDto>(user);
@@ -138,7 +167,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UserRegister(UserCreateRequestDto requestDto)
+        public async Task Create(UserCreateRequestDto requestDto)
         {
             try
             {
@@ -184,16 +213,24 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task Update(UserUpdateRequestDto requestDto)
+        public async Task CustomerFirstLoginUpdate(UserUpdateRequestDto requestDto, int userId)
         {
             try
             {
-                var u = await userRepository.Detail(requestDto.UserId);
+                var u = await userRepository.Detail(userId);
 
                 switch (false)
                 {
+                    case var isFalse when isFalse != (requestDto.UserFirstName.Equals("")):
+                        throw new MyException("The user first name can't be empty.", 404);
+                    case var isFalse when isFalse != (requestDto.UserPhone.Equals("")):
+                        throw new MyException("The user phone number can't be empty.", 404);
                     case var isExist when isExist == (u != null):
                         throw new MyException("The user doesn't exist.", 404);
+                    case var isCustomer when isCustomer == (u!.RoleId == 1):
+                        throw new MyException("The user don't have permission.", 403);
+                    case var isFirstLogin when isFirstLogin == (u.UserFirstName == null):
+                        throw new MyException("The user already update information.", 404);
                 }
 
                 var user = mapper.Map<UserUpdateRequestDto, User>(requestDto, u!,

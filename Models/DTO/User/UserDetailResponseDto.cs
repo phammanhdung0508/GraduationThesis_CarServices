@@ -5,8 +5,6 @@ namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class UserDetailResponseDto
     {
-        
-
         public string UserFirstName { get; set; }
         public string UserLastName { get; set; }
         public string FullName { get; set; }

@@ -13,5 +13,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateStatus(int bookingId, BookingStatus bookingStatus);
         Task<List<BookingListResponseDto>?> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
         Task<String> GenerateQRCode(int bookingId);
+        Task<List<FilterByCustomerResponseDto>?> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto);
     }
 }

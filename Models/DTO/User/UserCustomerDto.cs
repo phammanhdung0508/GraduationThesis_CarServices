@@ -1,7 +1,8 @@
+#nullable disable
 namespace GraduationThesis_CarServices.Models.DTO.User
 {
     public class UserCustomerDto
     {
-        public int CustomerId { get; set; }
+        public List<CustomerCarDto> CustomerCarDtos {get; set;}
     }
 }

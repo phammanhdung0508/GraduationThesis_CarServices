@@ -78,11 +78,32 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [HttpGet("check-email-exist/{recipientEmail}")]
+        public async Task<IActionResult> CheckEmailExist(string recipientEmail)
+        {
+            var email = await authenticationRepository.IsEmailExist(recipientEmail);
+            return Ok(email);
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto requestDto)
+        {
+            await authenticationRepository.ChangePassword(requestDto);
+            throw new MyException("Successfully.", 200);
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult> Register(UserCreateRequestDto requestDto)
         {
             await authenticationRepository.UserRegister(requestDto);
             throw new MyException("Successfully.", 200);
+        }
+
+        [HttpGet("count/{entity}")]
+        public async Task<IActionResult> Count(string entity)
+        {
+            var count = await authenticationRepository.Count(entity);
+            return Ok(count);
         }
     }
 }

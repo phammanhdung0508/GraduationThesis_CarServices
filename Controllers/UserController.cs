@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
@@ -33,6 +34,13 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(user);
         }
 
+        [HttpGet("detail-customer/{userId}")]
+        public async Task<IActionResult> CustomerDetail(int userId)
+        {
+            var customer = await userService.CustomerDetail(userId);
+            return Ok(customer);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("filter-by-role/{roleId}")]
         public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
@@ -45,15 +53,22 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("create-user")]
         public async Task<IActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
         {
-            await userService.UserRegister(userCreateRequestDto);
+            await userService.Create(userCreateRequestDto);
             throw new MyException("Successfully.", 200);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Customer")]
         [HttpPut("update-user")]
         public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
         {
-            await userService.Update(userUpdateRequestDto);
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+
+            await userService.CustomerFirstLoginUpdate(userUpdateRequestDto, userId);
             throw new MyException("Successfully.", 200);
         }
 

@@ -89,13 +89,31 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<List<Booking>?> FilterBookingByCustomer(int userId, PageDto page){
+            try
+            {
+                var list = await PagingConfiguration<Booking>.Get(context.Users.Where(u => u.UserId == userId)
+                .Select(u => u.Customer).SelectMany(c => c.Cars).SelectMany(c => c.Bookings), page);
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
 
         public async Task<Booking?> Detail(int id)
         {
             try
             {
-                var booking = await context.Bookings.Include(b => b.Car).Include(b => b.Garage)
-                .FirstOrDefaultAsync(c => c.BookingId == id);
+                var booking = await context.Bookings.Include(b => b.Garage)
+                .Include(b => b.Car).ThenInclude(c => c.Customer).ThenInclude(m => m.User)
+                .Include(b => b.BookingDetails).ThenInclude(d => d.Mechanic).ThenInclude(m => m.User)
+                .Include(b => b.BookingDetails).ThenInclude(d => d.ServiceDetail).ThenInclude(s => s.Service)
+                .Include(b => b.BookingDetails).ThenInclude(d => d.Product).FirstOrDefaultAsync(c => c.BookingId == id);
+
                 return booking;
             }
             catch (Exception)

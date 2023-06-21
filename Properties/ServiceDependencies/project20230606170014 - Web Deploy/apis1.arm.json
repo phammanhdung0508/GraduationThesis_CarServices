@@ -97,9 +97,9 @@
               "type": "Microsoft.ApiManagement/service/apis",
               "name": "carserviceapi/carservices",
               "properties": {
-                "displayName": "Car Services",
+                "displayName": "Car Services API",
                 "apiRevision": "1",
-                "description": null,
+                "description": "A simple example ASP.NET Core Web API",
                 "subscriptionRequired": true,
                 "serviceUrl": "https://project20230606170014.azurewebsites.net",
                 "path": "",

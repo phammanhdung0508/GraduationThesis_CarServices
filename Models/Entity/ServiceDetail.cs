@@ -10,7 +10,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ServiceDetailId { get; set; }
         [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float ServicePrice { get; set; }
+        public double ServicePrice { get; set; }
         public int MinNumberOfCarLot { get; set; }
         public int MaxNumberOfCarLot { get; set; }
 

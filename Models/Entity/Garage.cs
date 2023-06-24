@@ -52,6 +52,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public virtual ICollection<GarageDetail> GarageDetails { get; set; }
         public virtual ICollection<Lot> Lots { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
-        public virtual ICollection<WorkingSchedule> WorkingSchedules { get; set; }
+        public virtual ICollection<GarageMechanic> GarageMechanics { get; set; }
     }
 }

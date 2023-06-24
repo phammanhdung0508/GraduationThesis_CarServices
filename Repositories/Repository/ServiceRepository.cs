@@ -31,7 +31,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsServiceExist(int serviceId){
+        public async Task<int> CountServiceData()
+        {
+            try
+            {
+                var count = await context.Services.CountAsync();
+                
+                return count;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsServiceExist(int serviceId)
+        {
             try
             {
                 var check = await context.Services
@@ -65,7 +80,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsDuplicatedService(Service service){
+        public async Task<bool> IsDuplicatedService(Service service)
+        {
             try
             {
                 var check = await context.Services
@@ -107,8 +123,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-        
-        public float GetPrice(int serviceDetailId)
+
+        public double GetPrice(int serviceDetailId)
         {
             try
             {
@@ -133,7 +149,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Where(p => p.ServiceDetailId.Equals(serviceDetailId))
                 .Select(p => p.Service.ServiceDuration)
                 .FirstOrDefaultAsync();
-                
+
                 return serviceDuration;
             }
             catch (Exception)

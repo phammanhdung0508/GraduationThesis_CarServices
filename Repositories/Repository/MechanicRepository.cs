@@ -35,7 +35,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.Mechanics
-                .Join(context.WorkingSchedules.Where(w => w.GarageId == garageId), m => m.MechanicId, w => w.MechanicId,
+                .Join(context.GarageMechanics.Where(w => w.GarageId == garageId), m => m.MechanicId, w => w.MechanicId,
                 (m, w) => new { Mechanic = m, WorkingSchedule = w }).Select(m => m.Mechanic).Include(m => m.User).ToListAsync();
 
                 return list;
@@ -77,27 +77,27 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<WorkingSchedule>> FilterWorkingSchedulesByMechanicId(int mechanicId)
-        {
-            try
-            {
-                var list = await context.WorkingSchedules
-                .Where(w => w.MechanicId == mechanicId).ToListAsync();
+        // public async Task<List<WorkingSchedule>> FilterWorkingSchedulesByMechanicId(int mechanicId)
+        // {
+        //     try
+        //     {
+        //         var list = await context.WorkingSchedules
+        //         .Where(w => w.MechanicId == mechanicId).ToListAsync();
 
-                return list;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //         return list;
+        //     }
+        //     catch (Exception)
+        //     {
+        //         throw;
+        //     }
+        // }
 
         public async Task<List<Mechanic>> FilterMechanicAvailableByGarageId(int garageId)
         {
             try
             {
                 var list =  await context.Mechanics
-                .Join(context.WorkingSchedules.Where(w => w.GarageId == garageId && w.WorkingScheduleStatus == WorkingScheduleStatus.Available), 
+                .Join(context.GarageMechanics.Where(w => w.GarageId == garageId), 
                 m => m.MechanicId, w => w.MechanicId, (m, w) => new { Mechanic = m, WorkingSchedule = w }).Select(m => m.Mechanic)
                 .OrderBy(m => m.TotalWorkingHours).ToListAsync();
 

@@ -19,6 +19,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(20)]
         public int ServiceDuration { get; set; }
         [Column(TypeName = "tinyint")]
+        public ServiceUnit ServiceUnit {get; set;}
+        
+        public string ServiceGroup {get; set;}
+        [Column(TypeName = "tinyint")]
         public Status ServiceStatus {get; set;}
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

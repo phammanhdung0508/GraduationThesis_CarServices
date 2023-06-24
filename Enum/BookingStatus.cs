@@ -2,8 +2,8 @@ namespace GraduationThesis_CarServices.Enum
 {
     public enum BookingStatus
     {
-        NotStart,
-        AppointmentDay,
+        Pending,
+        Canceled,
         CheckIn,
         Processing,
         Completed

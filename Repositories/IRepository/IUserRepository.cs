@@ -17,5 +17,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsEmailVerifyOtp(string userEmail);
         Task<User?> CustomerDetail(int userId);
         Task<User?> GetUserByEmail(string userEmail);
+        Task<List<User>?> SearchUser(string search, int roleId);
     }
 }

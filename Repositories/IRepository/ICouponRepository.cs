@@ -9,5 +9,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository{
         Task Create(Coupon coupon);
         Task Update(Coupon coupon);
         Task<bool> IsCouponExist(int couponId);
+        Task<int> CountCouponData();
     }
 }

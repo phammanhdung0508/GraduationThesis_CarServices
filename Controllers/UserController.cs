@@ -34,11 +34,20 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("detail-customer/{userId}")]
         public async Task<IActionResult> CustomerDetail(int userId)
         {
             var customer = await userService.CustomerDetail(userId);
             return Ok(customer);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("search-by-role/{search}&{roleId}")]
+        public async Task<IActionResult> SearchUser(string search, int roleId)
+        {
+            var list = await userService.SearchUser(search, roleId);
+            return Ok(list);
         }
 
         [Authorize(Roles = "Admin")]

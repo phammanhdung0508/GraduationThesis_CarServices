@@ -1,5 +1,4 @@
 #nullable disable
-using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.DTO.Category
 {
@@ -8,5 +7,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Category
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public string CategoryStatus { get; set; }
+        public int DataCount {get; set;}
     }
 }

@@ -15,14 +15,29 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<Coupon>?> View(PageDto page){
+        public async Task<List<Coupon>?> View(PageDto page)
+        {
             try
             {
                 var list = await PagingConfiguration<Coupon>.Get(context.Coupons, page);
-                
+
                 return list;
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> CountCouponData()
+        {
+            try
+            {
+                var count = await context.Coupons.CountAsync();
+
+                return count;
+            }
+            catch (System.Exception)
             {
                 throw;
             }

@@ -86,7 +86,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Connect Sql Server
 //"https://project20230606170014.azurewebsites.net/"
 //"https://localhost:7006/"
-var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
+var connectionString = builder.Configuration.GetConnectionString("DataContextServerConection") ??
     throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -116,7 +116,6 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingDetailRepository, BookingDetailRepository>();
@@ -124,7 +123,6 @@ builder.Services.AddScoped<IGarageDetailRepository, GarageDetailRepository>();
 builder.Services.AddScoped<IServiceDetailRepository, ServiceDetailRepository>();
 builder.Services.AddScoped<ILotRepository, LotRepository>();
 builder.Services.AddScoped<IMechanicRepository, MechanicRepository>();
-builder.Services.AddScoped<IWorkingScheduleRepository, WorkingScheduleRepository>();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IGarageService, GarageService>();
@@ -134,11 +132,9 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
-builder.Services.AddScoped<IWorkingScheduleService, WorkingScheduleService>();
 builder.Services.AddScoped<IGarageDetailService, GarageDetailService>();
 builder.Services.AddScoped<IServiceDetailService, ServiceDetailService>();
 

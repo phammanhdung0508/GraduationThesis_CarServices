@@ -50,7 +50,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        // [Authorize(Roles = "Admin, Manager, Customer")]
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage/{id}")]
         public async Task<IActionResult> DetailGarage(int id)
         {

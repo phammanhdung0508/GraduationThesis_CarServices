@@ -9,10 +9,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int BookingDetailId { get; set; }
-        [Range(0, float.MaxValue)]
-        public float ProductCost { get; set; }
-        [Range(0, float.MaxValue)]
-        public float ServiceCost { get; set; }
+        [Range(0, double.MaxValue)]
+        public double ProductCost { get; set; }
+        [Range(0, double.MaxValue)]
+        public double ServiceCost { get; set; }
 
         /*-------------------------------------------------*/
         public Nullable<int> BookingId { get; set; }

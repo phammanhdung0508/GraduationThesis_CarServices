@@ -1,5 +1,4 @@
 #nullable disable
-using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Role;
 
 namespace GraduationThesis_CarServices.Models.DTO.User

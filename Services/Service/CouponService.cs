@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -23,13 +24,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<CouponListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<CouponListResponseDto>>> View(PageDto page)
         {
             try
             {
                 var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.View(page));
 
-                return list;
+                var listCount = new GenericObject<List<CouponListResponseDto>>(list, await couponRepository.CountCouponData());
+
+                return listCount;
             }
             catch (Exception e)
             {

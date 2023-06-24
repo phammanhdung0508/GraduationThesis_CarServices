@@ -1,4 +1,5 @@
 #nullable disable
+using System;
 using Bogus;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Enum;
@@ -22,13 +23,12 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Service> Services { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
         public DbSet<GarageDetail> GarageDetails { get; set; }
-        public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Mechanic> Mechanics { get; set; }
-        public DbSet<WorkingSchedule> WorkingSchedules { get; set; }
+        public DbSet<GarageMechanic> GarageMechanics { get; set; }
         public DbSet<Lot> Lots { get; set; }
-        public DbSet<ServiceDetail> ServiceDetails {get; set;}
+        public DbSet<ServiceDetail> ServiceDetails { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -44,7 +44,6 @@ namespace GraduationThesis_CarServices.Models
             Randomizer.Seed = new Random(200);
             this.SeedRoleData(modelBuilder);
             this.SeedCategoryData(modelBuilder);
-            this.SeedSubcategoryData(modelBuilder);
             this.SeedServiceData(modelBuilder);
             this.SeedServiceDetailData(modelBuilder);
             this.SeedRandomProductData(modelBuilder);
@@ -80,6 +79,8 @@ namespace GraduationThesis_CarServices.Models
             .HasForeignKey<Mechanic>(e => e.MechanicId)
             //.OnDelete(DeleteBehavior.Cascade)
             ;
+
+            // modelBuilder.Entity<Service>().OwnsOne(x => x.ServiceGroup);
         }
 
         private void MultipleCascadePathFix(ModelBuilder modelBuilder)
@@ -92,6 +93,7 @@ namespace GraduationThesis_CarServices.Models
         }
 
         private readonly DateTime now = DateTime.Now;
+
         private void SeedRoleData(ModelBuilder modelBuilder)
         {
             var list = new List<Role>()
@@ -108,116 +110,219 @@ namespace GraduationThesis_CarServices.Models
         private void SeedCategoryData(ModelBuilder modelBuilder)
         {
             var list = new List<Category>{
-                new Category{CategoryId=1, CategoryName="Phụ tùng thay thế", CreatedAt=now, CategoryStatus=Status.Activate},
-                new Category{CategoryId=2, CategoryName="Vật liệu tiêu hao", CreatedAt=now, CategoryStatus=Status.Activate},
-                new Category{CategoryId=3, CategoryName="Công cụ và thiết bị", CreatedAt=now, CategoryStatus=Status.Activate}
+                new Category{CategoryId=1, CategoryName="Sản phẩm vệ sinh", CreatedAt=now, CategoryStatus=Status.Activate},
+                new Category{CategoryId=2, CategoryName="Sản phẩm nâng cấp", CreatedAt=now, CategoryStatus=Status.Activate}
             };
             modelBuilder.Entity<Category>().HasData(list);
-        }
-
-        private void SeedSubcategoryData(ModelBuilder modelBuilder)
-        {
-            var list = new List<Subcategory>{
-                //Phụ tùng thay thế, sửa chữa
-                new Subcategory{SubcategoryId=1, SubcategoryName="Bộ lọc gió", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=2, SubcategoryName="Bộ lọc dầu", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=3, SubcategoryName="Bộ lọc nhiên liệu", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=4, SubcategoryName="Giảm xóc", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=5, SubcategoryName="Bộ lò xo", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=6, SubcategoryName="Bộ phanh", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=7, SubcategoryName="Cần số", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=8, SubcategoryName="Cầu lái", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-
-                //Vật liệu tiêu hao, bảo dưỡng
-                new Subcategory{SubcategoryId=9, SubcategoryName="Dầu nhớt", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=10, SubcategoryName="Dung dịch làm mát", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=11, SubcategoryName="Bình nước rửa kính", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=12, SubcategoryName="Nội thất", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=13, SubcategoryName="Đèn trước, đèn sau", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=14, SubcategoryName="Pin xe", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2}
-            };
-            modelBuilder.Entity<Subcategory>().HasData(list);
         }
 
         private void SeedServiceData(ModelBuilder modelBuilder)
         {
             var list = new List<Service>{
-                //Rửa xe, vệ Sinh
-                new Service{ServiceId=1, ServiceName="Rửa Xe Sạch, An Toàn", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=2, ServiceName="Vệ Sinh Nội Thất", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=3, ServiceName="Vệ Sinh Khoang Máy", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=4, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=5, ServiceName="Khử Mùi Hôi, Mùi Thuốc Lá", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=6, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                //GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
+                new Service{ServiceId=1, ServiceName="Rửa xe + hút bụi + xịt gầm", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString().ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
-                //Nâng cấp xe
-                new Service{ServiceId=7, ServiceName="Phủ Ceramic", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=8, ServiceName="Sơn Phủ Gầm Xe Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=9, ServiceName="Cách Âm Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=10, ServiceName="Dán Phim Cách Nhiệt Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=11, ServiceName="Nâng Cấp Cửa Hít Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=12, ServiceName="Lắp Camera Hành Trình Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=2, ServiceName="Tẩy nhựa đường", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=3, ServiceName="Tẩy ố kính", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=4, ServiceName="Vệ Sinh + Bảo dưỡng khoang động cơ", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=5, ServiceName="Vệ Sinh + Bảo dưỡng nội thất", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=6, ServiceName="Vệ sinh nội soi hệ thống lạnh", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=7, ServiceName="Vệ sinh kim phun", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=8, ServiceName="Diệt khuẩn Demi", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=9, ServiceName="Diệt khuẩn khử mùi nội thất", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=10, ServiceName="Vệ sinh buồng đốt", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=11, ServiceName="Vệ sinh họng ga+ bướm ga+ van EGR", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=12, ServiceName="Vệ sinh họng ga+ bướm ga+ van EGR", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=13, ServiceName="Vệ sinh, bảo dưỡng thắng", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=14, ServiceName="Vệ sinh nội soi dàn lạnh", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                //GÓI DỊCH VỤ NGOẠI THẤT
+                new Service{ServiceId=15, ServiceName="Phủ Nano", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=16, ServiceName="Phủ Ceramic 9H", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=17, ServiceName="Phủ gầm gói tiêu chuẩn", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=18, ServiceName="Phủ gầm gói cao cấp", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=19, ServiceName="Dán phim Nano gói tiêu chuẩn", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=20, ServiceName="Dán phim Nano gói cao cấp", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=21, ServiceName="Phim 3M- Llumar gói tiêu chuẩn", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=22, ServiceName="Phim 3M- Llumar gói cao cấp", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Bảo dưỡng định kỳ
-                new Service{ServiceId=13, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=14, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=15, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=23, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=24, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=25, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Sửa chữa khẩn cấp
-                new Service{ServiceId=16, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=17, ServiceName="Sửa chữa động cơ", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=18, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=19, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=26, ServiceName="Áo ghế simili", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=27, ServiceName="Thảm lót sàn", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=28, ServiceName="Mặt cốp + lưng ghế", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=29, ServiceName="La phông trần - bọc ni long", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=30, ServiceName="Bọc da bò", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=31, ServiceName="Camera hành trình", ServiceImage="",
+                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
             };
             modelBuilder.Entity<Service>().HasData(list);
         }
 
-        private void SeedServiceDetailData(ModelBuilder modelBuilder){
-            var list = new List<ServiceDetail>{
-                new ServiceDetail{ServiceDetailId=1, MinNumberOfCarLot=2, MaxNumberOfCarLot=4, ServicePrice=800, ServiceId=2},
-                new ServiceDetail{ServiceDetailId=2, MinNumberOfCarLot=5, MaxNumberOfCarLot=6, ServicePrice=900, ServiceId=2},
-                new ServiceDetail{ServiceDetailId=3, MinNumberOfCarLot=7, MaxNumberOfCarLot=9, ServicePrice=1200000, ServiceId=2},
-            };
+        private void SeedServiceDetailData(ModelBuilder modelBuilder)
+        {
+            var list = new List<ServiceDetail>();
+            Random random = new Random();
+            int y = 1;
+            for (int i = 1; i <= 62; i++)
+            {
+                int million = random.Next(1, 4);
+                int hundred = random.Next(1, 9);
+                var price = Double.Parse($"{million:N0}{hundred}00000");
+                list.Add(new ServiceDetail { ServiceDetailId = i, MinNumberOfCarLot = 4, MaxNumberOfCarLot = 5, ServicePrice = price, ServiceId = y });
+                price = price + 200000; 
+                list.Add(new ServiceDetail { ServiceDetailId = i + 1, MinNumberOfCarLot = 6, MaxNumberOfCarLot = 7, ServicePrice = price, ServiceId = y });
+                i = i + 1;
+                y = y + 1;
+            }
             modelBuilder.Entity<ServiceDetail>().HasData(list);
         }
 
         private void SeedRandomProductData(ModelBuilder modelBuilder)
         {
-            var productFaker = new Faker<Product>();
-
-            for (int i = 1; i <= 30; i++)
-            {
-                productFaker.RuleFor(p => p.ProductId, i)
-                    .RuleFor(p => p.ProductName, f => f.Commerce.ProductName())
-                    .RuleFor(p => p.ProductDetailDescription, f => f.Lorem.Sentence())
-                    .RuleFor(p => p.ProductPrice, f => f.Random.Float(50, 200))
-                    .RuleFor(p => p.ProductQuantity, f => f.Random.Int(1, 100))
-                    .RuleFor(p => p.ProductStatus, Status.Activate)
-                    .RuleFor(p => p.CreatedAt, now)
-                    .RuleFor(p => p.SubcategoryId, f => f.Random.Int(1, 14))
-                    .RuleFor(p => p.ServiceId, f => f.Random.Int(1, 10));
-
-                modelBuilder.Entity<Product>().HasData(productFaker.Generate());
-            }
+            var list = new List<Product>{
+                new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=280000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                new Product{ProductId = 2, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=295000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                new Product{ProductId = 3, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 350ml ", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=350000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                new Product{ProductId = 4, ProductName="Nano Engine Super Protection (Nano bảo vệ động cơ) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=375000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=2},
+                new Product{ProductId = 5, ProductName="Oxicat Oxygen Sensor & Catalytic (Vệ sinh cảm biến oxy và catalytic) 300ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=295000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+                new Product{ProductId = 6, ProductName="Octane Booster (Cải thiện octane) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=255000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=2},
+                new Product{ProductId = 7, ProductName="Throttle Body Cleaner (Vệ sinh họng ga) 280ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=205000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
+                new Product{ProductId = 8, ProductName="Radiator Flush (Vệ sinh hệ thống làm mát) 300ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=155000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                new Product{ProductId = 9, ProductName="Radiator conditioner ( điều hòa tản nhiệt)", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=215000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=14, CategoryId=1},
+            };
+            modelBuilder.Entity<Product>().HasData(list);
         }
 
         private void SeedRandomUserData(ModelBuilder modelBuilder)
@@ -263,7 +368,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                     .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                     .RuleFor(u => u.UserStatus, Status.Activate)
-                    .RuleFor(u => u.EmailConfirmed, 0)
+                    .RuleFor(u => u.EmailConfirmed, 1)
                     .RuleFor(u => u.CreatedAt, now)
                     .RuleFor(u => u.RoleId, f =>
                     {
@@ -287,20 +392,15 @@ namespace GraduationThesis_CarServices.Models
 
         private void SeedRandomWorkingScheduleData(ModelBuilder modelBuilder)
         {
-            var workingScheduleFaker = new Faker<WorkingSchedule>();
+            var garageMechanicFaker = new Faker<GarageMechanic>();
 
             for (int i = 1; i <= 60; i++)
             {
-                workingScheduleFaker.RuleFor(w => w.WorkingScheduleId, i)
-                    .RuleFor(w => w.StartTime, "08:00 AM")
-                    .RuleFor(w => w.EndTime, "07:00 PM")
-                    .RuleFor(w => w.DaysOfTheWeek, f => f.PickRandom<DayOfWeek>().ToString())
-                    .RuleFor(w => w.Description, f => f.Lorem.Lines())
-                    .RuleFor(w => w.WorkingScheduleStatus, f => WorkingScheduleStatus.NotAvailable)
+                garageMechanicFaker.RuleFor(w => w.GarageMechanicId, i)
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
-                modelBuilder.Entity<WorkingSchedule>().HasData(workingScheduleFaker.Generate());
+                modelBuilder.Entity<GarageMechanic>().HasData(garageMechanicFaker.Generate());
             }
         }
 
@@ -436,8 +536,10 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 15; i++)
             {
                 bookingFaker.RuleFor(b => b.BookingId, i)
+                    .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
                     .RuleFor(b => b.PaymentMethod, f => "Tra sau")
+                    .RuleFor(b => b.TotalPrice, f => f.Random.Double(1000000, 2000000))
                     .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                     .RuleFor(b => b.CreatedAt, now)
@@ -454,7 +556,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(s => s.ServiceCost, f => f.Random.Float(50, 200))
                     .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
                     .RuleFor(s => s.ServiceDetailId, f => f.Random.Int(1, 3))
-                    .RuleFor(s => s.ProductId, f => f.Random.Int(1, 30))
+                    .RuleFor(s => s.ProductId, f => f.Random.Int(1, 9))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 19));
 
                 modelBuilder.Entity<BookingDetail>().HasData(bookingDetailFaker.Generate());

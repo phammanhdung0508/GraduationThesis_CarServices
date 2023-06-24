@@ -1,12 +1,14 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Text;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 using QRCoder;
@@ -44,13 +46,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.mechanicRepository = mechanicRepository;
         }
 
-        public async Task<List<BookingListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<BookingListResponseDto>>> View(PageDto page)
         {
             try
             {
                 var list = mapper.Map<List<BookingListResponseDto>>(await bookingRepository.View(page));
 
-                return list;
+                var listCount = new GenericObject<List<BookingListResponseDto>>(list, await bookingRepository.CountBookingData());
+
+                return listCount;
             }
             catch (Exception e)
             {
@@ -492,6 +496,23 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        private string GenerateRandomString()
+        {
+            const string chars = "0123456789ABCDEF";
+            var random = new Random();
+
+            var result = new StringBuilder();
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+
+            return result.ToString();
+        }
+
         private async Task Run(BookingCreateRequestDto requestDto, DateTime bookingTime, int totalEstimated)
         {
             try
@@ -500,30 +521,23 @@ namespace GraduationThesis_CarServices.Services.Service
                 otp => otp.AfterMap((src, des) =>
                 {
                     var now = DateTime.Now;
+                    des.BookingCode = GenerateRandomString();
                     des.BookingTime = bookingTime;
                     des.CreatedAt = now;
-                    switch (now.Date)
-                    {
-                        case var nowDate when nowDate < bookingTime.Date:
-                            des.BookingStatus = BookingStatus.NotStart;
-                            break;
-                        case var nowDate when nowDate == bookingTime.Date:
-                            des.BookingStatus = BookingStatus.AppointmentDay;
-                            break;
-                    }
+                    des.BookingStatus = BookingStatus.Pending;
                 }));
 
                 var bookingId = await bookingRepository.Create(booking);
 
-                float discountedPrice = 0;
-                float originalPrice = 0;
+                double discountedPrice = 0;
+                double originalPrice = 0;
 
                 var listService = mapper.Map<List<ServiceListDto>, List<BookingDetail>>(requestDto.ServiceList,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < requestDto.ServiceList.Count; i++)
                     {
-                        float productCost = 0, serviceCost = 0;
+                        double productCost = 0, serviceCost = 0;
                         if (requestDto.ServiceList[i].ProductId == 0)
                         {
                             des[i].ProductId = null;
@@ -606,20 +620,20 @@ namespace GraduationThesis_CarServices.Services.Service
 
             booking!.BookingStatus = bookingStatus;
 
-            //await bookingRepository.Update(booking);
+            await bookingRepository.Update(booking);
 
-            // switch (bookingStatus)
-            // {
-            //     case BookingStatus.CheckIn:
-            //         await UpdateLotStatus(LotStatus.Assigned, booking);
-            //         break;
-            //     case BookingStatus.Processing:
-            //         await UpdateLotStatus(LotStatus.BeingUsed, booking);
-            //         break;
-            //     case BookingStatus.Completed:
-            //         await UpdateLotStatus(LotStatus.Free, booking);
-            //         break;
-            // }
+            switch (bookingStatus)
+            {
+                case BookingStatus.CheckIn:
+                    await UpdateLotStatus(LotStatus.Assigned, booking);
+                    break;
+                case BookingStatus.Processing:
+                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
+                    break;
+                case BookingStatus.Completed:
+                    await UpdateLotStatus(LotStatus.Free, booking);
+                    break;
+            }
 
             watch.Stop();
             Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -635,9 +649,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 lot.LotStatus = status;
                 lot.IsAssignedFor = licensePlate;
 
-                //await lotRepository.Update(lot);
+                await lotRepository.Update(lot);
 
-                await AssigneMechanicForBooking(booking);
+                //await AssigneMechanicForBooking(booking);
             }
             else
             {
@@ -666,6 +680,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
             var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
 
+            //Index out of range bug
             for (int i = 0; i < bookingDetailList.Count; i++)
             {
                 bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
@@ -681,7 +696,8 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 // Generate the QR code
-                string url = $"https://localhost:7006/api/booking/run-qr-code/{bookingId}";
+                // string url = $"https://project20230606170014.azurewebsites.net/api/booking/run-qr/{bookingId}";
+                string url = $"https://localhost:7006/api/booking/run-qr/{bookingId}";
 
                 var qrGenerator = new QRCodeGenerator();
                 var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
@@ -715,6 +731,26 @@ namespace GraduationThesis_CarServices.Services.Service
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                         throw;
                 }
+            }
+        }
+
+        public async Task RunQRCode(int bookingId)
+        {
+            //var url = $"https://project20230606170014.azurewebsites.net/api/booking/update-status-booking/{bookingId}&3";
+            var url = $"https://localhost:7006/api/booking/update-status-booking/{bookingId}&3";
+            var data = "{\"status\": \"updated status\"}";
+
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
+                };
+
+                var response = await httpClient.SendAsync(request);
+                var statusCode = response.StatusCode;
+
+                Console.WriteLine($"Response Status Code: {statusCode}");
             }
         }
     }

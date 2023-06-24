@@ -10,13 +10,14 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int BookingId { get; set; }
+        public string BookingCode {get; set;}
         public DateTime BookingTime { get; set; }
         public string PaymentMethod { get; set; }
         [Column(TypeName = "tinyint")]
         public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]
         public BookingStatus BookingStatus { get; set; }
-        public float TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
         public int TotalEstimatedCompletionTime  { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
         public Nullable<DateTime> UpdatedAt { get; set; }

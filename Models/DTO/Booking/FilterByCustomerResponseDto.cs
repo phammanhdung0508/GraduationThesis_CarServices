@@ -6,7 +6,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public int BookingId { get; set; }
         public string BookingTime { get; set; }
         public string BookingStatus { get; set; }
-        public float TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
         public int GarageId { get; set; }
     }
 }

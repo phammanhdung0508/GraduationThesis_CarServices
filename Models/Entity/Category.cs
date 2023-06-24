@@ -18,6 +18,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public virtual ICollection<Subcategory> Subcategories { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

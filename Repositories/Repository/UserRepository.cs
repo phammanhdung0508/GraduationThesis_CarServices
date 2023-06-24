@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -69,7 +70,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
-                
+
                 throw;
             }
         }
@@ -81,6 +82,32 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var isVerify = await context.Users.Where(u => u.UserEmail.Equals(userEmail) && u.EmailConfirmed == 1).AnyAsync();
 
                 return isVerify;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<User>?> SearchUser(string search, int roleId)
+        {
+            try
+            {
+                string pattern = @"\d{3}-\d{3}-\d{3}";
+                Match match = Regex.Match(search, pattern);
+
+                var list = context.Users.Include(c => c.Customer).Include(c => c.Role).AsQueryable();
+                var searchTrim = search.Trim().Replace(" ", "").ToLower();
+
+                switch (match.Success)
+                {
+                    case true:
+                        return await list.Where(c => c.UserPhone.Contains(search) && c.RoleId == roleId).ToListAsync();
+                    case false:
+                        return await list.Where(c => (c.UserFirstName.ToLower().Trim() + c.UserLastName.ToLower().Trim()).Contains(searchTrim) 
+                        || c.UserFirstName.ToLower().Contains(searchTrim) 
+                        || c.UserLastName.ToLower().Contains(searchTrim)).Where(c => c.RoleId == roleId).ToListAsync();
+                }
             }
             catch (System.Exception)
             {

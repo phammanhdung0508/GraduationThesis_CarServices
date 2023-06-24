@@ -24,8 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await PagingConfiguration<Product>
                 .Get(context.Products
                 .Where(p => p.ProductStatus == Status.Activate)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
+                .Include(p => p.Category)
                 .Include(p => p.Service)
                 , page);
                 return list;
@@ -36,7 +35,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsProductExist(int productId){
+        public async Task<int> CountProductData()
+        {
+            try
+            {
+                var count = await context.Products.CountAsync();
+
+                return count;
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<bool> IsProductExist(int productId)
+        {
             try
             {
                 var check = await context.Products
@@ -56,8 +71,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Products
                 .Where(p => p.ServiceId == serviceId && p.ProductQuantity > 0)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
+                .Include(p => p.Category)
                 .Include(p => p.Service)
                 .ToListAsync();
 
@@ -75,8 +89,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var product = await context.Products
                 .Where(p => p.ProductId == id)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
+                .Include(p => p.Category)
                 .Include(p => p.Service)
                 .FirstOrDefaultAsync();
                 return product;
@@ -87,12 +100,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsDuplicatedProduct(Product product){
+        public async Task<bool> IsDuplicatedProduct(Product product)
+        {
             try
             {
                 var check = await context.Products
                 .Where(p => p.ProductName.Equals(product.ProductName)
-                && p.ProductDetailDescription.Equals(product.ProductDetailDescription)
                 && p.ProductPrice == product.ProductPrice
                 && p.ProductStatus == Status.Activate).AnyAsync();
 
@@ -130,7 +143,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public float GetPrice(int productId)
+        public double GetPrice(int productId)
         {
             try
             {

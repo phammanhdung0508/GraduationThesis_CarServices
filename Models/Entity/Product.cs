@@ -14,10 +14,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string ProductName { get; set; }
         [MaxLength(1024)]
         public string ProductImage { get; set; }
-        [MaxLength(200)]
-        public string ProductDetailDescription { get; set; }
-        [Range(0, float.MaxValue, ErrorMessage = "")]
-        public float ProductPrice { get; set; }
+        public ProductUnit ProductUnit {get; set;}
+        [Range(0, double.MaxValue, ErrorMessage = "")]
+        public double ProductPrice { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "")]
         public int ProductQuantity { get; set; }
         // [Range(0, int.MaxValue, ErrorMessage = "")]
@@ -28,8 +27,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public Nullable<DateTime> UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> SubcategoryId { get; set; }
-        public virtual Subcategory Subcategory { get; set; }
+        public Nullable<int> CategoryId { get; set; }
+        public virtual Category Category { get; set; }
 
         public Nullable<int> ServiceId { get; set; }
         public virtual Service Service { get; set; }

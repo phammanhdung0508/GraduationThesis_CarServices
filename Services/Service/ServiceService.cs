@@ -7,6 +7,7 @@ using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using System.Diagnostics;
+using GraduationThesis_CarServices.Paging;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
@@ -23,13 +24,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageDetailRepository = garageDetailRepository;
         }
 
-        public async Task<List<ServiceListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<ServiceListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper
-                .Map<List<ServiceListResponseDto>>(await serviceRepository.View(page));
-                return list;
+                var list = mapper.Map<List<ServiceListResponseDto>>(await serviceRepository.View(page));
+
+                var listCount = new GenericObject<List<ServiceListResponseDto>>(list, await serviceRepository.CountServiceData());
+
+                return listCount;
             }
             catch (Exception e)
             {

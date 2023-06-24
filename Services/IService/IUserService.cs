@@ -13,5 +13,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateRole(UserRoleRequestDto requestDto);
         Task UpdateStatus(UserStatusRequestDto requestDto);
         Task<CustomerDetailResponseDto> CustomerDetail(int userId);
+        Task<List<UserListResponseDto>?> SearchUser(string search, int roleId);
     }
 }

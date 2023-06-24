@@ -35,6 +35,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("filter-booking-by-customer")]
         public async Task<IActionResult> FilterBookingByCustomer(FilterByCustomerRequestDto requestDto)
         {
@@ -42,7 +43,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
-        // [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpPost("check-booking")]
         public async Task<IActionResult> CheckBooking(BookingCheckRequestDto bookingCheckRequestDto)
         {
@@ -50,7 +51,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
-        // [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-booking/{id}")]
         public async Task<IActionResult> DetailBooking(int id)
         {
@@ -58,7 +59,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(car);
         }
 
-        // [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
@@ -66,6 +67,7 @@ namespace GraduationThesis_bookingServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost("generate-qr-code/{bookingId}")]
         public async Task<IActionResult> GenerateQRCode(int bookingId)
         {
@@ -74,10 +76,22 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("update-status-booking/{bookingId}&{bookingStatus}")]
-        public async Task<IActionResult> UpdateBooking(int bookingId, int bookingStatus)
+        [HttpPut]
+        [Route("update-status-booking/{bookingId}&{bookingStatus}")]
+        // [AcceptVerbs("PUT")]
+        public async Task<IActionResult> UpdateBooking([FromRoute] int bookingId, [FromRoute] int bookingStatus)
         {
             await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus);
+            throw new MyException("Successfully.", 200);
+        }
+
+        // [HttpGet]
+        [Authorize(Roles = "Staff")]
+        [Route("run-qr/{bookingId}")]
+        [AcceptVerbs("GET")]
+        public async Task<IActionResult> RunQR(int bookingId)
+        {
+            await bookingService.RunQRCode(bookingId);
             throw new MyException("Successfully.", 200);
         }
     }

@@ -13,6 +13,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsDuplicatedProduct(Product product);
         Task Create(Product product);
         Task Update(Product product);
-        float GetPrice(int productId);
+        double GetPrice(int productId);
+        Task<int> CountProductData();
     }
 }

@@ -1,6 +1,6 @@
 namespace GraduationThesis_CarServices.Enum
 {
-    public enum WorkingScheduleStatus
+    public enum MechanicStatus
     {
         NotAvailable,
         Available,

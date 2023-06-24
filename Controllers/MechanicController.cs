@@ -31,13 +31,13 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(mechanic);
         }
 
-        [Authorize(Roles = "Staff")]
-        [HttpGet("get-working-schedule-mechanic/{mechanicId}")]
-        public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
-        {
-            var list = await mechanicService.FilterWorkingSchedulesByMechanicId(mechanicId);
-            return Ok(list);
-        }
+        // [Authorize(Roles = "Staff")]
+        // [HttpGet("get-working-schedule-mechanic/{mechanicId}")]
+        // public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
+        // {
+        //     var list = await mechanicService.FilterWorkingSchedulesByMechanicId(mechanicId);
+        //     return Ok(list);
+        // }
 
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-mechanic")]

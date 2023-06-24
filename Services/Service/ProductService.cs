@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -21,13 +22,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.productRepository = productRepository;
         }
 
-        public async Task<List<ProductListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<ProductListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper
-                .Map<List<ProductListResponseDto>>(await productRepository.View(page));
-                return list;
+                var list = mapper.Map<List<ProductListResponseDto>>(await productRepository.View(page));
+
+                var listCount = new GenericObject<List<ProductListResponseDto>>(list, await productRepository.CountProductData());
+
+                return listCount;
             }
             catch (Exception e)
             {

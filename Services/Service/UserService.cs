@@ -57,6 +57,49 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<UserListResponseDto>?> SearchUser(string search, int roleId)
+        {
+            try
+            {
+                var list = new List<UserListResponseDto>();
+                switch (roleId)
+                {
+                    case 1:
+                        list = mapper.Map<List<User>?, List<UserListResponseDto>>(await userRepository.SearchUser(search, roleId),
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            for (int i = 0; i < src!.Count; i++)
+                            {
+                                des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
+                            }
+                        }));
+                        break;
+                    default:
+                        list = mapper.Map<List<UserListResponseDto>>(await userRepository.SearchUser(search, roleId));
+                        break;
+                }
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<List<UserListResponseDto>?> FilterByRole(PageDto page, int roleId)
         {
             try
@@ -104,7 +147,7 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var c =  await userRepository.CustomerDetail(userId);
+                var c = await userRepository.CustomerDetail(userId);
                 var customer = mapper.Map<CustomerDetailResponseDto>(c);
 
                 return customer;

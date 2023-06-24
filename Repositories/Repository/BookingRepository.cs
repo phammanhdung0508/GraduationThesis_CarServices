@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await PagingConfiguration<Booking>
-                .Get(context.Bookings.Include(b => b.Car).Include(b => b.Garage), page);
+                .Get(context.Bookings.Include(b => b.Car).ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(b => b.Garage), page);
 
                 return list;
             }
@@ -30,7 +30,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsBookingExist(int bookingId){
+        public async Task<int> CountBookingData()
+        {
+            try
+            {
+                var count = await context.Bookings.CountAsync();
+
+                return count;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsBookingExist(int bookingId)
+        {
             try
             {
                 var isExist = await context.Bookings
@@ -59,7 +74,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId){
+        public async Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId)
+        {
             try
             {
                 var list = await context.Bookings
@@ -74,7 +90,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Booking>?> FilterBookingByTimePerDay(DateTime dateTime, int garageId){
+        public async Task<List<Booking>?> FilterBookingByTimePerDay(DateTime dateTime, int garageId)
+        {
             try
             {
                 var list = await context.Bookings
@@ -89,7 +106,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Booking>?> FilterBookingByCustomer(int userId, PageDto page){
+        public async Task<List<Booking>?> FilterBookingByCustomer(int userId, PageDto page)
+        {
             try
             {
                 var list = await PagingConfiguration<Booking>.Get(context.Users.Where(u => u.UserId == userId)

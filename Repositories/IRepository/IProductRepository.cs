@@ -6,7 +6,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IProductRepository
     {
-        Task<List<Product>?> View(PageDto page);
+        Task<(List<Product>, int count)> View(PageDto page);
         Task<bool> IsProductExist(int productId);
         Task<List<Product>?> FilterAvailableProductForService(int serviceId);
         Task<Product?> Detail(int id);
@@ -15,5 +15,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task Update(Product product);
         double GetPrice(int productId);
         Task<int> CountProductData();
+        Task<(List<Product>, int count)> SearchByName(PageDto page, string searchString);
     }
 }

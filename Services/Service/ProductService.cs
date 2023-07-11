@@ -4,6 +4,7 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
+using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -26,11 +27,46 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var list = mapper.Map<List<ProductListResponseDto>>(await productRepository.View(page));
+                (var listObj, var count) = await productRepository.View(page);
 
-                var listCount = new GenericObject<List<ProductListResponseDto>>(list, await productRepository.CountProductData());
+                var listDto = mapper.Map<List<ProductListResponseDto>>(listObj);
 
-                return listCount;
+                var list = new GenericObject<List<ProductListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<ProductListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await productRepository.SearchByName(page, requestDto.Search);
+
+                var listDto = mapper.Map<List<ProductListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ProductListResponseDto>>(listDto, count);
+
+                return list;
             }
             catch (Exception e)
             {

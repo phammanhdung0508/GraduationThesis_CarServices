@@ -57,27 +57,18 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<UserListResponseDto>?> SearchUser(string search, int roleId)
+        public async Task<List<CustomerListResponseDto>> SearchCustomer(string search)
         {
             try
             {
-                var list = new List<UserListResponseDto>();
-                switch (roleId)
+                var list = mapper.Map<List<User>?, List<CustomerListResponseDto>>(await userRepository.SearchUser(search, 1),
+                otp => otp.AfterMap((src, des) =>
                 {
-                    case 1:
-                        list = mapper.Map<List<User>?, List<UserListResponseDto>>(await userRepository.SearchUser(search, roleId),
-                        otp => otp.AfterMap((src, des) =>
-                        {
-                            for (int i = 0; i < src!.Count; i++)
-                            {
-                                des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
-                            }
-                        }));
-                        break;
-                    default:
-                        list = mapper.Map<List<UserListResponseDto>>(await userRepository.SearchUser(search, roleId));
-                        break;
-                }
+                    for (int i = 0; i < src!.Count; i++)
+                    {
+                        des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
+                    }
+                }));
 
                 return list;
             }
@@ -100,29 +91,91 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<UserListResponseDto>?> FilterByRole(PageDto page, int roleId)
+        public async Task<List<CustomerListResponseDto>> FilterCustomer(PageDto page)
         {
             try
             {
-                var list = new List<UserListResponseDto>();
-                switch (roleId)
+                var list = mapper.Map<List<User>, List<CustomerListResponseDto>>(await userRepository.FilterByRole(page, 1),
+                otp => otp.AfterMap((src, des) =>
                 {
-                    case 1:
-                        list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId),
-                        otp => otp.AfterMap((src, des) =>
-                        {
-                            for (int i = 0; i < src.Count; i++)
-                            {
-                                des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
-                            }
-                        }));
-                        break;
-                    default:
-                        list = mapper.Map<List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
-                        break;
-                }
+                    for (int i = 0; i < src.Count; i++)
+                    {
+                        des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
+                    }
+                }));
 
                 return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<UserListResponseDto>?> SearchUser(string search, int roleId)
+        {
+            try
+            {
+                switch (false)
+                {
+                    case var isFalse when isFalse == (roleId != 0):
+                        throw new MyException("Can't accept value 0.", 404);
+                }
+
+                var list = mapper.Map<List<UserListResponseDto>>(await userRepository.SearchUser(search, roleId));
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<UserListResponseDto>> FilterUser(PageDto page, int roleId)
+        {
+            try
+            {
+                switch (false)
+                {
+                    case var isFalse when isFalse == (roleId != 0):
+                        throw new MyException("Can't accept value 0.", 404);
+                }
+
+                var list = new List<UserListResponseDto>();
+
+                switch (roleId)
+                {
+                    case 3:
+                        return list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
+                    default:
+                        return list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId));
+                }
             }
             catch (Exception e)
             {
@@ -266,8 +319,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     case var isFalse when isFalse != (requestDto.UserFirstName.Equals("")):
                         throw new MyException("The user first name can't be empty.", 404);
-                    case var isFalse when isFalse != (requestDto.UserPhone.Equals("")):
-                        throw new MyException("The user phone number can't be empty.", 404);
+                    case var isFalse when isFalse != (requestDto.UserEmail.Equals("")):
+                        throw new MyException("The user email number can't be empty.", 404);
                     case var isExist when isExist == (u != null):
                         throw new MyException("The user doesn't exist.", 404);
                     case var isCustomer when isCustomer == (u!.RoleId == 1):

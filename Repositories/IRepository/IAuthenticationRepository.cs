@@ -7,11 +7,13 @@ namespace GraduationThesis_CarServices.Repositories.IRepository{
         Task<UserLoginDto?> CheckLogin(LoginDto login);
         RefreshTokenDto? RefreshToken();
         Task<JWTDto> AuthenFirebase(string idToken);
-        Task SendOTP(string recipientEmail);
-        Task ValidateOTP(string otp, string recipientEmail);
-        Task UserRegister(UserCreateRequestDto requestDto);
+        Task SendOTP(string recipientPhone);
+        Task ValidateOTP(string otp, string recipientPhone);
+        Task UserRegister(UserRegisterRequestDto requestDto);
         Task<int> Count(string entity);
         Task ChangePassword(ChangePasswordDto requestDto);
         Task<string> IsEmailExist(string entityName);
+        string RecreateToken(UserLoginDto user);
+        Task<UserLoginDto> GetUser(int userId);
     }
 }

@@ -101,37 +101,59 @@ namespace GraduationThesis_CarServices.Randomly
         }
 
         public class Coordinates{
+            public string? Address { get; set; }
+            public string? Ward { get; set; }
+            public string? District { get; set; }
+            public string? City { get; set; } 
             public double Latitude {get; set;}
             public double Longitude { get; set; }
         }
 
         public static List<Coordinates> Location = new List<Coordinates>{
-            new Coordinates{Latitude=10.763931646166899, Longitude=106.69564615504434},
-            new Coordinates{Latitude=10.765357983335225, Longitude=106.67540191456098},
-            new Coordinates{Latitude=10.745556918903318, Longitude=106.68952712823149},
-            new Coordinates{Latitude=10.753202537046564, Longitude=106.71243370657636},
-            new Coordinates{Latitude=10.770846334985222, Longitude=106.67838516123628},
-            new Coordinates{Latitude=10.758837040486794, Longitude=106.67807461014627},
-            new Coordinates{Latitude=10.771472907894179, Longitude=106.68604786007458},
-            new Coordinates{Latitude=10.75664665679407, Longitude=106.70010757315116},
-            new Coordinates{Latitude=10.753192970720434, Longitude=106.71245825706636},
-            new Coordinates{Latitude=10.754790795344721, Longitude=106.66072405510118},
-            new Coordinates{Latitude=10.754372579836698, Longitude=106.6738731901177},
-            new Coordinates{Latitude=10.75887258385469, Longitude=106.67805637713498},
-            new Coordinates{Latitude=10.76068396559795, Longitude=106.6827757752482},
-            new Coordinates{Latitude=10.764712983167666, Longitude=106.68116218105035},
-            new Coordinates{Latitude=10.745572022846487, Longitude=106.6270524477263},
-            new Coordinates{Latitude=10.739311649701769, Longitude=106.62344204785116},
-            new Coordinates{Latitude=10.732255336778813, Longitude=106.62501618972078},
-            new Coordinates{Latitude=10.745749183168783, Longitude=106.62491780586315},
-            new Coordinates{Latitude=10.756668659179981, Longitude=106.62503962906366},
-            new Coordinates{Latitude=10.73132027408366, Longitude=106.70024536416858},
-            new Coordinates{Latitude=10.738295740959048, Longitude=106.72743149396123},
-            new Coordinates{Latitude=10.727699818257554, Longitude=106.73705857706113},
-            new Coordinates{Latitude=10.713318564751694, Longitude=106.74350818181838},
-            new Coordinates{Latitude=10.841384334152652, Longitude=106.65709150138284},
-            new Coordinates{Latitude=10.82631923315733, Longitude=106.73578317034169},
-            new Coordinates{Latitude=10.763931646166899, Longitude=106.69564615504434}
+            new Coordinates{Address="586-300 Đ. Nguyễn Hữu Thọ", Ward="Phường Tân Hưng", District="Quận 7", City="Thành phố Hồ Chí Minh",
+                Latitude=10.73168914204616, Longitude=106.70024433725652},
+
+            new Coordinates{Address="503 Nguyễn Thị Thập", Ward="Phường Tân Quy", District="Quận 7", City="Thành phố Hồ Chí Minh",
+                Latitude=10.738659510040932, Longitude=106.71129519557827},
+
+            new Coordinates{Address="12 Trần Trọng Cung", Ward="Phường Tân Thuận Đông", District="Quận 7", City="Thành phố Hồ Chí Minh",
+                Latitude=10.743307033696517, Longitude=106.73450715714962},
+
+            new Coordinates{Address="221 Đ. Trần Bình Trọng", Ward="Phường 3", District="Quận 5", City="Thành phố Hồ Chí Minh",
+                Latitude=10.759439875644452, Longitude=106.68029816775544},
+
+            new Coordinates{Address="189 Huỳnh Mẫn Đạt", Ward="Phường 8", District="Quận 5", City="Thành phố Hồ Chí Minh",
+                Latitude=10.757359962870533, Longitude=106.67581773821539},
+
+            new Coordinates{Address="702 Đ. Số 7", Ward="Phường An Phú", District="Quận 2", City="Thành phố Hồ Chí Minh",
+                Latitude=10.799069217729246, Longitude=106.73562710263168},
+
+            new Coordinates{Address="4 Đ. 12", Ward="Phường Bình An", District="Quận 2", City="Thành phố Hồ Chí Minh",
+                Latitude=10.792479378284, Longitude=106.73123221851327},
+
+            new Coordinates{Address="71 Nguyễn Văn Lượng", Ward="Phường 10", District="Quận Gò Vấp", City="Thành phố Hồ Chí Minh",
+                Latitude=10.835207705112682, Longitude=106.6720760637316},
+
+            new Coordinates{Address="183, Lê Văn Thọ", Ward="Phường 8", District="Quận Gò Vấp", City="Thành phố Hồ Chí Minh",
+                Latitude=10.841321738425458, Longitude=106.65707258451964},
+
+            new Coordinates{Address="26 Đường số 21", Ward="Phường 8", District="Quận Gò Vấp", City="Thành phố Hồ Chí Minh",
+                Latitude=10.841387111058902, Longitude=106.65122515765769},
+
+            new Coordinates{Address="90 Tân Cảng", Ward="Phường 25", District="Quận Bình Thạnh", City="Thành phố Hồ Chí Minh",
+                Latitude=10.801927512862166, Longitude=106.72229777898752},
+
+            new Coordinates{Address="1 Đ. D2", Ward="Phường 25", District="Quận Bình Thạnh", City="Thành phố Hồ Chí Minh",
+                Latitude=10.804033806101337, Longitude=106.71477232640146},
+
+            new Coordinates{Address="922 Đ. Phạm Văn Đồng", Ward="Hiệp Bình Chánh", District="Quận Thủ Đức", City="Thành phố Hồ Chí Minh",
+                Latitude=10.826798838672856, Longitude=106.71881104013613},
+
+            new Coordinates{Address="37 Đường Số 13", Ward="Hiệp Bình Chánh", District="Quận Thủ Đức", City="Thành phố Hồ Chí Minh",
+                Latitude=10.82917875719101, Longitude=106.73048435557894},
+
+            new Coordinates{Address="533 Đ. Kha Vạn Cân", Ward="Linh Đông", District="Quận Thủ Đức", City="Thành phố Hồ Chí Minh",
+                Latitude=10.846209915188018, Longitude=106.75062756251548}
         };
     }
 }

@@ -4,7 +4,9 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
+using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -25,12 +27,16 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<ReviewListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<ReviewListResponseDto>>> View(PageDto page)
         {
 
             try
             {
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.View(page));
+                (var listObj, var count) = await reviewRepository.View(page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -53,7 +59,40 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(PagingReviewPerGarageRequestDto requestDto)
+        public async Task<GenericObject<List<ReviewListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await reviewRepository.SearchByName(requestDto.Search, page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<ReviewListResponseDto>>> FilterReviewByGarage(FilterByGarageRequestDto requestDto)
         {
             try
             {
@@ -65,13 +104,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var page = new PageDto
-                {
-                    PageIndex = requestDto.PageIndex,
-                    PageSize = requestDto.PageSize
-                };
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
 
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(requestDto.GarageId, page));
+                (var listObj, var count) = await reviewRepository.FilterReviewByGarage(requestDto.GarageId, page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -101,16 +140,14 @@ namespace GraduationThesis_CarServices.Services.Service
                 DateTime? dateFrom = null;
                 DateTime? dateTo = null;
 
-                if (requestDto.DateFrom != null && requestDto.DateTo != null)
+                if (requestDto.DateFrom is not null)
                 {
                     dateFrom = DateTime.Parse(requestDto.DateFrom!);
-                    dateTo = DateTime.Parse(requestDto.DateTo!);
+                }
 
-                    switch (false)
-                    {
-                        case var isExist when isExist == (dateFrom < dateTo):
-                            throw new MyException("To date must greater from date.", 404);
-                    }
+                if (requestDto.DateTo is not null)
+                {
+                    dateTo = DateTime.Parse(requestDto.DateTo!);
                 }
 
                 var page = new PageDto
@@ -119,7 +156,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     PageSize = requestDto.PageSize
                 };
 
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterAllReview(requestDto.GarageId, requestDto.CustomerId, requestDto.ReviewStatus, dateFrom, dateTo, page));
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterAllReview(requestDto.GarageId, dateFrom, dateTo, page));
 
                 return list;
 

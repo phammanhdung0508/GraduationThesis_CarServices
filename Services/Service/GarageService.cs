@@ -25,13 +25,54 @@ namespace GraduationThesis_CarServices.Services.Service
             this.geocoderConfiguration = geocoderConfiguration;
         }
 
+        public async Task<List<GarageAdminListResponseDto>> ViewAllForAdmin(PageDto page)
+        {
+            try
+            {
+                var list = await garageRepository.View(page);
+
+                return mapper.Map<List<Garage>?, List<GarageAdminListResponseDto>>(list,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        (var totalServices, var totalOrders) = garageRepository.GetServicesAndBookingsPerGarage(src![i].GarageId);
+                        if (list![i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                            des[i].TotalOrders = totalOrders;
+                            des[i].TotalServices = totalServices;
+                        }
+                        des[i].GarageStatus = src![i].GarageStatus.ToString();
+                    }
+                }));
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<List<GarageListResponseDto>?> View(PageDto page)
         {
 
             try
             {
                 var list = await garageRepository.View(page);
-                
+
                 return mapper.Map<List<Garage>?, List<GarageListResponseDto>>(list,
                 otp => otp.AfterMap((src, des) =>
                 {
@@ -44,6 +85,35 @@ namespace GraduationThesis_CarServices.Services.Service
                         des[i].GarageStatus = src![i].GarageStatus.ToString();
                     }
                 }));
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<GarageListMobileMapResponseDto>> GetAllCoordinates()
+        {
+            try
+            {
+                var list = await garageRepository.GetAllCoordinates();
+
+                var listDto = mapper.Map<List<GarageListMobileMapResponseDto>>(list);
+
+                return listDto;
             }
             catch (Exception e)
             {
@@ -118,6 +188,11 @@ namespace GraduationThesis_CarServices.Services.Service
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
+                    des.AvaliableCoupon = src.Coupons.Count;
+                    if (src.Reviews.Count != 0)
+                    {
+                        des.Rating = src.Reviews.Sum(r => r.Rating) / src.Reviews.Count;
+                    }
 
                     var presentTime = DateTime.Now.TimeOfDay;
                     var openAt = DateTime.ParseExact(src.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
@@ -273,7 +348,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
- 
+
         public async Task UpdateStatus(GarageStatusRequestDto requestDto)
         {
             try
@@ -345,42 +420,6 @@ namespace GraduationThesis_CarServices.Services.Service
                         }
                     }
                 }));
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
-        public async Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page)
-        {
-            try
-            {
-                var list = await garageRepository.FilterCoupon(page);
-                return mapper.Map<List<GarageListResponseDto>>
-                    (list, opt => opt.AfterMap((src, des) =>
-                    {
-                        for (int i = 0; i < list?.Count; i++)
-                        {
-                            if (list[i].Reviews.Count != 0)
-                            {
-                                des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
-                            }
-                        }
-                    }));
             }
             catch (Exception e)
             {

@@ -28,11 +28,13 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.View(page));
+                (var listObj, var count) = await couponRepository.View(page);
 
-                var listCount = new GenericObject<List<CouponListResponseDto>>(list, await couponRepository.CountCouponData());
+                var listDto = mapper.Map<List<CouponListResponseDto>>(listObj);
 
-                return listCount;
+                var list = new GenericObject<List<CouponListResponseDto>>(listDto, count);
+
+                return list;
             }
             catch (Exception e)
             {

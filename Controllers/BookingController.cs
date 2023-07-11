@@ -19,6 +19,28 @@ namespace GraduationThesis_bookingServices.Controllers
             this.bookingService = bookingService;
         }
 
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("detail-booking/{id}")]
+        public async Task<IActionResult> DetailBooking(int id)
+        {
+            var car = await bookingService.Detail(id);
+            return Ok(car);
+        }
+
+        [HttpGet("get-revenue-by-garage/garageId={garageId}")]
+        public async Task<IActionResult> CountRevune(int garageId)
+        {
+            var revenue = await bookingService.CountRevune(garageId);
+            return Ok(revenue);
+        }
+
+        [HttpPost("search-service-by-code")]
+        public async Task<IActionResult> SearchByBookingCode(SearchBookingByUserRequestDto requestDto)
+        {
+            var list = await bookingService.SearchByBookingCode(requestDto);
+            return Ok(list);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-booking")]
         public async Task<IActionResult> ViewAllBooking(PageDto page)
@@ -28,10 +50,24 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         [Authorize(Roles = "Admin, Manager")]
-        [HttpPost("get-garage-bookings")]
-        public async Task<IActionResult> GetReviewPerGarage(PagingBookingPerGarageRequestDto requestDto)
+        [HttpPost("filter-booking-by-garage")]
+        public async Task<IActionResult> FilterBookingByGarage(PagingBookingPerGarageRequestDto requestDto)
         {
             var list = await bookingService.FilterBookingByGarageId(requestDto)!;
+            return Ok(list);
+        }
+
+        [HttpPost("filter-booking-by-status")]
+        public async Task<IActionResult> FilterBookingByStatus(FilterByStatusRequestDto requestDto)
+        {
+            var list = await bookingService.FilterBookingByStatus(requestDto);
+            return Ok(list);
+        }
+
+        [HttpPost("filter-booking-by-date-and-status")]
+        public async Task<IActionResult> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto)
+        {
+            var list = await bookingService.FilterBookingStatusAndDate(requestDto);
             return Ok(list);
         }
 
@@ -49,14 +85,6 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             var list = await bookingService.IsBookingAvailable(bookingCheckRequestDto);
             return Ok(list);
-        }
-
-        [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("detail-booking/{id}")]
-        public async Task<IActionResult> DetailBooking(int id)
-        {
-            var car = await bookingService.Detail(id);
-            return Ok(car);
         }
 
         [Authorize(Roles = "Customer")]
@@ -93,6 +121,14 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             await bookingService.RunQRCode(bookingId);
             throw new MyException("Successfully.", 200);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("count-booking-per-status")]
+        public async Task<IActionResult> CountBookingPerStatus()
+        {
+           var count = await bookingService.CountBookingPerStatus();
+           return Ok(count);
         }
     }
 }

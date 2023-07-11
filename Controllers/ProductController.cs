@@ -20,19 +20,18 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-product")]
-        public async Task<IActionResult> ViewProduct(PageDto page)
-        {
-            var productList = await productService.View(page)!;
-            return Ok(productList);
-
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("get-available-products-for-service/{serviceId}")]
+        [HttpGet("get-available-products-for-service/serviceId={serviceId}")]
         public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
         {
             var productList = await productService.FilterAvailableProductForService(serviceId)!;
+            return Ok(productList);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("search-products-by-name")]
+        public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            var productList = await productService.SearchByName(requestDto);
             return Ok(productList);
         }
 
@@ -42,6 +41,15 @@ namespace GraduationThesis_CarServices.Controllers
         {
             var product = await productService.Detail(id);
             return Ok(product);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-product")]
+        public async Task<IActionResult> ViewProduct(PageDto page)
+        {
+            var productList = await productService.View(page)!;
+            return Ok(productList);
+
         }
 
         [Authorize(Roles = "Admin")]

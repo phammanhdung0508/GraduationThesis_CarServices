@@ -18,6 +18,21 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
+        [HttpGet("detail-service/{id}")]
+        public async Task<IActionResult> DetailService(int id)
+        {
+            var service = await serviceService.Detail(id);
+            return Ok(service);
+        }
+
+        [HttpGet("get-all-service-list")]
+        public async Task<IActionResult> GetAllService()
+        {
+            var list = await serviceService.GetAll();
+            return Ok(list);
+        }
+
+        [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("view-all-service")]
         public async Task<IActionResult> ViewService(PageDto page)
         {
@@ -26,19 +41,19 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin, Manager, Customer")]
-        [HttpGet("get-available-services-for-garage/{garageId}")]
-        public async Task<IActionResult> GetAvailableServicesForGarage(int garageId)
+        [HttpPost("filter-service-by-garage")]
+        public async Task<IActionResult> FilterServiceByGarage(FilterByGarageRequestDto requestDto)
         {
-            var serviceList = await serviceService.FilterServiceByGarage(garageId)!;
+            var serviceList = await serviceService.FilterServiceByGarage(requestDto)!;
             return Ok(serviceList);
         }
 
-        [Authorize(Roles = "Admin, Manager, Customer")]
-        [HttpGet("detail-service/{id}")]
-        public async Task<IActionResult> DetailService(int id)
+        [Authorize(Roles = "Admin")]
+        [HttpPost("search-services-by-name")]
+        public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
-            var service = await serviceService.Detail(id);
-            return Ok(service);
+            var serviceList = await serviceService.SearchByName(requestDto);
+            return Ok(serviceList);
         }
 
         [Authorize(Roles = "Admin")]

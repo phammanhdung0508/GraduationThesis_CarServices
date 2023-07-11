@@ -397,7 +397,7 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 60; i++)
             {
                 garageMechanicFaker.RuleFor(w => w.GarageMechanicId, i)
-                    .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(w => w.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
                 modelBuilder.Entity<GarageMechanic>().HasData(garageMechanicFaker.Generate());
@@ -427,39 +427,43 @@ namespace GraduationThesis_CarServices.Models
 
         private void SeedRandomGarageData(ModelBuilder modelBuilder)
         {
+            var garageList = new List<Garage>();
             var garageFaker = new Faker<Garage>();
             var garageDetailFaker = new Faker<GarageDetail>();
             var lotFaker = new Faker<Lot>();
 
-            for (int i = 1; i <= 25; i++)
+            for (int i = 1; i <= 14; i++)
             {
                 garageFaker.RuleFor(g => g.GarageId, i)
-                    .RuleFor(g => g.GarageName, f => f.Name.FirstName() + " Garage")
+                    .RuleFor(g => g.GarageName, "Me " + "Garage")
                     .RuleFor(g => g.GarageAbout, f => f.Lorem.Paragraph())
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
                     .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
                     // .RuleFor(g => g.FromTo, "Monday to Saturday")
                     .RuleFor(g => g.OpenAt, "08:00 AM")
                     .RuleFor(g => g.CloseAt, "05:00 PM")
-                    .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
-                    .RuleFor(g => g.GarageCity, "Ho Chi Minh")
-                    .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))
-                    .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict)); })
-                    .RuleFor(g => g.GarageLatitude, RandomConfiguration.Location[i].Latitude)
-                    .RuleFor(g => g.GarageLongitude, RandomConfiguration.Location[i].Longitude)
                     .RuleFor(g => g.GarageStatus, Status.Activate)
                     .RuleFor(g => g.CreatedAt, now)
                     .RuleFor(g => g.UserId, f => f.Random.Int(21, 30));
 
+                var garage = garageFaker.Generate();
 
-                modelBuilder.Entity<Garage>().HasData(garageFaker.Generate());
+                var ran = RandomConfiguration.Location[i];
 
+                garage.GarageAddress = ran.Address;
+                garage.GarageWard = ran.Ward;
+                garage.GarageDistrict = ran.District;
+                garage.GarageCity = ran.City;
+                garage.GarageLatitude = ran.Latitude;
+                garage.GarageLongitude = ran.Longitude;
+
+                modelBuilder.Entity<Garage>().HasData(garage);
             }
 
             for (int i = 1; i <= 70; i++)
             {
                 garageDetailFaker.RuleFor(s => s.GarageDetailId, i)
-                    .RuleFor(s => s.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(s => s.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 10));
 
                 modelBuilder.Entity<GarageDetail>().HasData(garageDetailFaker.Generate());
@@ -470,7 +474,7 @@ namespace GraduationThesis_CarServices.Models
                 lotFaker.RuleFor(l => l.LotId, i)
                     .RuleFor(l => l.LotNumber, f => f.Random.Replace("#?"))
                     .RuleFor(l => l.LotStatus, f => f.PickRandom<LotStatus>())
-                    .RuleFor(l => l.GarageId, f => f.Random.Int(1, 25));
+                    .RuleFor(l => l.GarageId, f => f.Random.Int(1, 14));
 
                 modelBuilder.Entity<Lot>().HasData(lotFaker.Generate());
             }
@@ -487,7 +491,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(r => r.Content, f => f.Lorem.Paragraph())
                     .RuleFor(r => r.ReviewStatus, Status.Activate)
                     .RuleFor(r => r.CustomerId, f => f.Random.Int(1, 20))
-                    .RuleFor(r => r.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(r => r.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(r => r.CreatedAt, now);
 
                 modelBuilder.Entity<Review>().HasData(reveiwFaker.Generate());
@@ -521,7 +525,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(c => c.CouponMaxSpend, f => f.Random.Float(60, 100))
                     .RuleFor(c => c.NumberOfTimesToUse, f => f.Random.Int(1, 10))
                     .RuleFor(c => c.CouponStatus, f => f.PickRandom<CouponStatus>())
-                    .RuleFor(c => c.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(c => c.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(c => c.CreatedAt, now);
 
                 modelBuilder.Entity<Coupon>().HasData(couponFaker.Generate());
@@ -544,7 +548,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                     .RuleFor(b => b.CreatedAt, now)
                     .RuleFor(b => b.CarId, f => f.Random.Int(1, 20))
-                    .RuleFor(b => b.GarageId, f => f.Random.Int(1, 25));
+                    .RuleFor(b => b.GarageId, f => f.Random.Int(1, 14));
 
                 modelBuilder.Entity<Booking>().HasData(bookingFaker.Generate());
             }

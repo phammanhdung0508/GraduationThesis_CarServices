@@ -19,14 +19,6 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
-        [Authorize(Roles = "Admin, Manager")]
-        [HttpPost("view-all-service-detail")]
-        public async Task<IActionResult> ViewServiceDetail(PageDto page)
-        {
-            var serviceDetailList = await serviceDetailService.View(page)!;
-            return Ok(serviceDetailList);
-        }
-
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("filter-service-detail-by-service/{serviceId}")]
         public async Task<IActionResult> FilterServiceDetailByService(int serviceId)
@@ -41,6 +33,14 @@ namespace GraduationThesis_CarServices.Controllers
         {
             var serviceDetail = await serviceDetailService.Detail(id);
             return Ok(serviceDetail);
+        }
+
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPost("view-all-service-detail")]
+        public async Task<IActionResult> ViewServiceDetail(PageDto page)
+        {
+            var serviceDetailList = await serviceDetailService.View(page)!;
+            return Ok(serviceDetailList);
         }
 
         [Authorize(Roles = "Admin")]

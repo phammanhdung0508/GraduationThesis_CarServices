@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
+using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,14 @@ namespace GraduationThesis_CarServices.Controllers
             this.reviewService = reviewService;
         }
 
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("detail-review/{id}")]
+        public async Task<IActionResult> DetailReview(int id)
+        {
+            var review = await reviewService.Detail(id);
+            return Ok(review);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-review")]
         public async Task<IActionResult> ViewAllReview(PageDto page)
@@ -26,11 +35,10 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
-        [Authorize(Roles = "Admin, Manager")]
-        [HttpPost("get-garage-reviews")]
-        public async Task<IActionResult> GerReviewPerGarage(PagingReviewPerGarageRequestDto requestDto)
+        [HttpPost("search-review-by-customer-name")]
+        public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
-            var list = await reviewService.FilterReviewByGarageId(requestDto)!;
+            var list = await reviewService.SearchByName(requestDto);
             return Ok(list);
         }
 
@@ -43,11 +51,11 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("detail-review/{id}")]
-        public async Task<IActionResult> DetailReview(int id)
+        [HttpPost("filter-review-by-garage")]
+        public async Task<IActionResult> FilterReviewByGarage(FilterByGarageRequestDto requestDto)
         {
-            var review = await reviewService.Detail(id);
-            return Ok(review);
+            var list = await reviewService.FilterReviewByGarage(requestDto)!;
+            return Ok(list);
         }
 
         [Authorize(Roles = "Customer")]
@@ -60,7 +68,7 @@ namespace GraduationThesis_CarServices.Controllers
             var token = handler.ReadJwtToken(encodedToken);
 
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
-            
+
             await reviewService.Create(reviewDto, userId);
             throw new MyException("Successfully.", 200);
         }

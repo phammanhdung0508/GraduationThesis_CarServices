@@ -18,20 +18,20 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageDetailService = garageDetailService;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-garage-detail")]
-        public async Task<IActionResult> ViewGarageDetail(PageDto page)
-        {
-            var garageDetailList = await garageDetailService.View(page)!;
-            return Ok(garageDetailList);
-        }
-
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage-detail/{id}")]
         public async Task<IActionResult> DetailGarageDetail(int id)
         {
             var garageDetail = await garageDetailService.Detail(id);
             return Ok(garageDetail);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-garage-detail")]
+        public async Task<IActionResult> ViewGarageDetail(PageDto page)
+        {
+            var garageDetailList = await garageDetailService.View(page)!;
+            return Ok(garageDetailList);
         }
 
         [Authorize(Roles = "Admin")]

@@ -29,6 +29,7 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<User, UserLoginDto>().ForMember(des => des.UserFullName,
                 obj => obj.MapFrom(src => src.UserFirstName + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
+            CreateMap<UserRegisterRequestDto, User>();
 
 
             //Role
@@ -60,18 +61,21 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Garage, GarageBookingDto>()
                 .ForMember(des => des.FullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity))
                 .ReverseMap().ForMember(des => des.Bookings, obj => obj.Ignore());
+            CreateMap<Garage, GarageAdminListResponseDto>()
+                .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User));
             CreateMap<Garage, GarageReviewDto>();
             CreateMap<Garage, GarageWorkingScheduleDto>();
             CreateMap<Garage, GarageServiceDto>();
             CreateMap<Garage, GarageOfGarageDetailDto>();
+            CreateMap<Garage, GarageListMobileMapResponseDto>();
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<Garage, GarageListResponseDto>()
                 .ForMember(des => des.GarageFullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity));
             CreateMap<Garage, GarageDetailResponseDto>()
-                .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User))
+                // .ForMember(des => des.UserGarageDto, obj => obj.MapFrom(src => src.User))
                 .ForMember(des => des.ReviewGarageDto, obj => obj.MapFrom(src => src.Reviews))
-                .ForMember(des => des.CouponGarageDto, obj => obj.MapFrom(src => src.Coupons))
-                .ForMember(des => des.GarageDetailGarageDto, obj => obj.MapFrom(src => src.GarageDetails))
+                // .ForMember(des => des.CouponGarageDto, obj => obj.MapFrom(src => src.Coupons))
+                // .ForMember(des => des.GarageDetailGarageDto, obj => obj.MapFrom(src => src.GarageDetails))
                 .ForMember(des => des.GarageFullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity));
             CreateMap<Garage, GarageCreateRequestDto>().ReverseMap();
             CreateMap<Garage, GarageUpdateRequestDto>()
@@ -85,13 +89,13 @@ namespace GraduationThesis_CarServices.Mapping
             //User
             CreateMap<Customer, UserCustomerDto>();
             CreateMap<User, UserBookingDto>()
-                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Customer.User.UserFirstName + src.Customer.User.UserLastName));
+                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Customer.User.UserFirstName  + " " + src.Customer.User.UserLastName));
             CreateMap<User, MechanicBookingDetailDto>()
                 .ForMember(des => des.UserEmail, obj => obj.MapFrom(src => Base64Decode(src.UserEmail)));
             CreateMap<User, CustomerBookingDto>()
                 .ForMember(des => des.UserEmail, obj => obj.MapFrom(src => Base64Decode(src.UserEmail)));;
             CreateMap<User, UserReviewDto>()
-                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Customer.User.UserFirstName + src.Customer.User.UserLastName));
+                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Customer.User.UserFirstName  + " " + src.Customer.User.UserLastName));
             CreateMap<User, UserGarageDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
@@ -101,6 +105,8 @@ namespace GraduationThesis_CarServices.Mapping
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role))
                 .ForMember(des => des.UserGender, obj => obj.MapFrom(src => src.UserGender.ToString()));
+            CreateMap<User, CustomerListResponseDto>()
+                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Customer.User.UserFirstName  + " " + src.Customer.User.UserLastName));
             //----------------------------------------------------------------------------------------------------------------------
             CreateMap<User, UserListResponseDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
@@ -209,6 +215,7 @@ namespace GraduationThesis_CarServices.Mapping
             //Service
             CreateMap<Service, ServiceGarageDto>();
             CreateMap<Service, ServiceProductDto>();
+            CreateMap<Service, ServiceListMobileResponseDto>();
             CreateMap<Service, ServiceOfGarageDetailDto>()
                 .ForMember(des => des.ProductServiceDtos, obj => obj.MapFrom(src => src.Products))
                 .ForMember(des => des.ServiceDetailServiceDtos, obj => obj.MapFrom(src => src.ServiceDetails));

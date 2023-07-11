@@ -16,14 +16,18 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<Review>?> View(PageDto page)
+        public async Task<(List<Review>?, int count)> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<Review>
-                .Get(context.Reviews.Include(r => r.Garage).Include(r => r.Customer).ThenInclude(r => r.User), page);
+                var query = context.Reviews.AsQueryable();
 
-                return list;
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Review>.Get(query.Include(r => r.Garage)
+                .Include(r => r.Customer).ThenInclude(r => r.User), page);
+
+                return (list, count);
             }
             catch (Exception)
             {
@@ -31,14 +35,17 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Review>?> FilterReviewByGarageId(int garageId, PageDto page)
+        public async Task<(List<Review>?, int count)> FilterReviewByGarage(int garageId, PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<Review>
-                .Get(context.Reviews.Where(c => c.GarageId == garageId), page);
+                var query = context.Reviews.Where(r => r.GarageId == garageId).AsQueryable();
 
-                return list;
+                var count = await query.CountAsync();
+                
+                var list = await PagingConfiguration<Review>.Get(query.Include(r => r.Customer).ThenInclude(c => c.User), page);
+
+                return (list, count);
             }
             catch (Exception)
             {
@@ -90,54 +97,75 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Review>?> FilterAllReview(int? garageId, int? customerId, Status? reviewStatus, DateTime? dateFrom, DateTime? dateTo, PageDto page)
+        public async Task<List<Review>?> FilterAllReview(int? garageId, DateTime? dateFrom, DateTime? dateTo, PageDto page)
         {
             try
             {
-                var query = context.Reviews.AsQueryable();
+                IQueryable<Review>? runQuery = null;
+                var mainQuery = context.Reviews.AsQueryable();
 
-                if (dateFrom == null && dateFrom == null)
+                if (garageId > 0 && garageId is not null)
                 {
-                    switch (true)
+                    runQuery = mainQuery.Where(r => r.GarageId == garageId).AsQueryable();
+                    if (dateFrom is not null && dateTo is not null)
                     {
-                        case var isTrue when isTrue == (garageId > 0 && customerId == null && reviewStatus == null):
-                            return await query.Where(r => r.GarageId == garageId).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (customerId > 0 && reviewStatus == null && garageId == null):
-                            return await query.Where(r => r.CustomerId == customerId).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (reviewStatus != null && customerId == null && garageId == null):
-                            return await query.Where(r => r.ReviewStatus == reviewStatus).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (garageId > 0 && customerId > 0 && reviewStatus == null):
-                            return await query.Where(r => r.GarageId == garageId & r.CustomerId == customerId).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (garageId > 0 && reviewStatus != null && customerId == null):
-                            return await query.Where(r => r.ReviewStatus == reviewStatus & r.GarageId == garageId).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (customerId > 0 && reviewStatus != null && garageId == null):
-                            return await query.Where(r => r.CustomerId == customerId & r.ReviewStatus == reviewStatus).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        default:
-                            return await query.Where(r => r.GarageId == garageId & r.CustomerId == customerId & r.ReviewStatus == reviewStatus).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
+                        runQuery = mainQuery.Where(r => r.GarageId == garageId & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).AsQueryable();
+                    }
+                    else
+                    {
+                        if (dateFrom is not null)
+                        {
+                            runQuery = mainQuery.Where(r => r.GarageId == garageId & dateFrom <= r.CreatedAt).AsQueryable();
+                        }
+                        if (dateTo is not null)
+                        {
+                            runQuery = mainQuery.Where(r => r.GarageId == garageId & r.CreatedAt <= dateTo).AsQueryable();
+                        }
                     }
                 }
                 else
                 {
-                    switch (true)
+                    if (dateFrom is not null && dateTo is not null)
                     {
-                        case var isTrue when isTrue == (garageId > 0 && customerId == null && reviewStatus == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.GarageId == garageId & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (customerId > 0 && reviewStatus == null && garageId == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.CustomerId == customerId & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (reviewStatus != null && customerId == null && garageId == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.ReviewStatus == reviewStatus & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (garageId > 0 && customerId > 0 && reviewStatus == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.GarageId == garageId & r.CustomerId == customerId & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (garageId > 0 && reviewStatus != null && customerId == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.ReviewStatus == reviewStatus & r.GarageId == garageId & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        case var isTrue when isTrue == (customerId > 0 && reviewStatus != null && garageId == null && dateFrom != null && dateTo != null):
-                            return await query.Where(r => r.CustomerId == customerId & r.ReviewStatus == reviewStatus & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
-                        default:
-                            return await query.Where(r => r.GarageId == garageId & r.CustomerId == customerId & r.ReviewStatus == reviewStatus & dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
+                        runQuery = mainQuery.Where(r => dateFrom <= r.CreatedAt & r.CreatedAt <= dateTo).AsQueryable();
+                    }
+                    if (dateFrom is not null)
+                    {
+                        runQuery = mainQuery.Where(r => dateFrom <= r.CreatedAt).AsQueryable();
+                    }
+                    if (dateTo is not null)
+                    {
+                        runQuery = mainQuery.Where(r => r.CreatedAt <= dateTo).AsQueryable();
                     }
                 }
+
+                var list = await runQuery!.Include(r => r.Garage).Include(r => r.Customer).ThenInclude(c => c.User).ToListAsync();
+                return list;
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Review>, int count)> SearchByName(string searchString, PageDto page)
+        {
+            try
+            {
+                var searchTrim = searchString.Trim().Replace(" ", "").ToLower();
+
+                var query = context.Reviews.Include(r => r.Customer).ThenInclude(c => c.User)
+                .Where(r => (r.Customer.User.UserFirstName.ToLower().Trim() + r.Customer.User.UserLastName.ToLower().Trim()).Contains(searchTrim)
+                || r.Customer.User.UserFirstName.ToLower().Contains(searchTrim)
+                || r.Customer.User.UserLastName.ToLower().Contains(searchTrim)).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Review>.Get(query.Include(r => r.Garage), page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
             {
                 throw;
             }

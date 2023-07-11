@@ -1,13 +1,10 @@
 using System.ComponentModel;
-using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.DTO.Review
 {
     public class ReviewFilterRequestDto
     {
         public Nullable<int> GarageId {get; set;}
-        public Nullable<int> CustomerId {get; set;}
-        public Nullable<Status> ReviewStatus {get; set;}
         [DefaultValue("06/25/2023")]
         public string? DateFrom {get; set;}
         [DefaultValue("06/25/2023")]

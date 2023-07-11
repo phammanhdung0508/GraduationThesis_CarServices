@@ -25,11 +25,46 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var list = mapper.Map<List<CategoryListResponseDto>>(await categoryRepository.View(page));
+                (var listObj, var count) = await categoryRepository.View(page);
 
-                var listCount = new GenericObject<List<CategoryListResponseDto>>(list, list.Count);
+                var listDto = mapper.Map<List<CategoryListResponseDto>>(listObj);
 
-                return listCount;
+                var list = new GenericObject<List<CategoryListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<CategoryListResponseDto>>?> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await categoryRepository.SearchByName(page, requestDto.Search);
+                
+                var listDto = mapper.Map<List<CategoryListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<CategoryListResponseDto>>(listDto, count);
+
+                return list;
             }
             catch (Exception e)
             {

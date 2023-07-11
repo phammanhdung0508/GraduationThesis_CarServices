@@ -13,6 +13,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdatePrice(ProductPriceRequestDto requestDto);
         Task UpdateStatus(ProductStatusRequestDto requestDto);
         Task UpdateQuantity(ProductQuantityRequestDto requestDto);
-
+        Task<GenericObject<List<ProductListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto);
     }
 }

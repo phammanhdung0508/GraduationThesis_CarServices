@@ -17,19 +17,38 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         }
 
 
-        public async Task<List<Product>?> View(PageDto page)
+        public async Task<(List<Product>, int count)> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<Product>
-                .Get(context.Products
-                .Where(p => p.ProductStatus == Status.Activate)
-                .Include(p => p.Category)
-                .Include(p => p.Service)
-                , page);
-                return list;
+                var query = context.Products.AsQueryable();
+
+                var count = await query.CountAsync();
+                
+                var list = await PagingConfiguration<Product>.Get(query.Include(p => p.Category).Include(p => p.Service), page);
+
+                return (list, count);
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Product>, int count)> SearchByName(PageDto page, string searchString)
+        {
+            try
+            {
+                var searchTrim = searchString.Trim().Replace(" ", "").ToLower();
+                var query = context.Products.Where(s => s.ProductName.ToLower().Trim().Replace(" ", "").Contains(searchTrim)).AsQueryable();
+                
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Product>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
             {
                 throw;
             }

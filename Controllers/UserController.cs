@@ -18,14 +18,6 @@ namespace GraduationThesis_CarServices.Controllers
             this.userService = userService;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-user")]
-        public async Task<IActionResult> ViewUser(PageDto page)
-        {
-            var list = await userService.View(page)!;
-            return Ok(list);
-        }
-
         [AllowAnonymous]
         [HttpGet("detail-user/{id}")]
         public async Task<IActionResult> DetailUser(int id)
@@ -46,7 +38,22 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpGet("search-by-role/{search}&{roleId}")]
         public async Task<IActionResult> SearchUser(string search, int roleId)
         {
-            var list = await userService.SearchUser(search, roleId);
+            switch (roleId)
+            {
+                case 1:
+                    var listCustomer = await userService.SearchCustomer(search);
+                    return Ok(listCustomer);
+                default:
+                    var listUser = await userService.SearchUser(search, roleId);
+                    return Ok(listUser);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-user")]
+        public async Task<IActionResult> ViewUser(PageDto page)
+        {
+            var list = await userService.View(page)!;
             return Ok(list);
         }
 
@@ -54,8 +61,15 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("filter-by-role/{roleId}")]
         public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
         {
-            var list = await userService.FilterByRole(page, roleId);
-            return Ok(list);
+            switch (roleId)
+            {
+                case 1:
+                    var listCustomer = await userService.FilterCustomer(page);
+                    return Ok(listCustomer);
+                default:
+                    var listUser = await userService.FilterUser(page, roleId);
+                    return Ok(listUser);
+            }
         }
 
         [Authorize(Roles = "Admin")]

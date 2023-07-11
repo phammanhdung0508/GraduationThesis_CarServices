@@ -31,7 +31,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsGarageExist(int garageId){
+        public (int totalServices, int totalOrders) GetServicesAndBookingsPerGarage(int garageId)
+        {
+            try
+            {
+                var query = context.Garages.Where(s => s.GarageId == garageId).AsQueryable();
+
+                var totalServices = query.SelectMany(g => g.GarageDetails).Select(g => g.Service).Count();
+
+                var totalOrders = query.SelectMany(g => g.Bookings).Count();
+
+                return (totalServices, totalOrders);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Garage>?> GetAllCoordinates()
+        {
+            var list = await context.Garages.ToListAsync();
+
+            return list;
+        }
+
+        public async Task<bool> IsGarageExist(int garageId)
+        {
             try
             {
                 var isExist = await context.Garages.Where(g => g.GarageId == garageId).AnyAsync();
@@ -64,22 +90,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Garages.Where(g => g.GarageName.Contains(search.SearchString))
                 .Include(g => g.Reviews).ToListAsync();
-
-                return list;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<List<Garage>?> FilterCoupon(PageDto page)
-        {
-            try
-            {
-                var list = await PagingConfiguration<Garage>.Get(context.Garages
-                .Where(g => g.Coupons.Count > 0)
-                .Include(g => g.Reviews), page);
 
                 return list;
             }

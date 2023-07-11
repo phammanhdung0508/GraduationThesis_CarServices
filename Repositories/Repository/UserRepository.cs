@@ -46,6 +46,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<bool> IsUserPhoneExist(string userPhone)
+        {
+            try
+            {
+                var isExist = await context.Users.Where(u => u.UserPhone.Equals(userPhone)).AnyAsync();
+
+                return isExist;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<bool> IsEmailExist(string userEmail)
         {
             try
@@ -75,13 +89,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsEmailVerifyOtp(string userEmail)
+        public async Task<bool> IsVerifyOtp(string inputString)
         {
             try
             {
-                var isVerify = await context.Users.Where(u => u.UserEmail.Equals(userEmail) && u.EmailConfirmed == 1).AnyAsync();
+                string pattern = @"\d{3}-\d{3}-\d{3}";
+                var match = Regex.Match(inputString, pattern);
 
-                return isVerify;
+                var isVerify = context.Users.AsQueryable();
+
+                switch (match.Success)
+                {
+                    case true:
+                        return await isVerify.Where(u => u.UserPhone.Equals(inputString) && u.EmailConfirmed == 1).AnyAsync();
+                    case false:
+                        return await isVerify.Where(u => u.UserEmail.Equals(inputString) && u.EmailConfirmed == 1).AnyAsync();
+                }
             }
             catch (System.Exception)
             {
@@ -94,7 +117,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 string pattern = @"\d{3}-\d{3}-\d{3}";
-                Match match = Regex.Match(search, pattern);
+                var match = Regex.Match(search, pattern);
 
                 var list = context.Users.Include(c => c.Customer).Include(c => c.Role).AsQueryable();
                 var searchTrim = search.Trim().Replace(" ", "").ToLower();
@@ -104,8 +127,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                     case true:
                         return await list.Where(c => c.UserPhone.Contains(search) && c.RoleId == roleId).ToListAsync();
                     case false:
-                        return await list.Where(c => (c.UserFirstName.ToLower().Trim() + c.UserLastName.ToLower().Trim()).Contains(searchTrim) 
-                        || c.UserFirstName.ToLower().Contains(searchTrim) 
+                        return await list.Where(c => (c.UserFirstName.ToLower().Trim() + c.UserLastName.ToLower().Trim()).Contains(searchTrim)
+                        || c.UserFirstName.ToLower().Contains(searchTrim)
                         || c.UserLastName.ToLower().Contains(searchTrim)).Where(c => c.RoleId == roleId).ToListAsync();
                 }
             }
@@ -195,9 +218,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer).Include(u => u.Role).Where(u => u.RoleId == roleId), page);
-
-                return list;
+                switch (roleId)
+                {
+                    case 245:
+                        return await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer)
+                        .Include(u => u.Role).Where(u => u.RoleId != 1 && u.RoleId != 3), page);
+                    default:
+                        return await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer)
+                        .Include(u => u.Role).Where(u => u.RoleId == roleId), page);
+                }
             }
             catch (System.Exception)
             {

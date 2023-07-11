@@ -6,13 +6,15 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IUserService
     {
         Task<List<UserListResponseDto>?> View(PageDto page);
-        Task<List<UserListResponseDto>?> FilterByRole(PageDto page, int roleId);
         Task<UserDetailResponseDto?> Detail(int id);
         Task Create(UserCreateRequestDto createUserDto);
         Task CustomerFirstLoginUpdate(UserUpdateRequestDto updateUserDto, int userId);
         Task UpdateRole(UserRoleRequestDto requestDto);
         Task UpdateStatus(UserStatusRequestDto requestDto);
         Task<CustomerDetailResponseDto> CustomerDetail(int userId);
+        Task<List<CustomerListResponseDto>> SearchCustomer(string search);
+        Task<List<CustomerListResponseDto>> FilterCustomer(PageDto page);
         Task<List<UserListResponseDto>?> SearchUser(string search, int roleId);
+        Task<List<UserListResponseDto>> FilterUser(PageDto page, int roleId);
     }
 }

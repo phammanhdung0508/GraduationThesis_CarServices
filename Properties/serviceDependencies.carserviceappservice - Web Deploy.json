@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/carserviceazureapi/apis/carserviceapi",
+      "type": "apis.azure"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/carserviceappservice/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsDataContextServerConect_7E5D5B3E03",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/carservices/databases/Carservices",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:DataContextServerConection",
+      "dynamicId": null
+    }
+  }
+}

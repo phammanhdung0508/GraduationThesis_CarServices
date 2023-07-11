@@ -26,21 +26,32 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             {
                 List<Claim> claims = new List<Claim>{
                     new Claim("userId", user.UserId.ToString()),
+                    new Claim("garageId", user.GarageId.ToString()),
+                    new Claim("firstname", user.UserFirstName! is not null ? user.UserFirstName : ""),
+                    new Claim("lastname", user.UserLastName! is not null ? user.UserLastName : ""),
                     new Claim("name", user.UserFirstName + user.UserLastName),
-                    new Claim("email", user.UserEmail),
-                    new Claim(ClaimTypes.Role, user.RoleDto.RoleName)};
+                    new Claim("phone", user.UserPhone),
+                    new Claim("image", user.UserImage! is not null ? user.UserImage : ""),
+                    new Claim(ClaimTypes.Role, user.RoleDto!.RoleName)};
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 
                 var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
+                var now = DateTime.Now;
+
+                var expired = now.AddHours(10);
+
                 var token = new JwtSecurityToken(
-                    _configuration["Jwt:Key"],
-                    _configuration["Jwt:Key"],
+                    issuer: _configuration["Jwt:Key"],
+                    audience: _configuration["Jwt:Key"],
                     claims: claims,
-                    expires: DateTime.Now.AddHours(12),
+                    expires: DateTime.UtcNow.AddMinutes(1),
                     signingCredentials: cred
                 );
+
+                var from = token.ValidFrom;
+                var to = token.ValidTo;
 
                 var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
@@ -139,6 +150,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             {
                 throw;
             }
+        }
+
+        public static bool Validate(
+        DateTime? notBefore,
+        DateTime? expires,
+        SecurityToken tokenToValidate,
+        TokenValidationParameters @param
+    )
+        {
+            return (expires != null && expires > DateTime.UtcNow);
         }
     }
 }

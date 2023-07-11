@@ -26,7 +26,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public byte[] PasswordSalt { get; set; }
         [MaxLength(1024)]
         public string UserImage { get; set; }
-        [MaxLength(12)]
+        [MaxLength(16)]
         public string UserPhone { get; set; }
         [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }

@@ -5,14 +5,16 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IServiceRepository
     {
-        Task<List<Service>?> View(PageDto page);
+        Task<(List<Service>, int count)> View(PageDto page);
         Task<bool> IsServiceExist(int serviceId);
+        Task<List<Service>> GetAll();
         Task<Service?> Detail(int id);
         Task<bool> IsDuplicatedService(Service service);
         Task Create(Service service);
         Task Update(Service service);
         double GetPrice(int serviceId);
         Task<int> GetDuration(int serviceId);
-        Task<int> CountServiceData();
+        Task<(List<Service>, int count)> SearchByName(string search, PageDto page);
+        Task<(List<ServiceDetail>, int count)> FilterServiceByGarage(int garageId, PageDto page);
     }
 }

@@ -50,50 +50,11 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var list = mapper.Map<List<BookingListResponseDto>>(await bookingRepository.View(page));
+                (var listObj, var count) = await bookingRepository.View(page);
 
-                var listCount = new GenericObject<List<BookingListResponseDto>>(list, await bookingRepository.CountBookingData());
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
 
-                return listCount;
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
-        public async Task<List<BookingListResponseDto>?> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto)
-        {
-            try
-            {
-                var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
-
-                switch (false)
-                {
-                    case var isExist when isExist == isGarageExist:
-                        throw new MyException("The garage doesn't exist.", 404);
-                }
-
-                var page = new PageDto
-                {
-                    PageIndex = requestDto.PageIndex,
-                    PageSize = requestDto.PageSize
-                };
-
-                var list = mapper.Map<List<BookingListResponseDto>>(await bookingRepository.FilterBookingByGarageId(requestDto.GarageId, page));
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -116,7 +77,173 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<FilterByCustomerResponseDto>?> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto)
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByStatus(FilterByStatusRequestDto requestDto)
+        {
+            try
+            {
+                var status = requestDto.BookingStatus;
+
+                if (!typeof(BookingStatus).IsEnumDefined(status))
+                {
+                    throw new MyException("The status number is out of avaliable range.", 404);
+                }
+
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingByStatus(status, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto)
+        {
+            try
+            {
+                var status = requestDto.BookingStatus;
+                DateTime? dateFrom = null;
+                DateTime? dateTo = null;
+
+                if (requestDto.DateFrom is not null)
+                {
+                    dateFrom = DateTime.Parse(requestDto.DateFrom!);
+                }
+
+                if (requestDto.DateTo is not null)
+                {
+                    dateTo = DateTime.Parse(requestDto.DateTo!);
+                }
+
+                if (status is not null && !typeof(BookingStatus).IsEnumDefined(status!))
+                {
+                    throw new MyException("The status number is out of avaliable range.", 404);
+                }
+
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingStatusAndDate(dateFrom, dateTo, status, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> SearchByBookingCode(SearchBookingByUserRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.SearchByBookingCode(requestDto.UserId, requestDto.Search, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto)
+        {
+            try
+            {
+                var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isGarageExist:
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingByGarage(requestDto.GarageId, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto)
         {
             try
             {
@@ -126,7 +253,11 @@ namespace GraduationThesis_CarServices.Services.Service
                     PageSize = requestDto.PageSize
                 };
 
-                var list = mapper.Map<List<FilterByCustomerResponseDto>>(await bookingRepository.FilterBookingByCustomer(requestDto.UserId, page));
+                (var listObj, var count) = await bookingRepository.FilterBookingByCustomer(requestDto.UserId, page);
+
+                var listDto = mapper.Map<List<FilterByCustomerResponseDto>>(listObj);
+
+                var list = new GenericObject<List<FilterByCustomerResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -751,6 +882,90 @@ namespace GraduationThesis_CarServices.Services.Service
                 var statusCode = response.StatusCode;
 
                 Console.WriteLine($"Response Status Code: {statusCode}");
+            }
+        }
+
+        public async Task<BookingRevenueResponseDto> CountRevune(int garageId)
+        {
+            try
+            {
+                var isGarageExist = await garageRepository.IsGarageExist(garageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isGarageExist:
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
+                (var amountEarned, var serviceEarned,
+                var productEarned, var sumPaid, var sumUnpaid,
+                var countPaid, var countUnpaid) = await bookingRepository.CountRevenue(garageId);
+
+                var revenue = new BookingRevenueResponseDto
+                {
+                    AmountEarned = amountEarned,
+                    ServiceEarned = serviceEarned,
+                    ProductEarned = productEarned,
+                    SumPaid = sumPaid,
+                    SumUnPaid = sumUnpaid,
+                    CountPaid = countPaid,
+                    CountUnpaid = countUnpaid
+                };
+
+                return revenue;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<CountBookingPerStatusDto> CountBookingPerStatus()
+        {
+            try
+            {
+                (var pendingCount, var canceledCount, var checkInCount, var processingCount, var completedCount) = await bookingRepository.CountBookingPerStatus();
+
+                var count = new CountBookingPerStatusDto()
+                {
+                    Pending = pendingCount,
+                    Canceled = canceledCount,
+                    CheckIn = checkInCount,
+                    Processing = processingCount,
+                    Completed = completedCount
+                };
+
+                return count;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
             }
         }
     }

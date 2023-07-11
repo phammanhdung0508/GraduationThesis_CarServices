@@ -11,5 +11,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task Create(CategoryCreateRequestDto requestDto);
         Task Update(CategoryUpdateRequestDto requestDto);
         Task UpdateStatus(CategoryStatusRequestDto requestDto);
+        Task<GenericObject<List<CategoryListResponseDto>>?> SearchByName(SearchByNameRequestDto requestDto);
     }
 }

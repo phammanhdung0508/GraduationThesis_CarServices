@@ -18,19 +18,27 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-category")]
-        public async Task<IActionResult> ViewCategory(PageDto page)
-        {
-            var categoryList = await categoryService.View(page)!;
-            return Ok(categoryList);
-        }
-
-        [Authorize(Roles = "Admin")]
         [HttpGet("detail-category/{id}")]
         public async Task<IActionResult> DetailCategory(int id)
         {
             var category = await categoryService.Detail(id);
             return Ok(category);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("search-categories-by-name")]
+        public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            var categoryList = await categoryService.SearchByName(requestDto);
+            return Ok(categoryList);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-category")]
+        public async Task<IActionResult> ViewCategory(PageDto page)
+        {
+            var categoryList = await categoryService.View(page)!;
+            return Ok(categoryList);
         }
 
         [Authorize(Roles = "Admin")]

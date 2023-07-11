@@ -24,6 +24,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+//builder.WebHost.ConfigureKestrel(options => options.Listen(System.Net.IPAddress.Parse("172.16.5.7"), 7132));
+
 builder.Services.AddSwaggerGen(
     options =>
     {
@@ -55,7 +57,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     {
         ValidateIssuer = false,
         ValidateAudience = false,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+        LifetimeValidator = TokenConfiguration.Validate,
         ValidIssuer = issuer,
         ValidAudience = issuer,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!)),
@@ -86,7 +90,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Connect Sql Server
 //"https://project20230606170014.azurewebsites.net/"
 //"https://localhost:7006/"
-var connectionString = builder.Configuration.GetConnectionString("DataContextServerConection") ??
+var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
     throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>

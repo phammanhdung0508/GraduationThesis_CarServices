@@ -15,14 +15,38 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<Category>> View(PageDto page)
+        public async Task<(List<Category>, int)> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<Category>.Get(context.Categories, page);
-                return list;
+                var query = context.Categories.AsQueryable();
+
+                var count = await query.CountAsync();
+                
+                var list = await PagingConfiguration<Category>.Get(query, page);
+
+                return (list, count);
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Category>, int)> SearchByName(PageDto page, string searchString)
+        {
+            try
+            {
+                var searchTrim = searchString.Trim().Replace(" ", "").ToLower();
+                var query = context.Categories.Where(s => s.CategoryName.ToLower().Trim().Replace(" ", "").Contains(searchTrim)).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Category>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
             {
                 throw;
             }

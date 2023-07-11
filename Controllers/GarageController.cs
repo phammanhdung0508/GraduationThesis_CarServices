@@ -18,19 +18,26 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageService = garageService;
         }
 
+        [Authorize(Roles = "Admin, Manager, Customer")]
+        [HttpGet("detail-garage/{id}")]
+        public async Task<IActionResult> DetailGarage(int id)
+        {
+            var garage = await garageService.Detail(id);
+            return Ok(garage);
+        }
+
+        [HttpGet("get-all-garage-coordinates")]
+        public async Task<IActionResult> GetAllCoordinates()
+        {
+            var list = await garageService.GetAllCoordinates();
+            return Ok(list);
+        }
+
         [AllowAnonymous]
         [HttpPost("get-nearby-garages-location")]
         public async Task<IActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
             var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
-            return Ok(list);
-        }
-
-        [Authorize(Roles = "Admin, Manager, Customer")]
-        [HttpPost("get-garages-with-coupon")]
-        public async Task<IActionResult> FilterGaragesWithCoupon(PageDto page)
-        {
-            var list = await garageService.FilterGaragesWithCoupon(page);
             return Ok(list);
         }
 
@@ -42,20 +49,20 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-garage-for-admin")]
+        public async Task<IActionResult> ViewAllForAdmin(PageDto page)
+        {
+            var list = await garageService.ViewAllForAdmin(page)!;
+            return Ok(list);
+        }
+
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("search-garage")]
         public async Task<IActionResult> SearchGarage(SearchDto search)
         {
             var list = await garageService.Search(search)!;
             return Ok(list);
-        }
-
-        [Authorize(Roles = "Admin, Manager, Customer")]
-        [HttpGet("detail-garage/{id}")]
-        public async Task<IActionResult> DetailGarage(int id)
-        {
-            var garage = await garageService.Detail(id);
-            return Ok(garage);
         }
 
         [Authorize(Roles = "Admin")]

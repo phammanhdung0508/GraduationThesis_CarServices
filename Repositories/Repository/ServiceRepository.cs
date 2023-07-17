@@ -165,7 +165,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public double GetPrice(int serviceDetailId)
+        public decimal GetPrice(int serviceDetailId)
         {
             try
             {
@@ -194,6 +194,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 return serviceDuration;
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Service>> GetServiceByServiceGroup(int garageId)
+        {
+            try
+            {
+                var services = await context.GarageDetails.Where(g => g.GarageId == garageId)
+                .Include(g => g.Service).ThenInclude(s => s.ServiceDetails).Select(g => g.Service).ToListAsync();
+
+                return services;
+            }
+            catch (System.Exception)
             {
                 throw;
             }

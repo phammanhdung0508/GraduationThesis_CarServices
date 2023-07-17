@@ -25,6 +25,14 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(service);
         }
 
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-service-by-garage/{garageId}")]
+        public async Task<IActionResult> GetServiceByServiceGroup(int garageId)
+        {
+            var serviceList = await serviceService.GetServiceByServiceGroup(garageId);
+            return Ok(serviceList);
+        }
+
         [HttpGet("get-all-service-list")]
         public async Task<IActionResult> GetAllService()
         {

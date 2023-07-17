@@ -46,7 +46,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     issuer: _configuration["Jwt:Key"],
                     audience: _configuration["Jwt:Key"],
                     claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(1),
+                    expires: expired,
                     signingCredentials: cred
                 );
 

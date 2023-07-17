@@ -14,8 +14,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CategoryName { get; set; }
         [Column(TypeName = "tinyint")]
         public Status CategoryStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
         public virtual ICollection<Product> Products { get; set; }

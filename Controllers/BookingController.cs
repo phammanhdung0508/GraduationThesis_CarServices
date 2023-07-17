@@ -34,6 +34,13 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(revenue);
         }
 
+        [HttpPost("get_check_out")]
+        public async Task<IActionResult> CheckOut(CheckOutRequestDto requestDto)
+        {
+            var list = await bookingService.CheckOut(requestDto);
+            return Ok(list);
+        }
+
         [HttpPost("search-service-by-code")]
         public async Task<IActionResult> SearchByBookingCode(SearchBookingByUserRequestDto requestDto)
         {
@@ -127,8 +134,8 @@ namespace GraduationThesis_bookingServices.Controllers
         [HttpGet("count-booking-per-status")]
         public async Task<IActionResult> CountBookingPerStatus()
         {
-           var count = await bookingService.CountBookingPerStatus();
-           return Ok(count);
+            var count = await bookingService.CountBookingPerStatus();
+            return Ok(count);
         }
     }
 }

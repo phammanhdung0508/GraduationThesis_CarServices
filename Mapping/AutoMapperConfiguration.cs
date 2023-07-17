@@ -17,6 +17,7 @@ using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
 using GraduationThesis_CarServices.Models.DTO.GarageDetail;
 using GraduationThesis_CarServices.Models.DTO.ServiceDetail;
 using System.Text;
+using System.Globalization;
 
 namespace GraduationThesis_CarServices.Mapping
 {
@@ -202,6 +203,9 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<GarageDetail, GarageDetailUpdateRequestDto>().ForMember(des => des.GarageDetailId, obj => obj.Ignore()).ReverseMap();
 
             //ServiceDetail
+            CreateMap<ServiceDetail, ServiceDetailListDto>()
+                .ForMember(des => des.CarSize, obj => obj.MapFrom(src => "Xe từ " + src.MinNumberOfCarLot + " đến " + src.MaxNumberOfCarLot + " chỗ."))
+                .ForMember(des => des.ServicePrice, obj => obj.MapFrom(src => String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", src.ServicePrice)));
             CreateMap<ServiceDetail, ServiceDetailServiceDto>();
             CreateMap<ServiceDetail, ServiceDetailListResponseDto>()
                 .ForMember(des => des.ServiceOfServiceDetailDto, obj => obj.MapFrom(src => src.Service));
@@ -213,12 +217,15 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //Service
+            CreateMap<Service, ServicListDto>()
+                .ForMember(des => des.serviceDetailListDtos, obj => obj.MapFrom(src => src.ServiceDetails));
             CreateMap<Service, ServiceGarageDto>();
             CreateMap<Service, ServiceProductDto>();
             CreateMap<Service, ServiceListMobileResponseDto>();
             CreateMap<Service, ServiceOfGarageDetailDto>()
                 .ForMember(des => des.ProductServiceDtos, obj => obj.MapFrom(src => src.Products))
                 .ForMember(des => des.ServiceDetailServiceDtos, obj => obj.MapFrom(src => src.ServiceDetails));
+            //----------------------------------------------------------------------------------------------------------------------
             CreateMap<Service, ServiceOfServiceDetailDto>();
             CreateMap<Service, ServiceListResponseDto>();
             CreateMap<Service, ServiceDetailResponseDto>()

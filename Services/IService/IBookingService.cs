@@ -21,5 +21,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto);
         Task<BookingRevenueResponseDto> CountRevune(int garageId);
         Task<CountBookingPerStatusDto> CountBookingPerStatus();
+        Task<CheckOutResponseDto> CheckOut(CheckOutRequestDto requestDto);
     }
 }

@@ -31,7 +31,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }
         [Column(TypeName = "date")]
-        public Nullable<DateTime> UserDateOfBirth { get; set; }
+        public DateTime? UserDateOfBirth { get; set; }
         [MaxLength(1024)]
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
@@ -40,14 +40,16 @@ namespace GraduationThesis_CarServices.Models.Entity
         public DateTime ExpiredIn {get; set;}
         [Column(TypeName = "tinyint")]
         public int EmailConfirmed {get; set;}
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         [MaxLength(1024)]
 
         /*-------------------------------------------------*/
         public virtual Customer Customer { get; set; }
         public virtual Mechanic Mechanic { get; set; }
-        public Nullable<int> RoleId { get; set; }
+
+        /*-------------------------------------------------*/
+        public int? RoleId { get; set; }
         public virtual Role Role { get; set; }
 
         /*-------------------------------------------------*/

@@ -132,13 +132,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                         _user = await query.FirstOrDefaultAsync(u => u.UserEmail.Equals(email));
                         break;
                     case var isPhone when !string.IsNullOrEmpty(isPhone.Phone):
-                        var formatPhone = "+84" + login.Phone!.Substring(1, 9);
-                        isEmailVerify = await userRepository.IsVerifyOtp(formatPhone!);
-                        _user = await query.FirstOrDefaultAsync(u => u.UserPhone.Equals(formatPhone));
+                        //For mobile test
+                        if (login.Phone!.Equals("1"))
+                        {
+                            _user = await query.FirstOrDefaultAsync(u => u.UserPhone.Equals(login.Phone));
+                            isEmailVerify = true;
+                        }
+                        else
+                        {
+                            var formatPhone = "+84" + login.Phone!.Substring(1, 9);
+                            isEmailVerify = await userRepository.IsVerifyOtp(formatPhone!);
+                            _user = await query.FirstOrDefaultAsync(u => u.UserPhone.Equals(formatPhone));
+                        }
                         break;
                 }
 
-                if (isEmailVerify)
+                if (!isEmailVerify)
                 {
                     throw new MyException("Tài khoản này chưa được xác thực.", 404);
                 }
@@ -178,7 +187,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 {
                     user.UserEmail = encryptConfiguration.Base64Decode(_user.UserEmail);
                 }
-                
+
                 return user;
             }
             catch (Exception e)
@@ -259,7 +268,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                 await userRepository.Update(user);
 
-                SendSMSWithTwilio(formatPhone, otp);
+                //SendSMSWithTwilio(formatPhone, otp);
 
                 //await tokenConfiguration.Send(otp, recipientEmail);
             }
@@ -295,6 +304,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                 //Company phone
                 var twilioPhone = "+19123725077";
+
+                var validationRequest = ValidationRequestResource.Create(
+                    friendlyName: "My Phone Number",
+                    phoneNumber: new Twilio.Types.PhoneNumber(recipientPhone)
+                );
 
                 var message = MessageResource.Create(
                     body: $"Generic dependency state illustration Your OTP verification code is: {otp}.",
@@ -430,7 +444,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

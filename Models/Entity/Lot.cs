@@ -16,7 +16,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public LotStatus LotStatus { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> GarageId { get; set; }
+        public int? GarageId { get; set; }
         public virtual Garage Garage { get; set; }
     }
 }

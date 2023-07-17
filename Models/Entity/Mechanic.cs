@@ -12,7 +12,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int MechanicId { get; set; }
         public MechanicStatus MechanicStatus {get; set;}
         public int TotalWorkingHours { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
 
         /*-------------------------------------------------*/
         public virtual User User { get; set; }

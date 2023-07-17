@@ -53,6 +53,50 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId)
+        {
+            try
+            {
+                var serviceSelectList = new List<ServiceSelectResponseDto>();
+
+                var serviceGroupList = new List<string>{
+                    ServiceGroup.PackageCleaningMaintenance.ToString(),
+                    ServiceGroup.PackageExterior.ToString(),
+                    ServiceGroup.PackageInterior.ToString(),
+                };
+
+                var serviceListByGarage = await serviceRepository.GetServiceByServiceGroup(garageId);
+
+                foreach (var item in serviceGroupList)
+                {
+                    var serviceList = serviceListByGarage.Where(s => s.ServiceGroup.Equals(item)).ToList();
+
+                    var serviceDtoList = mapper.Map<List<ServicListDto>>(serviceList);
+
+                    serviceSelectList.Add( new ServiceSelectResponseDto{ServiceGroup=item, ServicListDtos=serviceDtoList});
+                }
+
+                return serviceSelectList;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<List<ServiceListMobileResponseDto>> GetAll()
         {
             try

@@ -162,7 +162,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public double GetPrice(int productId)
+        public decimal GetPrice(int productId)
         {
             try
             {

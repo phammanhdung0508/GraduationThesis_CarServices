@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.Text;
 using AutoMapper;
@@ -477,9 +476,13 @@ namespace GraduationThesis_CarServices.Services.Service
                 var bookingInOneHours = listBooking?
                 .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime == 1).Count();
 
+                var test1 = i - convertHour < 4;
+                var test2 = openAt <= current.Hour && current.Hour <= closeAt;
+                var test3 = current.Date == dateSelect.Date;
+
                 switch (bookingCount)
                 {
-                    case var bookingCout when i - convertHour <= 3 && (current.Date == dateSelect.Date):
+                    case var bookingCout when i - convertHour < 4 && (openAt <= current.Hour && current.Hour <= closeAt) && (current.Date == dateSelect.Date):
                         UpdateListHours(i, listHours);
                         break;
                     case var bookingCout when bookingCout == lotCount:
@@ -568,9 +571,14 @@ namespace GraduationThesis_CarServices.Services.Service
                     totalEstimated += serviceDuration;
                 }
 
+                var bookingAt = bookingTime.TimeOfDay.Hours;
+
                 var bookingCheck = new BookingCheckRequestDto { DateSelected = requestDto.DateSelected, GarageId = requestDto.GarageId };
                 var listHours = await IsBookingAvailable(bookingCheck);
-                var isAvailableHours = listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours == bookingTime.TimeOfDay.Hours);
+                var isAvailableHours = listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours == bookingAt);
+
+                var openAt = DateTime.ParseExact(garage!.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+                var closeAt = DateTime.ParseExact(garage!.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
 
                 switch (false)
                 {
@@ -580,6 +588,8 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The selected time must be greater than or equal to the current time.", 404);
                     case var isEmpty when isEmpty == (requestDto.ServiceList.Count > 0):
                         throw new MyException("Must select the service before booking.", 404);
+                    case var isFalse when isFalse == (openAt < bookingAt && bookingAt < closeAt):
+                        throw new MyException("Must select time in working hour.", 404);
                     case var isFalse when isFalse == (isAvailableHours!.IsAvailable == true && isAvailableHours.EstimatedTimeCanBeBook > totalEstimated):
                         throw new MyException("Estimated hours for service will conflict with another booking.", 404);
                 }
@@ -660,31 +670,31 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var bookingId = await bookingRepository.Create(booking);
 
-                double discountedPrice = 0;
-                double originalPrice = 0;
+                decimal discountedPrice = 0;
+                decimal originalPrice = 0;
 
                 var listService = mapper.Map<List<ServiceListDto>, List<BookingDetail>>(requestDto.ServiceList,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < requestDto.ServiceList.Count; i++)
                     {
-                        double productCost = 0, serviceCost = 0;
+                        decimal productPrice = 0, servicePrice = 0;
                         if (requestDto.ServiceList[i].ProductId == 0)
                         {
                             des[i].ProductId = null;
                         }
                         if (requestDto.ServiceList[i].ProductId > 0)
                         {
-                            productCost = productRepository.GetPrice(src[i].ProductId);
+                            productPrice = productRepository.GetPrice(src[i].ProductId);
                         }
                         if (requestDto.ServiceList[i].ServiceDetailId > 0)
                         {
-                            serviceCost = serviceRepository.GetPrice(src[i].ServiceDetailId);
+                            servicePrice = serviceRepository.GetPrice(src[i].ServiceDetailId);
                         }
-                        originalPrice += productCost + serviceCost;
+                        originalPrice += productPrice + servicePrice;
                         des[i].BookingId = bookingId;
-                        des[i].ProductCost = productCost;
-                        des[i].ServiceCost = serviceCost;
+                        des[i].ProductPrice = productPrice;
+                        des[i].ServicePrice = servicePrice;
                     }
                 }));
 
@@ -717,6 +727,63 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
 
                 await bookingRepository.Update(booking);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<CheckOutResponseDto> CheckOut(CheckOutRequestDto requestDto)
+        {
+            try
+            {
+                switch (false)
+                {
+                    case var isFalse when isFalse == (requestDto.ServiceList.Any(s => s.ProductId > 0)):
+                        throw new MyException("ProductId can't take 0 value!", 404);
+                    case var isFalse when isFalse == (requestDto.ServiceList.Any(s => s.ServiceDetailId > 0)):
+                        throw new MyException("ServiceDetailId can't take 0 value!", 404);
+                    case var isFalse when isFalse == (requestDto.CouponId != 0):
+                        throw new MyException("CouponId can't take 0 value!", 404);
+                }
+
+                decimal discountedPrice = 0;
+                decimal originalPrice = 0;
+                decimal totalPrice = 0;
+
+                var listService = requestDto.ServiceList;
+
+                for (int i = 0; i < listService.Count; i++)
+                {
+                    var productPrice = productRepository.GetPrice(listService[i].ProductId);
+                    var servicePrice = serviceRepository.GetPrice(listService[i].ServiceDetailId);
+                    originalPrice += productPrice + servicePrice;
+                }
+
+                if (requestDto.CouponId is not null)
+                {
+                    var coupon = await couponRepository.GetCouponTypeAndCouponValue(requestDto.CouponId);
+
+                    switch (coupon!.Item1)
+                    {
+                        case CouponType.Percent:
+                            discountedPrice = originalPrice * (coupon.Item2 / 100);
+                            totalPrice = originalPrice - discountedPrice;
+                            break;
+                        case CouponType.FixedAmount:
+                            discountedPrice = coupon.Item2;
+                            totalPrice = originalPrice - discountedPrice;
+                            break;
+                    }
+                }
+
+                return new CheckOutResponseDto
+                {
+                    OriginalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", originalPrice),
+                    DiscountedPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", discountedPrice),
+                    TotalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", totalPrice)
+                };
             }
             catch (Exception e)
             {
@@ -826,19 +893,19 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                // Generate the QR code
-                // string url = $"https://project20230606170014.azurewebsites.net/api/booking/run-qr/{bookingId}";
                 string url = $"https://localhost:7006/api/booking/run-qr/{bookingId}";
 
                 var qrGenerator = new QRCodeGenerator();
                 var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
                 var qrCode = new QRCode(qrCodeData);
-                var qrCodeImage = qrCode.GetGraphic(10);
+                var qrCodeImage = qrCode.GetGraphic(20);
+
+                //qrCodeImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
 
                 string qrCodeImageBase64;
                 await using (var ms = new MemoryStream())
                 {
-                    qrCodeImage.Save(ms, ImageFormat.Png);
+                    //qrCodeImage.Save(ms, ImageFormat.Png);
                     byte[] imageBytes = ms.ToArray();
                     qrCodeImageBase64 = "data:image/png;base64," + Convert.ToBase64String(imageBytes);
                 }

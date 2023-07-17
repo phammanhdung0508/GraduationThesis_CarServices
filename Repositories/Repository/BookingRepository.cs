@@ -261,7 +261,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<(double amountEarned, double serviceEarned, double productEarned, double sumPaid, double sumUnpaid, int countPaid, int countUnpaid)> CountRevenue(int garageId)
+        public async Task<(decimal, decimal, decimal, decimal, decimal, int, int)> CountRevenue(int garageId)
         {
             try
             {
@@ -270,9 +270,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var amountEarned = await query.SumAsync(b => b.TotalPrice);
 
-                var serviceEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ServiceCost);
+                var serviceEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ServicePrice);
 
-                var productEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ProductCost);
+                var productEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ProductPrice);
 
                 var paidQuery = context.Bookings.Where(b => b.GarageId == garageId & b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
 
@@ -294,7 +294,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<(int pendingCount, int canceledCount, int checkInCount, int processingCount, int completedCount)> CountBookingPerStatus()
+        public async Task<(int, int, int, int, int)> CountBookingPerStatus()
         {
             var list = await context.Bookings.ToListAsync();
 

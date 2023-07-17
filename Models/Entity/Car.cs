@@ -23,11 +23,11 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int NumberOfCarLot {get; set;}
         [Column(TypeName = "tinyint")]
         public Status CarStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
 
         /*-------------------------------------------------*/

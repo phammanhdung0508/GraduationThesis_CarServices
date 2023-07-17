@@ -36,14 +36,14 @@ namespace GraduationThesis_CarServices.Models.Entity
         public double GarageLongitude { get; set; } = 0;
         [Column(TypeName = "tinyint")]
         public Status GarageStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [Timestamp]
         public byte[] VersionNumber { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> UserId { get; set; }
+        public int? UserId { get; set; }
         public virtual User User { get; set; }
 
         /*-------------------------------------------------*/

@@ -1,5 +1,4 @@
 #nullable disable
-using System;
 using Bogus;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Enum;
@@ -17,7 +16,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Garage> Garages { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Report> Reports { get; set; }
+        //public DbSet<Report> Reports { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Service> Services { get; set; }
@@ -48,13 +47,13 @@ namespace GraduationThesis_CarServices.Models
             this.SeedServiceDetailData(modelBuilder);
             this.SeedRandomProductData(modelBuilder);
             this.SeedRandomUserData(modelBuilder);
-            this.SeedRandomWorkingScheduleData(modelBuilder);
+            this.SeedRandomGarageMechanicData(modelBuilder);
             this.SeedRandomCarData(modelBuilder);
             this.SeedRandomGarageData(modelBuilder);
             this.SeedRandomReviewData(modelBuilder);
             this.SeedRandomCouponData(modelBuilder);
             this.SeedRandomBookingData(modelBuilder);
-            this.SeedRandomReportData(modelBuilder);
+            //this.SeedRandomReportData(modelBuilder);
             watch.Stop();
             Console.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
         }
@@ -104,6 +103,7 @@ namespace GraduationThesis_CarServices.Models
                 new Role{RoleId=4, RoleName="Admin"},
                 new Role{RoleId=5, RoleName="Staff"},
             };
+
             modelBuilder.Entity<Role>().HasData(list);
         }
 
@@ -113,6 +113,7 @@ namespace GraduationThesis_CarServices.Models
                 new Category{CategoryId=1, CategoryName="Sản phẩm vệ sinh", CreatedAt=now, CategoryStatus=Status.Activate},
                 new Category{CategoryId=2, CategoryName="Sản phẩm nâng cấp", CreatedAt=now, CategoryStatus=Status.Activate}
             };
+
             modelBuilder.Entity<Category>().HasData(list);
         }
 
@@ -122,7 +123,7 @@ namespace GraduationThesis_CarServices.Models
                 //GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
                 new Service{ServiceId=1, ServiceName="Rửa xe + hút bụi + xịt gầm", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
                     ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1,
-                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString().ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=2, ServiceName="Tẩy nhựa đường", ServiceImage="https://www.shutterstock.com/image-vector/automotive-repair-icon-car-service-600w-431732104.jpg",
@@ -278,6 +279,7 @@ namespace GraduationThesis_CarServices.Models
                     ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
                     ServiceStatus=Status.Activate, CreatedAt=now},
             };
+
             modelBuilder.Entity<Service>().HasData(list);
         }
 
@@ -290,13 +292,14 @@ namespace GraduationThesis_CarServices.Models
             {
                 int million = random.Next(1, 4);
                 int hundred = random.Next(1, 9);
-                var price = Double.Parse($"{million:N0}{hundred}00000");
+                var price = Decimal.Parse($"{million:N0}{hundred}00");
                 list.Add(new ServiceDetail { ServiceDetailId = i, MinNumberOfCarLot = 4, MaxNumberOfCarLot = 5, ServicePrice = price, ServiceId = y });
-                price = price + 200000; 
+                price = price + 200;
                 list.Add(new ServiceDetail { ServiceDetailId = i + 1, MinNumberOfCarLot = 6, MaxNumberOfCarLot = 7, ServicePrice = price, ServiceId = y });
                 i = i + 1;
                 y = y + 1;
             }
+
             modelBuilder.Entity<ServiceDetail>().HasData(list);
         }
 
@@ -304,29 +307,34 @@ namespace GraduationThesis_CarServices.Models
         {
             var list = new List<Product>{
                 new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=280000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
                 new Product{ProductId = 2, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=295000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
                 new Product{ProductId = 3, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 350ml ", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=350000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
                 new Product{ProductId = 4, ProductName="Nano Engine Super Protection (Nano bảo vệ động cơ) 250ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=375000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=2},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=2},
                 new Product{ProductId = 5, ProductName="Oxicat Oxygen Sensor & Catalytic (Vệ sinh cảm biến oxy và catalytic) 300ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=295000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
                 new Product{ProductId = 6, ProductName="Octane Booster (Cải thiện octane) 250ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=255000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=2},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)25.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=2},
                 new Product{ProductId = 7, ProductName="Throttle Body Cleaner (Vệ sinh họng ga) 280ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=205000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
                 new Product{ProductId = 8, ProductName="Radiator Flush (Vệ sinh hệ thống làm mát) 300ml", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=155000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
                 new Product{ProductId = 9, ProductName="Radiator conditioner ( điều hòa tản nhiệt)", ProductImage="",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=215000, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=14, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=14, CategoryId=1},
             };
+
             modelBuilder.Entity<Product>().HasData(list);
         }
 
         private void SeedRandomUserData(ModelBuilder modelBuilder)
         {
+            var userList = new List<User>();
+            var customerList = new List<Customer>();
+            var mechanicList = new List<Mechanic>();
+
             var customerFaker = new Faker<Customer>();
             var mechanicFaker = new Faker<Mechanic>();
             var userFaker = new Faker<User>();
@@ -346,13 +354,13 @@ namespace GraduationThesis_CarServices.Models
                             .RuleFor(c => c.CustomerWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.CustomerDistrict)); })
                             .RuleFor(c => c.CustomerCity, "Hồ Chí Minh");
 
-                        modelBuilder.Entity<Customer>().HasData(customerFaker.Generate());
+                        customerList.Add(customerFaker.Generate());
                         break;
                     case > 30 and <= 49:
                         mechanicFaker.RuleFor(m => m.MechanicId, ++m)
                             .RuleFor(m => m.TotalWorkingHours, f => f.Random.Int(0, 20));
 
-                        modelBuilder.Entity<Mechanic>().HasData(mechanicFaker.Generate());
+                        mechanicList.Add(mechanicFaker.Generate());
                         break;
                 }
 
@@ -363,7 +371,7 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(u => u.PasswordHash, password_hash)
                     .RuleFor(u => u.PasswordSalt, password_salt)
                     .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
-                    .RuleFor(u => u.UserPhone, f => f.Phone.PhoneNumberFormat())
+                    .RuleFor(u => u.UserPhone, f => f.Random.Replace("+84#########"))
                     .RuleFor(u => u.UserGender, f => f.PickRandom<Gender>())
                     .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                     .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
@@ -386,12 +394,18 @@ namespace GraduationThesis_CarServices.Models
                         }
                     });
 
-                modelBuilder.Entity<User>().HasData(userFaker.Generate());
+                userList.Add(userFaker.Generate());
             }
+
+            modelBuilder.Entity<Customer>().HasData(customerList);
+            modelBuilder.Entity<Mechanic>().HasData(mechanicList);
+            modelBuilder.Entity<User>().HasData(userList);
         }
 
-        private void SeedRandomWorkingScheduleData(ModelBuilder modelBuilder)
+        private void SeedRandomGarageMechanicData(ModelBuilder modelBuilder)
         {
+            var garageMechanicList = new List<GarageMechanic>();
+
             var garageMechanicFaker = new Faker<GarageMechanic>();
 
             for (int i = 1; i <= 60; i++)
@@ -400,12 +414,16 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
-                modelBuilder.Entity<GarageMechanic>().HasData(garageMechanicFaker.Generate());
+                garageMechanicList.Add(garageMechanicFaker.Generate());
             }
+
+            modelBuilder.Entity<GarageMechanic>().HasData(garageMechanicList);
         }
 
         private void SeedRandomCarData(ModelBuilder modelBuilder)
         {
+            var carList = new List<Car>();
+
             var carFaker = new Faker<Car>();
 
             for (int i = 1; i <= 20; i++)
@@ -421,13 +439,17 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(c => c.CreatedAt, now)
                     .RuleFor(c => c.CustomerId, f => f.Random.Int(1, 20));
 
-                modelBuilder.Entity<Car>().HasData(carFaker.Generate());
+                carList.Add(carFaker.Generate());
             }
+            modelBuilder.Entity<Car>().HasData(carList);
         }
 
         private void SeedRandomGarageData(ModelBuilder modelBuilder)
         {
             var garageList = new List<Garage>();
+            var garageDetailList = new List<GarageDetail>();
+            var lotList = new List<Lot>();
+
             var garageFaker = new Faker<Garage>();
             var garageDetailFaker = new Faker<GarageDetail>();
             var lotFaker = new Faker<Lot>();
@@ -457,16 +479,16 @@ namespace GraduationThesis_CarServices.Models
                 garage.GarageLatitude = ran.Latitude;
                 garage.GarageLongitude = ran.Longitude;
 
-                modelBuilder.Entity<Garage>().HasData(garage);
+                garageList.Add(garage);
             }
 
-            for (int i = 1; i <= 70; i++)
+            for (int i = 1; i <= 100; i++)
             {
                 garageDetailFaker.RuleFor(s => s.GarageDetailId, i)
                     .RuleFor(s => s.GarageId, f => f.Random.Int(1, 14))
-                    .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 10));
+                    .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 31));
 
-                modelBuilder.Entity<GarageDetail>().HasData(garageDetailFaker.Generate());
+                garageDetailList.Add(garageDetailFaker.Generate());
             }
 
             for (int i = 1; i <= 100; i++)
@@ -476,12 +498,18 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(l => l.LotStatus, f => f.PickRandom<LotStatus>())
                     .RuleFor(l => l.GarageId, f => f.Random.Int(1, 14));
 
-                modelBuilder.Entity<Lot>().HasData(lotFaker.Generate());
+                lotList.Add(lotFaker.Generate());
             }
+
+            modelBuilder.Entity<Garage>().HasData(garageList);
+            modelBuilder.Entity<GarageDetail>().HasData(garageDetailList);
+            modelBuilder.Entity<Lot>().HasData(lotList);
         }
 
         private void SeedRandomReviewData(ModelBuilder modelBuilder)
         {
+            var reviewList = new List<Review>();
+
             var reveiwFaker = new Faker<Review>();
 
             for (int i = 1; i <= 40; i++)
@@ -494,12 +522,15 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(r => r.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(r => r.CreatedAt, now);
 
-                modelBuilder.Entity<Review>().HasData(reveiwFaker.Generate());
+                reviewList.Add(reveiwFaker.Generate());
             }
+            modelBuilder.Entity<Review>().HasData(reviewList);
         }
 
         private void SeedRandomCouponData(ModelBuilder modelBuilder)
         {
+            var couponList = new List<Coupon>();
+
             var couponFaker = new Faker<Coupon>();
 
             for (int i = 1; i <= 30; i++)
@@ -521,19 +552,23 @@ namespace GraduationThesis_CarServices.Models
                     })
                     .RuleFor(c => c.CouponStartDate, f => f.Date.Recent())
                     .RuleFor(c => c.CouponEndDate, f => f.Date.Soon())
-                    .RuleFor(c => c.CouponMinSpend, f => f.Random.Float(1, 20))
-                    .RuleFor(c => c.CouponMaxSpend, f => f.Random.Float(60, 100))
+                    .RuleFor(c => c.CouponMinSpend, f => f.Random.Int(10, 20))
+                    .RuleFor(c => c.CouponMaxSpend, f => f.Random.Int(60, 100))
                     .RuleFor(c => c.NumberOfTimesToUse, f => f.Random.Int(1, 10))
                     .RuleFor(c => c.CouponStatus, f => f.PickRandom<CouponStatus>())
                     .RuleFor(c => c.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(c => c.CreatedAt, now);
 
-                modelBuilder.Entity<Coupon>().HasData(couponFaker.Generate());
+                couponList.Add(couponFaker.Generate());
             }
+            modelBuilder.Entity<Coupon>().HasData(couponList);
         }
 
         private void SeedRandomBookingData(ModelBuilder modelBuilder)
         {
+            var bookingList = new List<Booking>();
+            var bookingDetailList = new List<BookingDetail>();
+
             var bookingFaker = new Faker<Booking>();
             var bookingDetailFaker = new Faker<BookingDetail>();
 
@@ -543,45 +578,50 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
                     .RuleFor(b => b.PaymentMethod, f => "Tra sau")
-                    .RuleFor(b => b.TotalPrice, f => f.Random.Double(1000000, 2000000))
+                    .RuleFor(b => b.TotalPrice, f => f.Random.Int(100, 1000))
                     .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
+                    .RuleFor(b => b.IsAccepted, f => true)
                     .RuleFor(b => b.CreatedAt, now)
                     .RuleFor(b => b.CarId, f => f.Random.Int(1, 20))
                     .RuleFor(b => b.GarageId, f => f.Random.Int(1, 14));
 
-                modelBuilder.Entity<Booking>().HasData(bookingFaker.Generate());
+                bookingList.Add(bookingFaker.Generate());
             }
 
             for (int i = 1; i <= 50; i++)
             {
                 bookingDetailFaker.RuleFor(s => s.BookingDetailId, i)
-                    .RuleFor(s => s.ProductCost, f => f.Random.Float(50, 200))
-                    .RuleFor(s => s.ServiceCost, f => f.Random.Float(50, 200))
+                    .RuleFor(s => s.ProductPrice, f => f.Random.Int(50, 200))
+                    .RuleFor(s => s.ServicePrice, f => f.Random.Int(50, 200))
+                    .RuleFor(s => s.BookingServiceStatus, f => f.PickRandom<BookingServiceStatus>())
                     .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
                     .RuleFor(s => s.ServiceDetailId, f => f.Random.Int(1, 3))
                     .RuleFor(s => s.ProductId, f => f.Random.Int(1, 9))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 19));
 
-                modelBuilder.Entity<BookingDetail>().HasData(bookingDetailFaker.Generate());
+                bookingDetailList.Add(bookingDetailFaker.Generate());
             }
+
+            modelBuilder.Entity<Booking>().HasData(bookingList);
+            modelBuilder.Entity<BookingDetail>().HasData(bookingDetailList);
         }
 
-        private void SeedRandomReportData(ModelBuilder modelBuilder)
-        {
-            var reportFaker = new Faker<Report>();
+        // private void SeedRandomReportData(ModelBuilder modelBuilder)
+        // {
+        //     var reportFaker = new Faker<Report>();
 
-            for (int i = 1; i <= 15; i++)
-            {
-                reportFaker.RuleFor(r => r.ReportId, i)
-                    .RuleFor(r => r.Date, f => f.Date.Past())
-                    .RuleFor(r => r.Notes, f => f.Lorem.Text())
-                    .RuleFor(r => r.Description, f => f.Lorem.Paragraph())
-                    .RuleFor(r => r.ReportStatus, f => Status.Activate)
-                    .RuleFor(r => r.CreatedAt, now);
+        //     for (int i = 1; i <= 15; i++)
+        //     {
+        //         reportFaker.RuleFor(r => r.ReportId, i)
+        //             .RuleFor(r => r.Date, f => f.Date.Past())
+        //             .RuleFor(r => r.Notes, f => f.Lorem.Text())
+        //             .RuleFor(r => r.Description, f => f.Lorem.Paragraph())
+        //             .RuleFor(r => r.ReportStatus, f => Status.Activate)
+        //             .RuleFor(r => r.CreatedAt, now);
 
-                modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
-            }
-        }
+        //         modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
+        //     }
+        // }
     }
 }

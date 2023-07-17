@@ -17,8 +17,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CustomerDistrict { get; set; }
         [MaxLength(100)]
         public string CustomerCity { get; set; }
-        public Nullable<double> CustomerLatitude { get; set; } = 0;
-        public Nullable<double> CustomerLongitude { get; set; } = 0;
+        public double? CustomerLatitude { get; set; } = 0;
+        public double? CustomerLongitude { get; set; } = 0;
 
         /*-------------------------------------------------*/
         public virtual User User { get; set; }

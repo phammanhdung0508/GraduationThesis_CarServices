@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -22,7 +23,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var query = context.Coupons.AsQueryable();
 
                 var count = await query.CountAsync();
-                
+
                 var list = await PagingConfiguration<Coupon>.Get(query, page);
 
                 return (list, count);
@@ -98,6 +99,24 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 await context.SaveChangesAsync();
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(CouponType, decimal)> GetCouponTypeAndCouponValue(int? couponId)
+        {
+            try
+            {
+                var coupon = await context.Coupons.Where(c => c.CouponId == couponId).Select(c => new
+                {
+                    c.CouponType,
+                    c.CouponValue
+                }).FirstOrDefaultAsync();
+
+                return (coupon!.CouponType, coupon.CouponValue);
+            }
+            catch (System.Exception)
             {
                 throw;
             }

@@ -16,16 +16,15 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string ServiceImage { get; set; }
         [MaxLength(200)]
         public string ServiceDetailDescription { get; set; }
-        [MaxLength(20)]
         public int ServiceDuration { get; set; }
+        [MaxLength(1024)]
+        public string ServiceGroup { get; set; }
         [Column(TypeName = "tinyint")]
-        public ServiceUnit ServiceUnit {get; set;}
-        
-        public string ServiceGroup {get; set;}
+        public ServiceUnit ServiceUnit { get; set; }
         [Column(TypeName = "tinyint")]
-        public Status ServiceStatus {get; set;}
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public Status ServiceStatus { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
         public virtual ICollection<Product> Products { get; set; }

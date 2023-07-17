@@ -12,9 +12,10 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsDuplicatedService(Service service);
         Task Create(Service service);
         Task Update(Service service);
-        double GetPrice(int serviceId);
+        decimal GetPrice(int serviceId);
         Task<int> GetDuration(int serviceId);
         Task<(List<Service>, int count)> SearchByName(string search, PageDto page);
         Task<(List<ServiceDetail>, int count)> FilterServiceByGarage(int garageId, PageDto page);
+        Task<List<Service>> GetServiceByServiceGroup(int garageId);
     }
 }

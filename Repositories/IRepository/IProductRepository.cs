@@ -13,7 +13,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsDuplicatedProduct(Product product);
         Task Create(Product product);
         Task Update(Product product);
-        double GetPrice(int productId);
+        decimal GetPrice(int productId);
         Task<int> CountProductData();
         Task<(List<Product>, int count)> SearchByName(PageDto page, string searchString);
     }

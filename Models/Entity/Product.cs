@@ -15,22 +15,22 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(1024)]
         public string ProductImage { get; set; }
         public ProductUnit ProductUnit {get; set;}
-        [Range(0, double.MaxValue, ErrorMessage = "")]
-        public double ProductPrice { get; set; }
-        [Range(0, int.MaxValue, ErrorMessage = "")]
+        [Column(TypeName = "decimal(10,3)")]
+        public decimal ProductPrice { get; set; }
+        [Range(0, 1000, ErrorMessage = "Out of range!")]
         public int ProductQuantity { get; set; }
         // [Range(0, int.MaxValue, ErrorMessage = "")]
         // public int ProductSold { get; set; }
         [Column(TypeName = "tinyint")]
         public Status ProductStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
-        public Nullable<int> ServiceId { get; set; }
+        public int? ServiceId { get; set; }
         public virtual Service Service { get; set; }
 
         /*-------------------------------------------------*/

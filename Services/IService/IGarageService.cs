@@ -12,7 +12,7 @@ namespace GraduationThesis_CarServices.Services.IService
        Task Update(GarageUpdateRequestDto requestDto);
        Task UpdateStatus(GarageStatusRequestDto requestDto);
        Task UpdateLocation(LocationUpdateRequestDto requestDto);
-       Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
+       Task<List<GarageListResponseDto>?> FilterGaragesNearMe(FilterGarageRequestDto requestDto);
        Task<List<GarageListResponseDto>?> Search(SearchDto search);
        Task<List<GarageListMobileMapResponseDto>> GetAllCoordinates();
        Task<List<GarageAdminListResponseDto>> ViewAllForAdmin(PageDto page);

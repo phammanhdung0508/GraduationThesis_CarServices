@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -46,6 +47,10 @@ builder.Services.AddSwaggerGen(
             Description = "A simple example ASP.NET Core Web API",
             //TermsOfService = new Uri("https://example.com/terms"),
         });
+
+        // using System.Reflection;
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     });
 
 var key = builder.Configuration["Jwt:Key"];
@@ -90,7 +95,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 // Connect Sql Server
 //"https://project20230606170014.azurewebsites.net/"
 //"https://localhost:7006/"
-var connectionString = builder.Configuration.GetConnectionString("DataContextLocalConection") ??
+var connectionString = builder.Configuration.GetConnectionString("DataContextServerConection") ??
     throw new InvalidOperationException("Connection string 'DataContextLocalConection' not found.");
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -116,7 +121,7 @@ builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IReportRepository, ReportRepository>();
+//builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -132,7 +137,7 @@ builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IGarageService, GarageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IReportService, ReportService>();
+//builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();

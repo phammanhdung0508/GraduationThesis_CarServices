@@ -18,6 +18,9 @@ namespace GraduationThesis_CarServices.Controllers
             this.carService = carService;
         }
 
+        /// <summary>
+        /// View Cars a specific user owns.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpGet("get-user-car")]
         public async Task<IActionResult> GetUserCar()
@@ -33,6 +36,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(car);
         }
 
+        /// <summary>
+        /// View detail of a specific Car.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpGet("detail-car/{id}")]
         public async Task<IActionResult> DetailCar(int id)
@@ -41,6 +47,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(car);
         }
 
+        /// <summary>
+        /// Creates new a Car.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPost("create-car")]
         public async Task<IActionResult> CreateCar(CarCreateRequestDto carCreateRequestDto)
@@ -56,6 +65,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        /// <summary>
+        /// Updates a specific Car.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPut("update-car")]
         public async Task<IActionResult> UpdateCar(CarUpdateRequestDto carUpdateRequestDto)
@@ -65,6 +77,9 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        /// <summary>
+        /// Updates a specific Car status only.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPut("update-car-status")]
         public async Task<IActionResult> UpdateStatus(CarStatusRequestDto carStatusRequestDto)

@@ -15,6 +15,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateStatus(ServiceStatusRequestDto requestDto);
         Task<GenericObject<List<ServiceListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto);
         Task<List<ServiceListMobileResponseDto>> GetAll();
-        Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId);
+        Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId, int carType);
     }
 }

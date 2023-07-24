@@ -15,6 +15,20 @@ namespace GraduationThesis_CarServices.Controllers
             this.mechanicService = mechanicService;
         }
 
+        /// <summary>
+        /// View all mechanics. [Admin]
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-mechanic")]
+        public async Task<IActionResult> ViewAll(PageDto page)
+        {
+            var list = await mechanicService.View(page);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Filter Mechanics by specific garage. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("get-garage-mechanic/{garageId}")]
         public async Task<IActionResult> FilterMechanics(int garageId)
@@ -23,28 +37,15 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// View detail a specific Mechainc.
+        /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-mechanic/{mechanicId}")]
         public async Task<IActionResult> DetailMechanic(int mechanicId)
         {
             var mechanic = await mechanicService.Detail(mechanicId);
             return Ok(mechanic);
-        }
-
-        // [Authorize(Roles = "Staff")]
-        // [HttpGet("get-working-schedule-mechanic/{mechanicId}")]
-        // public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
-        // {
-        //     var list = await mechanicService.FilterWorkingSchedulesByMechanicId(mechanicId);
-        //     return Ok(list);
-        // }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-mechanic")]
-        public async Task<IActionResult> View(PageDto page)
-        {
-            var list = await mechanicService.View(page)!;
-            return Ok(list);
         }
     }
 }

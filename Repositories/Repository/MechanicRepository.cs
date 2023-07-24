@@ -1,4 +1,3 @@
-using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -16,16 +15,29 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task<List<Mechanic>> View(PageDto page){
+        public async Task<(List<Mechanic>, int, List<int>)> View(PageDto page){
             try
             {
-                var list = await PagingConfiguration<Mechanic>.Get(context.Mechanics.Include(m => m.User), page);
+                var query = context.Mechanics.AsQueryable();
 
-                return list;
+                var count = await query.Include(m => m.User).CountAsync();
+                
+                var list = await PagingConfiguration<Mechanic>.Get(query.Include(m => m.User), page);
+
+                var totalBookingList = new List<int>();
+
+                foreach (var item in list)
+                {
+                    var totalBooking = await query.Where(s => s.MechanicId == item.MechanicId)
+                    .SelectMany(s => s.BookingDetails).GroupBy(s => s.BookingId).CountAsync();
+                    
+                    totalBookingList.Add(totalBooking);
+                }
+
+                return (list, count, totalBookingList);
             }
             catch (Exception)
             {
-                
                 throw;
             }
         }

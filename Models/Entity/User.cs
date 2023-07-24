@@ -42,7 +42,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int EmailConfirmed {get; set;}
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        [MaxLength(1024)]
+        public string RefreshToken { get; set; }
+        public DateTime RefreshTokenCreated { get; set; }
+        public DateTime RefreshTokenExpires { get; set; }
 
         /*-------------------------------------------------*/
         public virtual Customer Customer { get; set; }

@@ -8,7 +8,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     {
         Task<List<Garage>?> View(PageDto page);
         Task<bool> IsGarageExist(int garageId);
-        Task<List<Garage>?> GetAll();
+        Task<List<Garage>?> GetGrageFilterByDateAndService(int serviceId);
         Task<List<Garage>?> Search(SearchDto search);
         Task<Garage?> Detail(int id);
         Task Create(Garage garage);

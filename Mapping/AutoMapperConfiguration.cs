@@ -26,6 +26,10 @@ namespace GraduationThesis_CarServices.Mapping
         public AutoMapperConfiguration()
         {
             //Authen
+            CreateMap<RefreshTokenDto, User>()
+                .ForMember(des => des.RefreshToken, obj => obj.MapFrom(src => src.Token))
+                .ForMember(des => des.RefreshTokenCreated, obj => obj.MapFrom(src => src.Created))
+                .ForMember(des => des.RefreshTokenExpires, obj => obj.MapFrom(src => src.Expires));
             CreateMap<User, LoginDto>();
             CreateMap<User, UserLoginDto>().ForMember(des => des.UserFullName,
                 obj => obj.MapFrom(src => src.UserFirstName + src.UserLastName))
@@ -101,7 +105,8 @@ namespace GraduationThesis_CarServices.Mapping
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role));
             CreateMap<User, UserMechanicDto>().ForMember(des => des.FullName,
-                obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName));
+                obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
+                .ForMember(des => des.UserEmail, obj => obj.MapFrom(src => Base64Decode(src.UserEmail)));
             CreateMap<User, UserDetailMechanicDto>().ForMember(des => des.FullName,
                 obj => obj.MapFrom(src => src.UserFirstName + " " + src.UserLastName))
                 .ForMember(des => des.RoleDto, obj => obj.MapFrom(src => src.Role))
@@ -203,9 +208,6 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<GarageDetail, GarageDetailUpdateRequestDto>().ForMember(des => des.GarageDetailId, obj => obj.Ignore()).ReverseMap();
 
             //ServiceDetail
-            CreateMap<ServiceDetail, ServiceDetailListDto>()
-                .ForMember(des => des.CarSize, obj => obj.MapFrom(src => "Xe từ " + src.MinNumberOfCarLot + " đến " + src.MaxNumberOfCarLot + " chỗ."))
-                .ForMember(des => des.ServicePrice, obj => obj.MapFrom(src => String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", src.ServicePrice)));
             CreateMap<ServiceDetail, ServiceDetailServiceDto>();
             CreateMap<ServiceDetail, ServiceDetailListResponseDto>()
                 .ForMember(des => des.ServiceOfServiceDetailDto, obj => obj.MapFrom(src => src.Service));
@@ -218,7 +220,8 @@ namespace GraduationThesis_CarServices.Mapping
 
             //Service
             CreateMap<Service, ServicListDto>()
-                .ForMember(des => des.serviceDetailListDtos, obj => obj.MapFrom(src => src.ServiceDetails));
+                .ForMember(des => des.ServiceDetailId, obj => obj.MapFrom(src => src.ServiceDetails.Select(s => s.ServiceDetailId).First()))
+                .ForMember(des => des.ServicePrice, obj => obj.MapFrom(src => String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", src.ServiceDetails.Select(s => s.ServicePrice).First())));
             CreateMap<Service, ServiceGarageDto>();
             CreateMap<Service, ServiceProductDto>();
             CreateMap<Service, ServiceListMobileResponseDto>();

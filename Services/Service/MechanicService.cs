@@ -3,6 +3,7 @@ using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -21,11 +22,22 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<MechanicListResponseDto>> View(PageDto page)
+        public async Task<GenericObject<List<MechanicListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.View(page));
+                (var listObj, var count, var listTotal) = await mechanicRepository.View(page);
+
+                var listDto = mapper.Map<List<MechanicListResponseDto>>(listObj,
+                obj => obj.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        des[i].TotalOrders = listTotal[i];
+                    }
+                }));
+
+                var list = new GenericObject<List<MechanicListResponseDto>>(listDto, count);
 
                 return list;
             }

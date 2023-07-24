@@ -53,7 +53,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId)
+        public async Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId, int carType)
         {
             try
             {

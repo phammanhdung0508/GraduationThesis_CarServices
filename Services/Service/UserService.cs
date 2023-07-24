@@ -329,45 +329,14 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The user already update information.", 404);
                 }
 
+                var encodeEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
+
                 var user = mapper.Map<UserUpdateRequestDto, User>(requestDto, u!,
                 opt => opt.AfterMap((src, des) =>
                 {
+                    des.UserEmail = encodeEmail;
                     des.UpdatedAt = DateTime.Now;
                 }));
-                await userRepository.Update(user);
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
-        public async Task UpdateRole(UserRoleRequestDto requestDto)
-        {
-            try
-            {
-                var u = await userRepository.Detail(requestDto.UserId);
-
-                switch (false)
-                {
-                    case var isExist when isExist == (u != null):
-                        throw new MyException("The user doesn't exist.", 404);
-                }
-
-                var user = mapper.Map<UserRoleRequestDto, User>(requestDto, u!);
                 await userRepository.Update(user);
             }
             catch (Exception e)

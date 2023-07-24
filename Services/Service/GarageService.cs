@@ -3,6 +3,7 @@ using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -18,11 +19,13 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMapper mapper;
         private readonly IGarageRepository garageRepository;
         private readonly GeocoderConfiguration geocoderConfiguration;
-        public GarageService(IMapper mapper, IGarageRepository garageRepository, GeocoderConfiguration geocoderConfiguration)
+        private readonly IBookingService bookingService;
+        public GarageService(IMapper mapper, IGarageRepository garageRepository, GeocoderConfiguration geocoderConfiguration, IBookingService bookingService)
         {
             this.garageRepository = garageRepository;
             this.mapper = mapper;
             this.geocoderConfiguration = geocoderConfiguration;
+            this.bookingService = bookingService;
         }
 
         public async Task<List<GarageAdminListResponseDto>> ViewAllForAdmin(PageDto page)
@@ -384,31 +387,57 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto)
+        public async Task<List<GarageListResponseDto>?> FilterGaragesNearMe(FilterGarageRequestDto requestDto)
         {
             try
             {
-                const double earthRadiusInKm = 6371.01;
-                var unfilteredGarages = await garageRepository.GetAll();
-                var filteredGarages = new List<Garage>();
-                foreach (var garage in unfilteredGarages!)
+                var filteredGaragesByService = await garageRepository.GetGrageFilterByDateAndService(requestDto.ServiceId);
+
+                foreach (var garage in filteredGaragesByService!.ToList())
                 {
-                    double lat1 = Math.PI * requestDto.Latitude / 180.0;
-                    double lon1 = Math.PI * requestDto.Longitude / 180.0;
-                    double lat2 = Math.PI * garage.GarageLatitude / 180.0;
-                    double lon2 = Math.PI * garage.GarageLongitude / 180.0;
-
-                    double dlon = lon2 - lon1;
-                    double dlat = lat2 - lat1;
-                    var a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(dlon / 2), 2);
-                    var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-                    var distanceInKm = earthRadiusInKm * c;
-
-                    if (distanceInKm <= requestDto.RadiusInKm)
+                    var checkBooking = new BookingCheckRequestDto()
                     {
-                        filteredGarages.Add(garage);
+                        DateSelected = requestDto.DateSelected,
+                        GarageId = garage.GarageId
+                    };
+
+                    //Remove garage which is full on select date
+                    var isFalse = bookingService.IsBookingAvailable(checkBooking).Result.All(g => g.IsAvailable is false);
+
+                    if (isFalse)
+                    {
+                        filteredGaragesByService!.Remove(garage);
                     }
                 }
+
+                var filteredGarages = new List<Garage>();
+
+                if (requestDto.Latitude is not null &&
+                requestDto.Longitude is not null &&
+                requestDto.RadiusInKm is not null)
+                {
+                    const double earthRadiusInKm = 6371.01;
+
+                    foreach (var garage in filteredGaragesByService!)
+                    {
+                        double lat1 = Math.PI * requestDto.Latitude.Value / 180.0;
+                        double lon1 = Math.PI * requestDto.Longitude.Value / 180.0;
+                        double lat2 = Math.PI * garage.GarageLatitude / 180.0;
+                        double lon2 = Math.PI * garage.GarageLongitude / 180.0;
+
+                        double dlon = lon2 - lon1;
+                        double dlat = lat2 - lat1;
+                        var a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(dlon / 2), 2);
+                        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                        var distanceInKm = earthRadiusInKm * c;
+
+                        if (distanceInKm <= requestDto.RadiusInKm)
+                        {
+                            filteredGarages.Add(garage);
+                        }
+                    }
+                }
+
                 return mapper.Map<List<GarageListResponseDto>>
                 (filteredGarages, opt => opt.AfterMap((src, des) =>
                 {

@@ -1,4 +1,5 @@
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Models.Entity;
@@ -15,7 +16,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             this.context = context;
         }
-
 
         public async Task<List<Garage>?> View(PageDto page)
         {
@@ -70,11 +70,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Garage>?> GetAll()
+        public async Task<List<Garage>?> GetGrageFilterByDateAndService(int serviceId)
         {
             try
             {
-                var list = await context.Garages.Include(g => g.Reviews).ToListAsync();
+                var list = await context.Garages.Include(g => g.Reviews)
+                .Where(g => g.GarageDetails.Any(s => s.Service.ServiceId == serviceId)).ToListAsync();
 
                 return list;
             }
@@ -176,5 +177,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+
     }
 }

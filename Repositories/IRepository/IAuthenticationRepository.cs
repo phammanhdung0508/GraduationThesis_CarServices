@@ -5,7 +5,7 @@ using GraduationThesis_CarServices.Models.DTO.User;
 namespace GraduationThesis_CarServices.Repositories.IRepository{
     public interface IAuthenticationRepository{
         Task<UserLoginDto?> CheckLogin(LoginDto login);
-        RefreshTokenDto? RefreshToken();
+        Task<RefreshTokenDto?> RefreshToken(int userId);
         Task<JWTDto> AuthenFirebase(string idToken);
         Task SendOTP(string recipientPhone);
         Task ValidateOTP(string otp, string recipientPhone);

@@ -15,6 +15,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
     public class TokenConfiguration
     {
         private readonly IConfiguration _configuration;
+
         public TokenConfiguration(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -38,15 +39,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                 var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-                var now = DateTime.Now;
-
-                var expired = now.AddHours(10);
-
                 var token = new JwtSecurityToken(
                     issuer: _configuration["Jwt:Key"],
                     audience: _configuration["Jwt:Key"],
                     claims: claims,
-                    expires: expired,
+                    expires: DateTime.Now.AddHours(5),
                     signingCredentials: cred
                 );
 
@@ -63,16 +60,37 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public RefreshTokenDto GenerateRefreshToken()
+        public RefreshTokenDto GenerateRefreshToken(int userId)
         {
             try
             {
+                List<Claim> claims = new List<Claim>
+                {
+                    new Claim("userId", userId.ToString()),
+                    new Claim(ClaimTypes.Role, "RefreshToken")};
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+
+                var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+                var expired = DateTime.Now.AddHours(7);
+
+                var token = new JwtSecurityToken(
+                    claims: claims,
+                    expires: expired,
+                    signingCredentials: cred
+                );
+
+                var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
                 var refreshToken = new RefreshTokenDto
                 {
-                    Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                    Expires = DateTime.Now.AddHours(7),
+                    Token = jwt,
+                    //Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                    Expires = expired,
                     Created = DateTime.Now
                 };
+
                 return refreshToken;
             }
             catch (System.Exception)

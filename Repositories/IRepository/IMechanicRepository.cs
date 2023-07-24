@@ -5,7 +5,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IMechanicRepository
     {
-        Task<List<Mechanic>> View(PageDto page);
+        Task<(List<Mechanic>, int, List<int>)> View(PageDto page);
         Task<List<Mechanic>> FilterMechanicsByGarageId(int garageId);
         Task<Mechanic?> Detail(int mechanicId);
         Task<bool> IsMechanicExist(int mechanicId);

@@ -19,6 +19,9 @@ namespace GraduationThesis_CarServices.Controllers
             this.reviewService = reviewService;
         }
 
+        /// <summary>
+        /// View detail a specific Review.
+        /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-review/{id}")]
         public async Task<IActionResult> DetailReview(int id)
@@ -27,6 +30,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(review);
         }
 
+        /// <summary>
+        /// View all Review. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-review")]
         public async Task<IActionResult> ViewAllReview(PageDto page)
@@ -35,6 +41,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Search Reviews by customer name. [Admin]
+        /// </summary>
         [HttpPost("search-review-by-customer-name")]
         public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
@@ -42,6 +51,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Dynamic Filter Reviews by specific garage. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("filter-all-review")]
         public async Task<IActionResult> FilterAllReview(ReviewFilterRequestDto requestDto)
@@ -50,6 +62,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Filter Reviews by specific garage. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("filter-review-by-garage")]
         public async Task<IActionResult> FilterReviewByGarage(FilterByGarageRequestDto requestDto)
@@ -58,6 +73,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Creates new a reivew.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPost("create-review")]
         public async Task<IActionResult> CreateReview(ReviewCreateRequestDto reviewDto)
@@ -73,6 +91,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        /// <summary>
+        /// Updates a specific review.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPut("update-review")]
         public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
@@ -81,6 +102,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        /// <summary>
+        /// Updates a specific review status.
+        /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)

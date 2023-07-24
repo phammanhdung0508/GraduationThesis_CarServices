@@ -14,8 +14,8 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string? UserImage { get; set; }
         public string UserPhone { get; set; } = "";
         public string RefreshToken { get; set; } = "";
-        public DateTime TokenCreated { get; set; }
-        public DateTime TokenExpires { get; set; }
+        public DateTime RefreshTokenCreated { get; set; }
+        public DateTime RefreshTokenExpires { get; set; }
         public RoleDto? RoleDto { get; set; }
     }
 }

@@ -9,7 +9,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<UserDetailResponseDto?> Detail(int id);
         Task Create(UserCreateRequestDto createUserDto);
         Task CustomerFirstLoginUpdate(UserUpdateRequestDto updateUserDto, int userId);
-        Task UpdateRole(UserRoleRequestDto requestDto);
         Task UpdateStatus(UserStatusRequestDto requestDto);
         Task<CustomerDetailResponseDto> CustomerDetail(int userId);
         Task<List<CustomerListResponseDto>> SearchCustomer(string search);

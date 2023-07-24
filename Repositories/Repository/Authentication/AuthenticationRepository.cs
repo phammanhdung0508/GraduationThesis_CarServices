@@ -84,32 +84,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public string RecreateToken(UserLoginDto user)
-        {
-            try
-            {
-                string token = tokenConfiguration.CreateToken(user);
-                return token;
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
         public async Task<UserLoginDto?> CheckLogin(LoginDto login)
         {
             try
@@ -209,12 +183,44 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-
-        public RefreshTokenDto? RefreshToken()
+        public string RecreateToken(UserLoginDto user)
         {
             try
             {
-                var refreshToken = tokenConfiguration.GenerateRefreshToken();
+                string token = tokenConfiguration.CreateToken(user);
+                return token;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<RefreshTokenDto?> RefreshToken(int userId)
+        {
+            try
+            {
+                var refreshToken = tokenConfiguration.GenerateRefreshToken(userId);
+
+                var user = await userRepository.Detail(userId);
+
+                var mapUser = mapper.Map<RefreshTokenDto, GraduationThesis_CarServices.Models.Entity.User>(refreshToken, user!);
+
+                await userRepository.Update(mapUser!);
+
                 return refreshToken;
             }
             catch (Exception e)

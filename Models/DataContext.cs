@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Models
 {
+    #pragma warning disable CS1591
     public class DataContext : DbContext
     {
         public DbSet<Booking> Bookings { get; set; }
@@ -624,4 +625,5 @@ namespace GraduationThesis_CarServices.Models
         //     }
         // }
     }
+    #pragma warning restore CS1591
 }

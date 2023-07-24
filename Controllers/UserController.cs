@@ -18,6 +18,9 @@ namespace GraduationThesis_CarServices.Controllers
             this.userService = userService;
         }
 
+        /// <summary>
+        /// View detail a specific User.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet("detail-user/{id}")]
         public async Task<IActionResult> DetailUser(int id)
@@ -26,6 +29,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// View detail a specific Customer.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet("detail-customer/{userId}")]
         public async Task<IActionResult> CustomerDetail(int userId)
@@ -34,6 +40,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(customer);
         }
 
+        /// <summary>
+        /// Search Customer by role.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet("search-by-role/{search}&{roleId}")]
         public async Task<IActionResult> SearchUser(string search, int roleId)
@@ -49,6 +58,9 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
+        /// <summary>
+        /// View all user. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-user")]
         public async Task<IActionResult> ViewUser(PageDto page)
@@ -57,6 +69,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Filter Customer by role.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("filter-by-role/{roleId}")]
         public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
@@ -72,6 +87,9 @@ namespace GraduationThesis_CarServices.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates new a user.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("create-user")]
         public async Task<IActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
@@ -80,6 +98,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        /// <summary>
+        /// Updates a specific user when they first login.
+        /// </summary>
         [Authorize(Roles = "Admin, Customer")]
         [HttpPut("update-user")]
         public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
@@ -95,14 +116,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPut("update-role")]
-        public async Task<IActionResult> UpdateRole(UserRoleRequestDto userRoleRequestDto)
-        {
-            await userService.UpdateRole(userRoleRequestDto);
-            throw new MyException("Successfully.", 200);
-        }
-
+        /// <summary>
+        /// Updates a specific user status.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-status")]
         public async Task<IActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)

@@ -18,6 +18,9 @@ namespace GraduationThesis_CarServices.Controllers
             this.garageDetailService = garageDetailService;
         }
 
+        /// <summary>
+        /// View detail a specific Garage Detail.
+        /// </summary>
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage-detail/{id}")]
         public async Task<IActionResult> DetailGarageDetail(int id)
@@ -26,6 +29,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(garageDetail);
         }
 
+        /// <summary>
+        /// View all garage detail.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-garage-detail")]
         public async Task<IActionResult> ViewGarageDetail(PageDto page)
@@ -34,6 +40,9 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(garageDetailList);
         }
 
+        /// <summary>
+        /// Creates new a Garage Detail.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("create-garage-detail")]
         public async Task<IActionResult> CreateGarageDetail(GarageDetailCreateRequestDto garageDetail)
@@ -42,6 +51,9 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
+        /// <summary>
+        /// Updates a specific Garage Detail.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-garage-detail")]
         public async Task<IActionResult> UpdateGarageDetail(GarageDetailUpdateRequestDto garageDetail)

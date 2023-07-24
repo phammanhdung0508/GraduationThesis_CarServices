@@ -93,7 +93,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                string pattern = @"\d{3}-\d{3}-\d{3}";
+                string pattern = @"\+84?\d{10}";
                 var match = Regex.Match(inputString, pattern);
 
                 var isVerify = context.Users.AsQueryable();

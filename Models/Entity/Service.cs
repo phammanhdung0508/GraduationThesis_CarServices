@@ -14,7 +14,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string ServiceName { get; set; }
         [MaxLength(1024)]
         public string ServiceImage { get; set; }
-        [MaxLength(200)]
+        [MaxLength(24680)]
         public string ServiceDetailDescription { get; set; }
         public int ServiceDuration { get; set; }
         [MaxLength(1024)]

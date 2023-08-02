@@ -84,7 +84,6 @@ namespace GraduationThesis_CarServices.Controllers
             await serviceDetailService.UpdatePrice(serviceDetail);
             throw new MyException("Successfully.", 200);
         }
-
     }
 }
 

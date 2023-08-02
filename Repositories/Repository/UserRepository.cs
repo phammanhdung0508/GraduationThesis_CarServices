@@ -116,7 +116,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                string pattern = @"\d{3}-\d{3}-\d{3}";
+                string pattern = @"\+84?\d{10}";
                 var match = Regex.Match(search, pattern);
 
                 var list = context.Users.Include(c => c.Customer).Include(c => c.Role).AsQueryable();

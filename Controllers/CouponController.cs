@@ -20,10 +20,10 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View coupon of a specific Garage.
+        /// View coupon of a specific Garage. [Customer]
         /// </summary>
-        [Authorize(Roles = "Admin, Manager, Customer")]
-        [HttpGet("get-garage-coupon/{garageId}")]
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-garage-coupon-for-customer/{garageId}")]
         public async Task<IActionResult> GetGarageCoupon(int garageId)
         {
             var list = await couponService.FilterGarageCoupon(garageId)!;
@@ -31,7 +31,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View detail a specific Coupon.
+        /// View detail a specific Coupon. [Admin, Manager, Customer]
         /// </summary>
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-coupon/{id}")]
@@ -42,7 +42,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View all Coupon.
+        /// View all Coupon. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-coupon")]
@@ -52,7 +52,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Creates new a coupon.
+        /// Creates new a coupon. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("create-coupon")]
@@ -63,7 +63,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Updates a specific coupon status.
+        /// Updates a specific coupon. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-coupon")]
@@ -74,7 +74,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Search categories by category name.
+        ///  Updates a specific coupon status. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-coupon-status")]

@@ -213,5 +213,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+
+        public async Task<List<BookingDetail>> GetServiceForBookingDetail(int bookingId)
+        {
+            try
+            {
+                var list = await context.BookingDetails.Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                .Where(b => b.BookingId == bookingId).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
     }
 }

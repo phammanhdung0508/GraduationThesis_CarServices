@@ -212,14 +212,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-
         public async Task<Booking?> Detail(int id)
         {
             try
             {
                 var booking = await context.Bookings.Include(b => b.Garage)
                 .Include(b => b.Car).ThenInclude(c => c.Customer).ThenInclude(m => m.User)
-                .Include(b => b.BookingDetails).ThenInclude(d => d.Mechanic).ThenInclude(m => m.User)
+                .Include(b => b.BookingMechanics).ThenInclude(d => d.Mechanic).ThenInclude(m => m.User)
                 .Include(b => b.BookingDetails).ThenInclude(d => d.ServiceDetail).ThenInclude(s => s.Service)
                 .Include(b => b.BookingDetails).ThenInclude(d => d.Product).FirstOrDefaultAsync(c => c.BookingId == id);
 
@@ -308,7 +307,48 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
             var completedCount = list.Where(b => b.BookingStatus == BookingStatus.Completed).Count();
 
-            return(pendingCount, canceledCount, checkInCount, processingCount, completedCount);
+            return (pendingCount, canceledCount, checkInCount, processingCount, completedCount);
+        }
+
+        public async Task<List<Booking>> FilterBookingByStatusCustomer(int bookingStatus, int userId)
+        {
+            var list = await context.Bookings.Include(b => b.Car).ThenInclude(c => c.Customer)
+            .ThenInclude(c => c.User).Include(b => b.Garage)
+            .Where(b => (int)b.BookingStatus == bookingStatus && b.Car.Customer.User.UserId == userId)
+            .ToListAsync();
+
+            return list;
+        }
+
+        public async Task<Booking> DetailBookingForCustomer(int bookingId)
+        {
+            try
+            {
+                var booking = await context.Bookings.Where(b => b.BookingId == bookingId).Include(b => b.BookingDetails)
+                .Include(b => b.Car).ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(b => b.Garage)
+                .FirstOrDefaultAsync();
+
+                return booking!;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Booking>> FilterBookingByGarage(int garageId)
+        {
+            try
+            {
+                var list = await context.Garages.Where(g => g.GarageId == garageId)
+                .SelectMany(g => g.Bookings).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
         }
     }
 }

@@ -73,7 +73,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     var serviceDtoList = mapper.Map<List<ServicListDto>>(serviceList);
 
-                    serviceSelectList.Add( new ServiceSelectResponseDto{ServiceGroup=item, ServicListDtos=serviceDtoList});
+                    serviceSelectList.Add(new ServiceSelectResponseDto { ServiceGroup = item, ServicListDtos = serviceDtoList });
                 }
 
                 return serviceSelectList;
@@ -226,9 +226,23 @@ namespace GraduationThesis_CarServices.Services.Service
                 GraduationThesis_CarServices.Models.Entity.Service>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
+                    switch (requestDto.ServiceGroup)
+                    {
+                        case 1:
+                            des.ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString();
+                            break;
+                        case 2:
+                            des.ServiceGroup = ServiceGroup.PackageExterior.ToString();
+                            break;
+                        case 3:
+                            des.ServiceGroup = ServiceGroup.PackageInterior.ToString();
+                            break;
+                    }
+
                     des.ServiceStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
+
                 if (!await serviceRepository.IsDuplicatedService(service))
                 {
                     await serviceRepository.Create(service);

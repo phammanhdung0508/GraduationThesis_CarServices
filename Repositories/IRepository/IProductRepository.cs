@@ -16,5 +16,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         decimal GetPrice(int productId);
         Task<int> CountProductData();
         Task<(List<Product>, int count)> SearchByName(PageDto page, string searchString);
+        Product GetDefaultProduct(int serviceDetailId);
     }
 }

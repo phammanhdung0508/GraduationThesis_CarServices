@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View detail a specific Review.
+        /// View detail a specific Review. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-review/{id}")]
@@ -74,7 +74,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Creates new a reivew.
+        /// Creates new a reivew. [Customer]
         /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPost("create-review")]
@@ -91,21 +91,19 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Successfully.", 200);
         }
 
-        /// <summary>
-        /// Updates a specific review.
-        /// </summary>
-        [Authorize(Roles = "Customer")]
-        [HttpPut("update-review")]
-        public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
-        {
-            await reviewService.Update(reviewDto);
-            throw new MyException("Successfully.", 200);
-        }
+
+        // [Authorize(Roles = "Customer")]
+        // [HttpPut("update-review")]
+        // public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
+        // {
+        //     await reviewService.Update(reviewDto);
+        //     throw new MyException("Successfully.", 200);
+        // }
 
         /// <summary>
-        /// Updates a specific review status.
+        /// Updates a specific review status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {

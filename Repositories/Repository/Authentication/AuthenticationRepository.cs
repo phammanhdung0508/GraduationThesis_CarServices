@@ -356,7 +356,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
-                string key = "AIzaSyA-XIGm7ETxWnhFWQogHuPKgXBJ0LZ-euk";
+                string key = configuration["Firebase:Key"]!;
                 string jwt = "";
                 JWTDto? jwtDto = null;
                 FirebaseToken decodedToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idToken);

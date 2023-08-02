@@ -17,6 +17,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICouponRepository couponRepository;
         private readonly IGarageRepository garageRepository;
         private readonly IMapper mapper;
+        
         public CouponService(ICouponRepository couponRepository, IGarageRepository garageRepository, IMapper mapper)
         {
             this.mapper = mapper;
@@ -55,7 +56,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId)
+        public async Task<List<FilterCouponByGarageResponseDto>?> FilterGarageCoupon(int garageId)
         {
             try
             {
@@ -67,7 +68,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
+                var list = mapper.Map<List<FilterCouponByGarageResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
 
                 return list;
             }

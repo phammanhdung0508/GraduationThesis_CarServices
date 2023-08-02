@@ -16,6 +16,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public decimal ServicePrice { get; set; }
         [Column(TypeName = "tinyint")]
         public BookingServiceStatus BookingServiceStatus {get; set;}
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
         public int? BookingId { get; set; }
@@ -26,8 +28,5 @@ namespace GraduationThesis_CarServices.Models.Entity
 
         public int? ProductId { get; set; }
         public virtual Product Product { get; set; }
-        
-        public int? MechanicId { get; set; }
-        public virtual Mechanic Mechanic { get; set; }
     }
 }

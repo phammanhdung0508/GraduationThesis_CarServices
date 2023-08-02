@@ -47,5 +47,29 @@ namespace GraduationThesis_CarServices.Controllers
             var mechanic = await mechanicService.Detail(mechanicId);
             return Ok(mechanic);
         }
+
+        /// <summary>
+        /// Allow Customers to view which mechanic has been applied to their booking. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-mechanic-by-booking/{bookingId}")]
+        public async Task<IActionResult> GetMechanicByBooking(int bookingId)
+        {
+            var list = await mechanicService.GetMechanicByBooking(bookingId);
+
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Filter mechanic working on the specific garage. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-mechanic-by-garage/{garageId}")]
+        public async Task<IActionResult> GetMechanicByGarage(int garageId)
+        {
+            var list = await mechanicService.GetMechanicByGarage(garageId);
+
+            return Ok(list);
+        }
     }
 }

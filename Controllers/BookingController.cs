@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
@@ -20,19 +21,31 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// View detail of a specific Booking.
+        /// View detail of a specific Booking. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-booking/{id}")]
         public async Task<IActionResult> DetailBooking(int id)
         {
-            var car = await bookingService.Detail(id);
-            return Ok(car);
+            var booking = await bookingService.Detail(id);
+            return Ok(booking);
         }
 
         /// <summary>
-        /// View revenue of a specific Garage.
+        /// View detail of a specific Booking. [Customer]
         /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("detail-booking-for-customer/{bookingId}")]
+        public async Task<IActionResult> DetailBookingForCustomer(int bookingId)
+        {
+            var booking = await bookingService.DetailBookingForCustomer(bookingId);
+            return Ok(booking);
+        }
+
+        /// <summary>
+        /// View revenue of a specific Garage. [Admin]
+        /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpGet("get-revenue-by-garage/garageId={garageId}")]
         public async Task<IActionResult> CountRevune(int garageId)
         {
@@ -41,8 +54,27 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Calculate check out the price for Booking.
+        /// Filter overall booking by status for customer mobile. [Customer]
         /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("filter-booking-by-overall-status/{bookingStatus}")]
+        public async Task<IActionResult> FilterBookingByStatusCustomer(int bookingStatus)
+        {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+            
+            var list = await bookingService.FilterBookingByStatusCustomer(bookingStatus, userId);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Calculate check out the price for Booking. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
         [HttpPost("get_check_out")]
         public async Task<IActionResult> CheckOut(CheckOutRequestDto requestDto)
         {
@@ -103,7 +135,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Filter Bookings by specific Customer.
+        /// Filter Bookings by specific Customer. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("filter-booking-by-customer")]
@@ -114,7 +146,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Check if the specific dates a user has chosen there are any times available or not.
+        /// Check if the specific dates a user has chosen there are any times available or not. [Customer]
         /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpPost("check-booking")]
@@ -125,8 +157,32 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Creates new a Booking.
+        /// Creates new a Booking. [Customer]
         /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Post create new booking.
+        ///     {
+        ///         "customerName": "name",
+        ///         "customerPhone": "phone",
+        ///         "customerEmail": "email",
+        ///         "dateSelected": "MM/dd/yyyy",
+        ///         "timeSelected": "hh:mm:ss",
+        ///         "serviceList": [
+        ///             {
+        ///                 "serviceDetailId": 1
+        ///             }
+        ///         ],
+        ///         "mechanicId": 1,
+        ///         "carId": 1,
+        ///         "garageId": 1,
+        ///         "couponId": 1,
+        ///
+        ///         "versionNumber": "AAAAAAAAEBM=" /*version number get when call garage detail. Must have*/
+        ///     }
+        ///
+        /// </remarks>
         [Authorize(Roles = "Customer")]
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
@@ -136,24 +192,24 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Creates new a Booking.
+        /// Generate new QR code for Customer when they check-in. [Customer]
         /// </summary>
         [Authorize(Roles = "Customer")]
-        [HttpPost("generate-qr-code/{bookingId}")]
+        [HttpGet("generate-qr-code/{bookingId}")]
         public async Task<IActionResult> GenerateQRCode(int bookingId)
         {
-            var qrString = await bookingService.GenerateQRCode(bookingId);
-            return Ok(qrString);
+            await bookingService.GenerateQRCode(bookingId);
+            throw new MyException("Successfully.", 200);
         }
 
         /// <summary>
-        /// Creates new a Booking.
+        /// Update booking status.
         /// </summary>
-        [Authorize(Roles = "Staff")]
+        //[Authorize(Roles = "Staff")]
         [HttpPut]
         [Route("update-status-booking/{bookingId}&{bookingStatus}")]
         // [AcceptVerbs("PUT")]
-        public async Task<IActionResult> UpdateBooking([FromRoute] int bookingId, [FromRoute] int bookingStatus)
+        public async Task<IActionResult> UpdateBookingStatus([FromRoute] int bookingId, [FromRoute] int bookingStatus)
         {
             await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus);
             throw new MyException("Successfully.", 200);
@@ -173,7 +229,7 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Count Bookings for every booking status.
+        /// Count Bookings for every booking status. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet("count-booking-per-status")]
@@ -181,6 +237,18 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             var count = await bookingService.CountBookingPerStatus();
             return Ok(count);
+        }
+    
+        /// <summary>
+        /// Count Bookings for every booking status. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-booking-detail-status-by-booking-customer/{bookingId}")]
+        public async Task<IActionResult> GetBookingDetailStatusByBooking(int bookingId)
+        {
+            var list = await bookingService.GetBookingDetailStatusByBooking(bookingId);
+
+            return Ok(list);
         }
     }
 }

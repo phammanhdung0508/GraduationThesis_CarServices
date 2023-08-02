@@ -110,6 +110,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
+                    des.CarBookingStatus = CarStatus.Available;
                     des.CarStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                     des.CustomerId = customerId;

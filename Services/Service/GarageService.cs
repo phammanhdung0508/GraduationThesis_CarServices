@@ -386,12 +386,11 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
-
-        public async Task<List<GarageListResponseDto>?> FilterGaragesNearMe(FilterGarageRequestDto requestDto)
+        public async Task<List<GarageListResponseDto>?> FilterGaragesByDateAndService(FilterGarageRequestDto requestDto)
         {
             try
             {
-                var filteredGaragesByService = await garageRepository.GetGrageFilterByDateAndService(requestDto.ServiceId);
+                var filteredGaragesByService = await garageRepository.GetGrageFilterByDateAndService(requestDto.ServiceList);
 
                 foreach (var garage in filteredGaragesByService!.ToList())
                 {
@@ -438,6 +437,62 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                 }
 
+                return mapper.Map<List<GarageListResponseDto>>
+                (filteredGarages, opt => opt.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < filteredGarages.Count; i++)
+                    {
+                        if (filteredGarages[i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = filteredGarages[i].Reviews.Sum(r => r.Rating) / filteredGarages[i].Reviews.Count;
+                        }
+                    }
+                }));
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto)
+        {
+            try
+            {
+                const double earthRadiusInKm = 6371.01;
+                var unfilteredGarages = await garageRepository.GetAll();
+                var filteredGarages = new List<Garage>();
+                foreach (var garage in unfilteredGarages!)
+                {
+                    double lat1 = Math.PI * requestDto.Latitude / 180.0;
+                    double lon1 = Math.PI * requestDto.Longitude / 180.0;
+                    double lat2 = Math.PI * garage.GarageLatitude / 180.0;
+                    double lon2 = Math.PI * garage.GarageLongitude / 180.0;
+
+                    double dlon = lon2 - lon1;
+                    double dlat = lat2 - lat1;
+                    var a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(dlon / 2), 2);
+                    var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                    var distanceInKm = earthRadiusInKm * c;
+
+                    if (distanceInKm <= requestDto.RadiusInKm)
+                    {
+                        filteredGarages.Add(garage);
+                    }
+                }
                 return mapper.Map<List<GarageListResponseDto>>
                 (filteredGarages, opt => opt.AfterMap((src, des) =>
                 {

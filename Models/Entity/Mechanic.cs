@@ -10,17 +10,17 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int MechanicId { get; set; }
+        [Column(TypeName = "tinyint")]
         public MechanicStatus MechanicStatus {get; set;}
-        public int TotalWorkingHours { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        [MaxLength(1024)]
+        public string Level {get; set;}
 
 
         /*-------------------------------------------------*/
         public virtual User User { get; set; }
 
         /*-------------------------------------------------*/
+        public virtual ICollection<BookingMechanic> BookingMechanics { get; set; }
         public virtual ICollection<GarageMechanic> GarageMechanics { get; set; }
-        public virtual ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }

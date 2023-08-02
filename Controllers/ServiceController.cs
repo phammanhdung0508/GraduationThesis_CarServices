@@ -85,6 +85,25 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Creates new a service.
         /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Post create new service.
+        ///     {
+        ///         "serviceName": "Rửa xe",
+        ///         "serviceImage": "Image",
+        ///         "serviceGroup": 1,
+        ///             1 : GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
+        ///             2 : GÓI DỊCH VỤ NGOẠI THẤT
+        ///             3 : GÓI DỊCH VỤ NỘI THẤT
+        ///         "serviceUnit": 1,
+        ///             1 : Lần
+        ///             2 : Gói
+        ///         "serviceDetailDescription": "Description",
+        ///         "serviceDuration": 1
+        ///     }
+        ///
+        /// </remarks>
         [Authorize(Roles = "Admin")]
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)

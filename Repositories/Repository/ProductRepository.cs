@@ -16,6 +16,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
+        public Product GetDefaultProduct(int serviceDetailId)
+        {
+            try
+            {
+                var product = context.ServiceDetails.Include(s => s.Service).ThenInclude(s => s.Products)
+                .Where(s => s.ServiceDetailId == serviceDetailId)
+                .SelectMany(s => s.Service.Products).FirstOrDefault();
+
+                return product!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<(List<Product>, int count)> View(PageDto page)
         {
@@ -24,7 +39,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var query = context.Products.AsQueryable();
 
                 var count = await query.CountAsync();
-                
+
                 var list = await PagingConfiguration<Product>.Get(query.Include(p => p.Category).Include(p => p.Service), page);
 
                 return (list, count);
@@ -41,7 +56,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var searchTrim = searchString.Trim().Replace(" ", "").ToLower();
                 var query = context.Products.Where(s => s.ProductName.ToLower().Trim().Replace(" ", "").Contains(searchTrim)).AsQueryable();
-                
+
                 var count = await query.CountAsync();
 
                 var list = await PagingConfiguration<Product>.Get(query, page);

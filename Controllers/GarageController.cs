@@ -44,20 +44,31 @@ namespace GraduationThesis_CarServices.Controllers
         [HttpPost("filter-garage-by-date-location-service")]
         public async Task<IActionResult> GetNearbyGaragesLocation(FilterGarageRequestDto requestDto)
         {
-            var list = await garageService.FilterGaragesNearMe(requestDto)!;
+            var list = await garageService.FilterGaragesByDateAndService(requestDto)!;
             return Ok(list);
         }
 
         /// <summary>
-        /// View all garages. [Customer]
+        /// Search Garages by specific location. [Customer]
         /// </summary>
-        [Authorize(Roles = "Admin")]
-        [HttpPost("view-all-garage")]
-        public async Task<IActionResult> ViewGarage(PageDto page)
+        [Authorize(Roles = "Customer")]
+        [HttpPost("search-garage-by-location")]
+        public async Task<IActionResult> GetNearbyGaragesLocation(LocationRequestDto locationRequestDto)
         {
-            var list = await garageService.View(page)!;
+            var list = await garageService.FilterGaragesNearMe(locationRequestDto)!;
             return Ok(list);
         }
+
+        // /// <summary>
+        // /// View all garages. [Customer]
+        // /// </summary>
+        // [Authorize(Roles = "Admin")]
+        // [HttpPost("view-all-garage")]
+        // public async Task<IActionResult> ViewGarage(PageDto page)
+        // {
+        //     var list = await garageService.View(page)!;
+        //     return Ok(list);
+        // }
 
         /// <summary>
         /// View all garages. [Admin]
@@ -71,7 +82,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Search garages. [Admin]
+        /// Search garages. [Admin, Customer]
         /// </summary>
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpPost("search-garage")]

@@ -70,12 +70,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Garage>?> GetGrageFilterByDateAndService(int serviceId)
+        public async Task<List<Garage>?> GetGrageFilterByDateAndService(List<int> serviceList)
         {
             try
             {
-                var list = await context.Garages.Include(g => g.Reviews)
-                .Where(g => g.GarageDetails.Any(s => s.Service.ServiceId == serviceId)).ToListAsync();
+                var listGarage = new List<Garage>();
+                
+                foreach (var id in serviceList)
+                {
+                    var list = await context.Garages.Include(g => g.Reviews)
+                    .Where(g => g.GarageDetails.Any(s => s.Service.ServiceId == id)).ToListAsync();
+
+                    listGarage.AddRange(list);
+                }
+                
+                return listGarage.Distinct().ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Garage>?> GetAll()
+        {
+            try
+            {
+                var list = await context.Garages.Include(g => g.Reviews).ToListAsync();
 
                 return list;
             }

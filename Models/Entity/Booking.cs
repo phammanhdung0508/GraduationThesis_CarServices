@@ -11,6 +11,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int BookingId { get; set; }
         public string BookingCode { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerPhone { get; set; }
+        public string CustomerEmail { get; set; }
         public DateTime BookingTime { get; set; }
         public string PaymentMethod { get; set; }
         [Column(TypeName = "decimal(10,3)")]
@@ -19,6 +22,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public decimal FinalPrice { get; set; }
         public bool? IsAccepted {get; set;}
         public int TotalEstimatedCompletionTime { get; set; }
+        public int CustomersCanReceiveTheCarTime { get; set; }
         [Column(TypeName = "tinyint")]
         public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]
@@ -35,5 +39,6 @@ namespace GraduationThesis_CarServices.Models.Entity
 
         /*-------------------------------------------------*/
         public virtual ICollection<BookingDetail> BookingDetails { get; set; }
+        public virtual ICollection<BookingMechanic> BookingMechanics { get; set; }
     }
 }

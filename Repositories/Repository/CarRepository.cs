@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -28,7 +29,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public async Task<bool> IsCarExist(int carId){
+        public async Task<bool> IsCarAvalible(int carId)
+        {
+            try
+            {
+                var isAvalible = await context.Cars.Where(c => c.CarId == carId && c.CarBookingStatus == CarStatus.Available).AnyAsync();
+
+                return isAvalible;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsCarExist(int carId)
+        {
             try
             {
                 var isExist = await context.Cars
@@ -42,7 +58,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
         }
 
-        public async Task<bool> IsLicensePlate(string licensePlate){
+        public async Task<bool> IsLicensePlate(string licensePlate)
+        {
             try
             {
                 var isExist = await context.Cars
@@ -52,12 +69,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
             }
             catch (System.Exception)
             {
-                
+
                 throw;
             }
         }
 
-        public async Task<string> GetLicensePlate(int carId){
+        public async Task<string> GetLicensePlate(int carId)
+        {
             try
             {
                 var licensePlate = await context.Cars

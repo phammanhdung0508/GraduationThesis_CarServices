@@ -7,7 +7,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface ICouponService
     {
         Task<GenericObject<List<CouponListResponseDto>>> View(PageDto page);
-        Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId);
+        Task<List<FilterCouponByGarageResponseDto>?> FilterGarageCoupon(int garageId);
         Task<CouponDetailResponseDto?> Detail(int id);
         Task Create(CouponCreateRequestDto requestDto);
         Task Update(CouponUpdateRequestDto requestDto);

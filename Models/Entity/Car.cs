@@ -22,6 +22,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CarFuelType { get; set; }
         public int NumberOfCarLot {get; set;}
         [Column(TypeName = "tinyint")]
+        public CarStatus CarBookingStatus { get; set; }
+        [Column(TypeName = "tinyint")]
         public Status CarStatus { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

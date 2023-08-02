@@ -105,8 +105,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile("carservices-868c3-firebase-adminsdk-c2mym-62ba5d7dbe.json"),
-    ProjectId = "carservices-868c3",
+    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:GoogleCredential"]!),
+    ProjectId = builder.Configuration["Firebase:ProjectId"]!,
 });
 
 builder.Services.AddTransient<StorageMiddleware>();

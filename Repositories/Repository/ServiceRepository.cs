@@ -16,14 +16,17 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-
-        public async Task<List<Service>?> View(PageDto page)
+        public async Task<(List<Service>, int count)> View(PageDto page)
         {
             try
             {
-                var list = await PagingConfiguration<Service>.Get(context.Services
-                .Where(s => s.ServiceStatus == Status.Activate), page);
-                return list;
+                var query = context.Services.AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Service>.Get(query, page);
+
+                return (list, count);
             }
             catch (Exception)
             {
@@ -31,7 +34,60 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsServiceExist(int serviceId){
+        public async Task<List<Service>> GetAll()
+        {
+            try
+            {
+                var list = await context.Services.ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<ServiceDetail>, int count)> FilterServiceByGarage(int garageId, PageDto page)
+        {
+            try
+            {
+                var query = context.Garages.Where(d => d.GarageId == garageId).SelectMany(u => u.GarageDetails)
+                .Select(c => c.Service).SelectMany(s => s.ServiceDetails).Include(s => s.Service).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<ServiceDetail>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Service>, int count)> SearchByName(string search, PageDto page)
+        {
+            try
+            {
+                var searchTrim = search.Trim().Replace(" ", "").ToLower();
+                var query = context.Services.Where(s => s.ServiceName.ToLower().Trim().Replace(" ", "").Contains(searchTrim)).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Service>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsServiceExist(int serviceId)
+        {
             try
             {
                 var check = await context.Services
@@ -65,7 +121,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsDuplicatedService(Service service){
+        public async Task<bool> IsDuplicatedService(Service service)
+        {
             try
             {
                 var check = await context.Services
@@ -107,8 +164,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-        
-        public float GetPrice(int serviceDetailId)
+
+        public decimal GetPrice(int serviceDetailId)
         {
             try
             {
@@ -133,10 +190,40 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Where(p => p.ServiceDetailId.Equals(serviceDetailId))
                 .Select(p => p.Service.ServiceDuration)
                 .FirstOrDefaultAsync();
-                
+
                 return serviceDuration;
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Service>> GetServiceByServiceGroup(int garageId)
+        {
+            try
+            {
+                var services = await context.GarageDetails.Where(g => g.GarageId == garageId)
+                .Include(g => g.Service).ThenInclude(s => s.ServiceDetails).Select(g => g.Service).ToListAsync();
+
+                return services;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<BookingDetail>> GetServiceForBookingDetail(int bookingId)
+        {
+            try
+            {
+                var list = await context.BookingDetails.Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                .Where(b => b.BookingId == bookingId).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
             {
                 throw;
             }

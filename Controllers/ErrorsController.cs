@@ -11,8 +11,14 @@ namespace GlobalErrorHandling.Controllers
         // [HttpGet]
         public IActionResult Error()
         {
-            var exception = (MyException) HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error!;
-            return Problem(title: exception.Message, statusCode: exception.StatusCode);
+            switch (HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error!)
+            {
+                case MyException:
+                    var exception = (MyException)HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error!;
+                    return Problem(title: exception.Message, statusCode: exception.StatusCode);
+                default:
+                    return Problem(title: "Internal Server Error", statusCode: 500);
+            }
         }
     }
 }

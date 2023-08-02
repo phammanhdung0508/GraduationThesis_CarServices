@@ -18,8 +18,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string Description { get; set; }
         [Column(TypeName = "tinyint")]
         public Status ReportStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
         // public virtual Booking Booking { get; set; }

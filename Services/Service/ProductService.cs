@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Product;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -21,12 +22,16 @@ namespace GraduationThesis_CarServices.Services.Service
             this.productRepository = productRepository;
         }
 
-        public async Task<List<ProductListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<ProductListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper
-                .Map<List<ProductListResponseDto>>(await productRepository.View(page));
+                (var listObj, var count) = await productRepository.View(page);
+
+                var listDto = mapper.Map<List<ProductListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ProductListResponseDto>>(listDto, count);
+
                 return list;
             }
             catch (Exception e)
@@ -43,7 +48,40 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<ProductListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await productRepository.SearchByName(page, requestDto.Search);
+
+                var listDto = mapper.Map<List<ProductListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ProductListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
                 }
             }
         }
@@ -71,7 +109,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -99,7 +137,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -133,7 +171,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -168,7 +206,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -198,7 +236,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -231,7 +269,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

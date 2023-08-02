@@ -11,5 +11,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task Update(Car car);
         Task<bool> IsCarExist(int carId);
         Task<bool> IsLicensePlate(string licensePlate);
+        Task<bool> IsCarAvalible(int carId);
     }
 }

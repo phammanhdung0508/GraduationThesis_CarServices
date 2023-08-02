@@ -36,7 +36,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('carservices', subscription().subscriptionId)))]",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('carserviceapi', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [
@@ -49,17 +49,17 @@
           "contentVersion": "1.0.0.0",
           "resources": [
             {
-              "name": "carservicesapi",
+              "name": "carserviceazureapi",
               "type": "Microsoft.ApiManagement/service",
               "location": "[parameters('resourceLocation')]",
               "properties": {
-                "publisherEmail": "kibichan52@gmail.com",
-                "publisherName": "El Desperado",
+                "publisherEmail": "vinhluu20@gmail.com",
+                "publisherName": "luu quoc vinh",
                 "notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
                 "hostnameConfigurations": [
                   {
                     "type": "Proxy",
-                    "hostName": "carservicesapi.azure-api.net",
+                    "hostName": "carserviceazureapi.azure-api.net",
                     "encodedCertificate": null,
                     "keyVaultId": null,
                     "certificatePassword": null,
@@ -95,9 +95,9 @@
             },
             {
               "type": "Microsoft.ApiManagement/service/apis",
-              "name": "carservicesapi/carservices",
+              "name": "carserviceazureapi/carserviceapi",
               "properties": {
-                "displayName": "carservices",
+                "displayName": "carserviceapi",
                 "apiRevision": "1",
                 "description": null,
                 "subscriptionRequired": true,
@@ -118,7 +118,7 @@
               },
               "apiVersion": "2019-12-01",
               "dependsOn": [
-                "carservicesapi"
+                "carserviceazureapi"
               ]
             }
           ]

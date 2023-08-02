@@ -7,8 +7,17 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     {
         Task<List<User>?> View(PageDto page);
         Task<bool> IsCustomerExist(int customerId);
+        Task<int> GetCustomerId(int userId);
         Task<User?> Detail(int id);
-        Task Create(User user);
+        Task<int> Create(User user);
         Task Update(User user);
+        Task<List<User>> FilterByRole(PageDto page, int roleId);
+        int TotalBooking(int customerId);
+        Task<bool> IsUserPhoneExist(string userPhone);
+        Task<bool> IsEmailExist(string userEmail);
+        Task<bool> IsVerifyOtp(string userEmail);
+        Task<User?> CustomerDetail(int userId);
+        Task<User?> GetUserByEmail(string userEmail);
+        Task<List<User>?> SearchUser(string search, int roleId);
     }
 }

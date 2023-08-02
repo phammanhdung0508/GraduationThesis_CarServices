@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -16,6 +17,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICouponRepository couponRepository;
         private readonly IGarageRepository garageRepository;
         private readonly IMapper mapper;
+        
         public CouponService(ICouponRepository couponRepository, IGarageRepository garageRepository, IMapper mapper)
         {
             this.mapper = mapper;
@@ -23,11 +25,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<CouponListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<CouponListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.View(page));
+                (var listObj, var count) = await couponRepository.View(page);
+
+                var listDto = mapper.Map<List<CouponListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<CouponListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -45,12 +51,12 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<CouponListResponseDto>?> FilterGarageCoupon(int garageId)
+        public async Task<List<FilterCouponByGarageResponseDto>?> FilterGarageCoupon(int garageId)
         {
             try
             {
@@ -62,7 +68,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var list = mapper.Map<List<CouponListResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
+                var list = mapper.Map<List<FilterCouponByGarageResponseDto>>(await couponRepository.FilterGarageCoupon(garageId));
 
                 return list;
             }
@@ -80,7 +86,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -113,7 +119,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -151,7 +157,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -190,7 +196,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -225,7 +231,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

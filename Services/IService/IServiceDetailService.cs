@@ -11,6 +11,5 @@ namespace GraduationThesis_CarServices.Services.IService
         Task Create(ServiceDetailCreateRequestDto requestDto);
         Task Update(ServiceDetailUpdateRequestDto requestDto);
         Task UpdatePrice(ServiceDetailPriceRequestDto requestDto);
-
     }
 }

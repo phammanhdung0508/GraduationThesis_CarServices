@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Models
 {
+#pragma warning disable CS1591
     public class DataContext : DbContext
     {
         public DbSet<Booking> Bookings { get; set; }
@@ -16,19 +17,19 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<Garage> Garages { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Report> Reports { get; set; }
+        //public DbSet<Report> Reports { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
         public DbSet<GarageDetail> GarageDetails { get; set; }
-        public DbSet<Subcategory> Subcategories { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Mechanic> Mechanics { get; set; }
-        public DbSet<WorkingSchedule> WorkingSchedules { get; set; }
+        public DbSet<GarageMechanic> GarageMechanics { get; set; }
         public DbSet<Lot> Lots { get; set; }
-        public DbSet<ServiceDetail> ServiceDetails {get; set;}
+        public DbSet<ServiceDetail> ServiceDetails { get; set; }
+        public DbSet<BookingMechanic> BookingMechanics {get; set;}
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -39,23 +40,26 @@ namespace GraduationThesis_CarServices.Models
             base.OnModelCreating(modelBuilder);
             this.OneToOneRelationship(modelBuilder);
             this.MultipleCascadePathFix(modelBuilder);
+            this.SeedData(modelBuilder);
+        }
 
+        private void SeedData(ModelBuilder modelBuilder)
+        {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             Randomizer.Seed = new Random(200);
             this.SeedRoleData(modelBuilder);
             this.SeedCategoryData(modelBuilder);
-            this.SeedSubcategoryData(modelBuilder);
             this.SeedServiceData(modelBuilder);
             this.SeedServiceDetailData(modelBuilder);
             this.SeedRandomProductData(modelBuilder);
             this.SeedRandomUserData(modelBuilder);
-            this.SeedRandomWorkingScheduleData(modelBuilder);
+            this.SeedRandomGarageMechanicData(modelBuilder);
             this.SeedRandomCarData(modelBuilder);
             this.SeedRandomGarageData(modelBuilder);
             this.SeedRandomReviewData(modelBuilder);
             this.SeedRandomCouponData(modelBuilder);
             this.SeedRandomBookingData(modelBuilder);
-            this.SeedRandomReportData(modelBuilder);
+            //this.SeedRandomReportData(modelBuilder);
             watch.Stop();
             Console.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
         }
@@ -80,6 +84,8 @@ namespace GraduationThesis_CarServices.Models
             .HasForeignKey<Mechanic>(e => e.MechanicId)
             //.OnDelete(DeleteBehavior.Cascade)
             ;
+
+            // modelBuilder.Entity<Service>().OwnsOne(x => x.ServiceGroup);
         }
 
         private void MultipleCascadePathFix(ModelBuilder modelBuilder)
@@ -92,6 +98,7 @@ namespace GraduationThesis_CarServices.Models
         }
 
         private readonly DateTime now = DateTime.Now;
+
         private void SeedRoleData(ModelBuilder modelBuilder)
         {
             var list = new List<Role>()
@@ -102,126 +109,250 @@ namespace GraduationThesis_CarServices.Models
                 new Role{RoleId=4, RoleName="Admin"},
                 new Role{RoleId=5, RoleName="Staff"},
             };
+
             modelBuilder.Entity<Role>().HasData(list);
         }
 
         private void SeedCategoryData(ModelBuilder modelBuilder)
         {
             var list = new List<Category>{
-                new Category{CategoryId=1, CategoryName="Phụ tùng thay thế", CreatedAt=now, CategoryStatus=Status.Activate},
-                new Category{CategoryId=2, CategoryName="Vật liệu tiêu hao", CreatedAt=now, CategoryStatus=Status.Activate},
-                new Category{CategoryId=3, CategoryName="Công cụ và thiết bị", CreatedAt=now, CategoryStatus=Status.Activate}
+                new Category{CategoryId=1, CategoryName="Sản phẩm vệ sinh", CreatedAt=now, CategoryStatus=Status.Activate},
+                new Category{CategoryId=2, CategoryName="Sản phẩm nâng cấp", CreatedAt=now, CategoryStatus=Status.Activate}
             };
+
             modelBuilder.Entity<Category>().HasData(list);
-        }
-
-        private void SeedSubcategoryData(ModelBuilder modelBuilder)
-        {
-            var list = new List<Subcategory>{
-                //Phụ tùng thay thế, sửa chữa
-                new Subcategory{SubcategoryId=1, SubcategoryName="Bộ lọc gió", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=2, SubcategoryName="Bộ lọc dầu", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=3, SubcategoryName="Bộ lọc nhiên liệu", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=4, SubcategoryName="Giảm xóc", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=5, SubcategoryName="Bộ lò xo", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=6, SubcategoryName="Bộ phanh", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=7, SubcategoryName="Cần số", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-                new Subcategory{SubcategoryId=8, SubcategoryName="Cầu lái", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=1},
-
-                //Vật liệu tiêu hao, bảo dưỡng
-                new Subcategory{SubcategoryId=9, SubcategoryName="Dầu nhớt", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=10, SubcategoryName="Dung dịch làm mát", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=11, SubcategoryName="Bình nước rửa kính", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=12, SubcategoryName="Nội thất", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=13, SubcategoryName="Đèn trước, đèn sau", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2},
-                new Subcategory{SubcategoryId=14, SubcategoryName="Pin xe", CreatedAt=now, SubcategoryStatus=Status.Activate, CategoryId=2}
-            };
-            modelBuilder.Entity<Subcategory>().HasData(list);
         }
 
         private void SeedServiceData(ModelBuilder modelBuilder)
         {
             var list = new List<Service>{
-                //Rửa xe, vệ Sinh
-                new Service{ServiceId=1, ServiceName="Rửa Xe Sạch, An Toàn", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=2, ServiceName="Vệ Sinh Nội Thất", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=3, ServiceName="Vệ Sinh Khoang Máy", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=4, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=5, ServiceName="Khử Mùi Hôi, Mùi Thuốc Lá", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=6, ServiceName="Đánh Bóng Xe Hơi", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                //GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
+                new Service{ServiceId=1, ServiceName="Rửa xe + hút bụi + xịt gầm", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Quy trình rửa xe gồm 11 bước nhầm bảo vệ tuyệt đối lớp sơn xe của khách hàng, đồng thời mang lại vẻ ngoài sáng bóng sau mỗi lần rửa xe tại MeCar.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
-                //Nâng cấp xe
-                new Service{ServiceId=7, ServiceName="Phủ Ceramic", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=8, ServiceName="Sơn Phủ Gầm Xe Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=4, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=9, ServiceName="Cách Âm Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=10, ServiceName="Dán Phim Cách Nhiệt Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=11, ServiceName="Nâng Cấp Cửa Hít Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=12, ServiceName="Lắp Camera Hành Trình Ô Tô", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=2, ServiceName="Tẩy nhựa đường", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Tẩy nhựa đường là một sản phẩm được sử dụng để loại bỏ vết nhựa đường, dầu mỡ, và bụi bẩn trên bề mặt.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=3, ServiceName="Tẩy ố kính", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Tẩy ố kính là một quy trình giúp loại bỏ các vết ố, bụi bẩn, và mảng cứng trên bề mặt của kính.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=4, ServiceName="Vệ Sinh + Bảo dưỡng khoang động cơ", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh và bảo dưỡng khoang động cơ là quá trình quan trọng để đảm bảo hoạt động hiệu quả và độ bền của động cơ xe.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=5, ServiceName="Vệ Sinh + Bảo dưỡng nội thất", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh và bảo dưỡng nội thất là quá trình dọn dẹp và bảo quản các bộ phận nội thất trong một không gian.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=6, ServiceName="Vệ sinh nội soi hệ thống lạnh", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh nội soi hệ thống lạnh là quá trình loại bỏ bụi bẩn, vi khuẩn và chất lỏng tích tụ trong hệ thống làm lạnh.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=7, ServiceName="Vệ sinh kim phun xăng", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh kim phun xăng là quá trình làm sạch và bảo dưỡng các bộ phận liên quan đến hệ thống phun nhiên liệu của động cơ.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=8, ServiceName="Vệ sinh kim phun dầu", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Việc vệ sinh kim phun dầu là quá trình loại bỏ bụi bẩn, cặn dầu và các tạp chất khác khỏi bề mặt kim phun dầu để đảm bảo hoạt động hiệu quả của hệ thống nạp nhiên liệu.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=9, ServiceName="Diệt khuẩn Demi", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Diệt khuẩn Demi là một loại sản phẩm hoặc chất liệu được sử dụng để tiêu diệt hoặc làm giảm tác động của vi khuẩn hoặc vi rút.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Time,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=10, ServiceName="Diệt khuẩn khử mùi nội thất", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Diệt khuẩn khử mùi nội thất là quá trình loại bỏ vi khuẩn và mùi hôi từ các bề mặt và không khí trong không gian nội thất.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=11, ServiceName="Vệ sinh két nước ô tô.", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh két nước ô tô là quá trình làm sạch và bảo dưỡng hệ thống két nước trong ô tô.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=12, ServiceName="Vệ sinh buồng đốt", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh buồng đốt là quá trình làm sạch và bảo dưỡng buồng đốt trong các thiết bị đốt cháy, như lò sưởi, máy nhiệt, hay lò hơi.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=13, ServiceName="Vệ sinh họng ga+ bướm ga+ van EGR", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh họng ga, bướm ga, và van EGR là quá trình làm sạch các phần của hệ thống ga và khí thải của xe ô tô.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=14, ServiceName="Vệ sinh, bảo dưỡng thắng", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh, bảo dưỡng thắng là quá trình duy trì và bảo quản hệ thống thắng trên một phương tiện, như xe hơi hoặc xe máy, để đảm bảo rằng hệ thống thắng hoạt động an toàn và hiệu quả.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=15, ServiceName="Vệ sinh nội soi dàn lạnh", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Vệ sinh nội soi dàn lạnh là quá trình làm sạch và bảo dưỡng hệ thống nội soi dàn lạnh. Nội soi dàn lạnh là một phần quan trọng trong hệ thống làm lạnh của máy lạnh hoặc thiết bị điều hòa không khí", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                //GÓI DỊCH VỤ NGOẠI THẤT
+                new Service{ServiceId=16, ServiceName="Phủ Nano", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="phủ bóng Nano là việc phủ lên bề mặt lớp sơn xe một lớp dung dịch có thành phần chính là các tinh thể có gốc hữu cơ với kích thước siêu nhỏ dạng Nano.", ServiceDuration=4,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=17, ServiceName="Phủ Ceramic 9H", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Ceramic Pro 9H là lớp sơn phủ Nano- ceramic có độ bóng cao, hiệu ứng siêu kỵ nước, chống trầy xước, kháng hóa chất, chống tia cực tím, kháng nhiệt và chống Grafitti.", ServiceDuration=4,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=18, ServiceName="Phủ gầm gói tiêu chuẩn", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Lớp phủ chống ăn mòn được áp dụng dưới phần dưới của xe, bao gồm cả khung gầm và các bộ phận khác như động cơ, hệ thống treo và ống xả.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=19, ServiceName="Phủ gầm gói cao cấp", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Lớp phủ chống ăn mòn được áp dụng dưới phần dưới của xe, bao gồm cả khung gầm và các bộ phận khác như động cơ, hệ thống treo và ống xả.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=20, ServiceName="Dán phim Nano gói tiêu chuẩn", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Dán phim Nano chuyển sáng và chống chói lóa, đặc biệt, cơ chế dẫn điện chuyển đổi kim loại bằng oxy nitride tăng khả năng loại bỏ nhiệt nhiều hơn và bền hơn so với các loại phim cách nhiệt thông thường khác.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=21, ServiceName="Dán phim Nano gói cao cấp", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Dán phim Nano chuyển sáng và chống chói lóa, đặc biệt, cơ chế dẫn điện chuyển đổi kim loại bằng oxy nitride tăng khả năng loại bỏ nhiệt nhiều hơn và bền hơn so với các loại phim cách nhiệt thông thường khác.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=22, ServiceName="Phim 3M- Llumar gói tiêu chuẩn", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Phim 3M- Llumar phim cách nhiệt mang đến thẩm mỹ và khả năng duy trì các kết nối trên xe ổn định, không gây cản trở như sóng điện thoại, radio, GPS,… .", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=23, ServiceName="Phim 3M- Llumar gói cao cấp", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Phim 3M- Llumar phim cách nhiệt mang đến thẩm mỹ và khả năng duy trì các kết nối trên xe ổn định, không gây cản trở như sóng điện thoại, radio, GPS,… .", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Bảo dưỡng định kỳ
-                new Service{ServiceId=13, ServiceName="Thay dầu, bộ lọc", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=1, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=14, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=15, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=24, ServiceName="Thay dầu, bộ lọc", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Thay dầu, bộ lọc có vai trò lọc sạch các cặn bẩn và giữ lại mạt sắt đảm bảo dầu được lọc sạch giúp bảo vệ hệ thống bôi trơn, hạn chế hao mòn của các chi tiết trong động cơ.", ServiceDuration=1,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=25, ServiceName="Kiểm tra hệ thống điện, phanh, treo", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Kiểm tra hệ thống điện, phanh, treo là quá trình kiểm tra các bộ phận quan trọng trên ôtô để đảm bảo sự an toàn và hoạt động hiệu quả của xe.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=26, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Kiểm tra và thay bình ắc quy là quá trình kiểm tra tình trạng hoạt động của bình ắc quy và thay thế nếu cần.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //Sửa chữa khẩn cấp
-                new Service{ServiceId=16, ServiceName="Thay thế phụ tùng bị hư hỏng", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=17, ServiceName="Sửa chữa động cơ", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=3, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=18, ServiceName="Sửa chữa hệ thống điện", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
-                new Service{ServiceId=19, ServiceName="Sửa chữa hệ thống phanh", ServiceImage="",
-                    ServiceDetailDescription="Lorem Ipsum is simply dummy text.", ServiceDuration=2, ServiceStatus=Status.Activate, CreatedAt=now},
+                new Service{ServiceId=27, ServiceName="Áo ghế simili", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Áo ghế Simili là một dạng vải tổng hợp bằng cách kết hợp chất liệu nhựa và sợi polyester. Được sản xuất để có độ bền cao, áo ghế simili thường có khả năng chống chịu mài mòn, chống thấm nước và dễ vệ sinh.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=28, ServiceName="Thảm lót sàn", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Thảm lót sàn được sử dụng để bảo vệ sàn ô tô khỏi bụi bẩn, nước, và các tác động bên ngoài khác.", ServiceDuration=3,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=29, ServiceName="Mặt cốp + lưng ghế", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Thay thế Mặt cốp và lưng ghế ô tô là quá trình thay thế các bộ phận của cốp sau và lưng ghế trong xe ô tô.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=30, ServiceName="La phông trần - bọc ni long", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="La phông trần - bọc ni long là quá trình thêm một lớp ni da nhân tạo hoặc ni vinyl lên bề mặt của chiếc xe để bảo vệ nó khỏi các tác động từ môi trường như mưa, nắng, bụi bẩn, trầy xước.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=31, ServiceName="Bọc da bò", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Bọc da bò là quá trình thêm một lớp da bò nhân tạo lên bề mặt của chiếc xe để bảo vệ nó khỏi các tác động từ môi trường như mưa, nắng, bụi bẩn, trầy xước và tăng thẩm mỹ cho xe.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
+
+                new Service{ServiceId=32, ServiceName="Camera hành trình", ServiceImage="https://img.freepik.com/premium-vector/auto-repair-garage-logo-template-automotive-industry_160069-75.jpg?w=2000",
+                    ServiceDetailDescription="Camera hành trình ô tô là một thiết bị ghi hình được gắn trên xe ô tô để ghi lại các sự kiện xảy ra trong quá trình lái xe.", ServiceDuration=2,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceStatus=Status.Activate, CreatedAt=now},
             };
+
             modelBuilder.Entity<Service>().HasData(list);
         }
 
-        private void SeedServiceDetailData(ModelBuilder modelBuilder){
-            var list = new List<ServiceDetail>{
-                new ServiceDetail{ServiceDetailId=1, MinNumberOfCarLot=2, MaxNumberOfCarLot=4, ServicePrice=800, ServiceId=2},
-                new ServiceDetail{ServiceDetailId=2, MinNumberOfCarLot=5, MaxNumberOfCarLot=6, ServicePrice=900, ServiceId=2},
-                new ServiceDetail{ServiceDetailId=3, MinNumberOfCarLot=7, MaxNumberOfCarLot=9, ServicePrice=1200000, ServiceId=2},
-            };
+        private void SeedServiceDetailData(ModelBuilder modelBuilder)
+        {
+            var list = new List<ServiceDetail>();
+            Random random = new Random();
+            int y = 1;
+            for (int i = 1; i <= 62; i++)
+            {
+                int million = random.Next(1, 4);
+                int hundred = random.Next(1, 9);
+                var price = Decimal.Parse($"{million:N0}{hundred}00");
+                list.Add(new ServiceDetail { ServiceDetailId = i, MinNumberOfCarLot = 4, MaxNumberOfCarLot = 5, ServicePrice = price, ServiceId = y });
+                price = price + 200;
+                list.Add(new ServiceDetail { ServiceDetailId = i + 1, MinNumberOfCarLot = 6, MaxNumberOfCarLot = 7, ServicePrice = price, ServiceId = y });
+                i = i + 1;
+                y = y + 1;
+            }
+
             modelBuilder.Entity<ServiceDetail>().HasData(list);
         }
 
         private void SeedRandomProductData(ModelBuilder modelBuilder)
         {
-            var productFaker = new Faker<Product>();
+            var list = new List<Product>{
+                new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
 
-            for (int i = 1; i <= 30; i++)
-            {
-                productFaker.RuleFor(p => p.ProductId, i)
-                    .RuleFor(p => p.ProductName, f => f.Commerce.ProductName())
-                    .RuleFor(p => p.ProductDetailDescription, f => f.Lorem.Sentence())
-                    .RuleFor(p => p.ProductPrice, f => f.Random.Float(50, 200))
-                    .RuleFor(p => p.ProductQuantity, f => f.Random.Int(1, 100))
-                    .RuleFor(p => p.ProductStatus, Status.Activate)
-                    .RuleFor(p => p.CreatedAt, now)
-                    .RuleFor(p => p.SubcategoryId, f => f.Random.Int(1, 14))
-                    .RuleFor(p => p.ServiceId, f => f.Random.Int(1, 10));
+                new Product{ProductId = 2, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
 
-                modelBuilder.Entity<Product>().HasData(productFaker.Generate());
-            }
+                new Product{ProductId = 3, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 350ml ", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+
+                new Product{ProductId = 4, ProductName="Nano Engine Super Protection (Nano bảo vệ động cơ) 250ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=16, CategoryId=2},
+
+                new Product{ProductId = 5, ProductName="Oxicat Oxygen Sensor & Catalytic (Vệ sinh cảm biến oxy và catalytic) 300ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+
+                new Product{ProductId = 6, ProductName="Throttle Body Cleaner (Vệ sinh họng ga) 280ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
+
+                new Product{ProductId = 7, ProductName="Radiator Flush (Vệ sinh hệ thống làm mát) 300ml", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+
+                new Product{ProductId = 8, ProductName="Radiator conditioner (Vệ sinh điều hòa tản nhiệt)", ProductImage="",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=1},
+            };
+
+            modelBuilder.Entity<Product>().HasData(list);
         }
 
         private void SeedRandomUserData(ModelBuilder modelBuilder)
         {
+            var userList = new List<User>();
+            var customerList = new List<Customer>();
+            var mechanicList = new List<Mechanic>();
+
+            var levelList = new string[] { MechanicLevel.Level1.ToString(), MechanicLevel.Level2.ToString(), MechanicLevel.Level3.ToString() };
+
             var customerFaker = new Faker<Customer>();
             var mechanicFaker = new Faker<Mechanic>();
             var userFaker = new Faker<User>();
@@ -241,28 +372,30 @@ namespace GraduationThesis_CarServices.Models
                             .RuleFor(c => c.CustomerWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.CustomerDistrict)); })
                             .RuleFor(c => c.CustomerCity, "Hồ Chí Minh");
 
-                        modelBuilder.Entity<Customer>().HasData(customerFaker.Generate());
+                        customerList.Add(customerFaker.Generate());
                         break;
                     case > 30 and <= 49:
                         mechanicFaker.RuleFor(m => m.MechanicId, ++m)
-                            .RuleFor(m => m.TotalWorkingHours, f => f.Random.Int(0, 20));
+                            .RuleFor(m => m.Level, f => f.PickRandom(levelList))
+                            .RuleFor(m => m.MechanicStatus, f => MechanicStatus.Available);
 
-                        modelBuilder.Entity<Mechanic>().HasData(mechanicFaker.Generate());
+                        mechanicList.Add(mechanicFaker.Generate());
                         break;
                 }
 
                 userFaker.RuleFor(u => u.UserId, i)
                     .RuleFor(u => u.UserFirstName, f => f.Name.FirstName())
                     .RuleFor(u => u.UserLastName, f => f.Name.LastName())
-                    .RuleFor(u => u.UserEmail, (f, u) => f.Internet.Email(u.UserFirstName, u.UserLastName))
+                    .RuleFor(u => u.UserEmail, (f, u) => encryptConfiguration.Base64Encode(f.Internet.Email(u.UserFirstName, u.UserLastName)))
                     .RuleFor(u => u.PasswordHash, password_hash)
                     .RuleFor(u => u.PasswordSalt, password_salt)
                     .RuleFor(u => u.UserImage, f => f.Internet.Avatar())
-                    .RuleFor(u => u.UserPhone, f => f.Phone.PhoneNumberFormat())
+                    .RuleFor(u => u.UserPhone, f => f.Random.Replace("+84#########"))
                     .RuleFor(u => u.UserGender, f => f.PickRandom<Gender>())
                     .RuleFor(u => u.UserDateOfBirth, f => f.Person.DateOfBirth)
                     .RuleFor(u => u.UserBio, f => f.Lorem.Lines())
                     .RuleFor(u => u.UserStatus, Status.Activate)
+                    .RuleFor(u => u.EmailConfirmed, 1)
                     .RuleFor(u => u.CreatedAt, now)
                     .RuleFor(u => u.RoleId, f =>
                     {
@@ -280,105 +413,123 @@ namespace GraduationThesis_CarServices.Models
                         }
                     });
 
-                modelBuilder.Entity<User>().HasData(userFaker.Generate());
+                userList.Add(userFaker.Generate());
             }
+
+            modelBuilder.Entity<Customer>().HasData(customerList);
+            modelBuilder.Entity<Mechanic>().HasData(mechanicList);
+            modelBuilder.Entity<User>().HasData(userList);
         }
 
-        private void SeedRandomWorkingScheduleData(ModelBuilder modelBuilder)
+        private void SeedRandomGarageMechanicData(ModelBuilder modelBuilder)
         {
-            var workingScheduleFaker = new Faker<WorkingSchedule>();
+            var garageMechanicList = new List<GarageMechanic>();
+
+            var garageMechanicFaker = new Faker<GarageMechanic>();
 
             for (int i = 1; i <= 60; i++)
             {
-                workingScheduleFaker.RuleFor(w => w.WorkingScheduleId, i)
-                    .RuleFor(w => w.StartTime, "08:00 AM")
-                    .RuleFor(w => w.EndTime, "07:00 PM")
-                    .RuleFor(w => w.DaysOfTheWeek, f => f.PickRandom<DayOfWeek>().ToString())
-                    .RuleFor(w => w.Description, f => f.Lorem.Lines())
-                    .RuleFor(w => w.WorkingScheduleStatus, f => WorkingScheduleStatus.NotAvailable)
-                    .RuleFor(w => w.GarageId, f => f.Random.Int(1, 25))
+                garageMechanicFaker.RuleFor(w => w.GarageMechanicId, i)
+                    .RuleFor(w => w.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
-                modelBuilder.Entity<WorkingSchedule>().HasData(workingScheduleFaker.Generate());
+                garageMechanicList.Add(garageMechanicFaker.Generate());
             }
+
+            modelBuilder.Entity<GarageMechanic>().HasData(garageMechanicList);
         }
 
         private void SeedRandomCarData(ModelBuilder modelBuilder)
         {
+            var carList = new List<Car>();
+
             var carFaker = new Faker<Car>();
 
             for (int i = 1; i <= 20; i++)
             {
                 carFaker.RuleFor(c => c.CarId, i)
-                    .RuleFor(c => c.CarColor, f => f.Commerce.Color())
                     .RuleFor(c => c.CarModel, f => f.Vehicle.Model())
                     .RuleFor(c => c.CarBrand, f => f.Vehicle.Manufacturer())
                     .RuleFor(c => c.CarLicensePlate, f => f.Random.Replace("##?-###.##"))
-                    .RuleFor(c => c.CarYear, f => f.Random.Int(1935, 2023))
-                    .RuleFor(c => c.CarBodyType, f => f.Vehicle.Type())
                     .RuleFor(c => c.CarFuelType, f => f.Vehicle.Fuel())
+                    .RuleFor(c => c.CarDescription, f => f.Lorem.Paragraph())
                     .RuleFor(c => c.NumberOfCarLot, f => f.Random.Int(2, 9))
+                    .RuleFor(c => c.CarBookingStatus, CarStatus.Available)
                     .RuleFor(c => c.CarStatus, Status.Activate)
                     .RuleFor(c => c.CreatedAt, now)
                     .RuleFor(c => c.CustomerId, f => f.Random.Int(1, 20));
 
-                modelBuilder.Entity<Car>().HasData(carFaker.Generate());
+                carList.Add(carFaker.Generate());
             }
+            modelBuilder.Entity<Car>().HasData(carList);
         }
 
         private void SeedRandomGarageData(ModelBuilder modelBuilder)
         {
+            var garageList = new List<Garage>();
+            var garageDetailList = new List<GarageDetail>();
+            var lotList = new List<Lot>();
+
             var garageFaker = new Faker<Garage>();
             var garageDetailFaker = new Faker<GarageDetail>();
             var lotFaker = new Faker<Lot>();
 
-            for (int i = 1; i <= 25; i++)
+            for (int i = 1; i <= 14; i++)
             {
                 garageFaker.RuleFor(g => g.GarageId, i)
-                    .RuleFor(g => g.GarageName, f => f.Name.FirstName() + " Garage")
+                    .RuleFor(g => g.GarageName, "Me " + "Garage")
                     .RuleFor(g => g.GarageAbout, f => f.Lorem.Paragraph())
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
                     .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
-                    .RuleFor(g => g.FromTo, "Monday to Saturday")
+                    // .RuleFor(g => g.FromTo, "Monday to Saturday")
                     .RuleFor(g => g.OpenAt, "08:00 AM")
                     .RuleFor(g => g.CloseAt, "05:00 PM")
-                    .RuleFor(g => g.GarageAddress, f => f.Address.StreetAddress())
-                    .RuleFor(g => g.GarageCity, "Ho Chi Minh")
-                    .RuleFor(g => g.GarageDistrict, f => f.PickRandom(RandomConfiguration.Districts))
-                    .RuleFor(g => g.GarageWard, (f, g) => { return f.PickRandom(RandomConfiguration.check(g.GarageDistrict)); })
-                    .RuleFor(g => g.GarageLatitude, RandomConfiguration.Location[i].Latitude)
-                    .RuleFor(g => g.GarageLongitude, RandomConfiguration.Location[i].Longitude)
                     .RuleFor(g => g.GarageStatus, Status.Activate)
                     .RuleFor(g => g.CreatedAt, now)
                     .RuleFor(g => g.UserId, f => f.Random.Int(21, 30));
 
+                var garage = garageFaker.Generate();
 
-                modelBuilder.Entity<Garage>().HasData(garageFaker.Generate());
+                var ran = RandomConfiguration.Location[i];
 
+                garage.GarageAddress = ran.Address;
+                garage.GarageWard = ran.Ward;
+                garage.GarageDistrict = ran.District;
+                garage.GarageCity = ran.City;
+                garage.GarageLatitude = ran.Latitude;
+                garage.GarageLongitude = ran.Longitude;
+
+                garageList.Add(garage);
             }
 
-            for (int i = 1; i <= 70; i++)
+            for (int i = 1; i <= 100; i++)
             {
                 garageDetailFaker.RuleFor(s => s.GarageDetailId, i)
-                    .RuleFor(s => s.GarageId, f => f.Random.Int(1, 25))
-                    .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 10));
+                    .RuleFor(s => s.GarageId, f => f.Random.Int(1, 14))
+                    .RuleFor(s => s.ServiceId, f => f.Random.Int(1, 32));
 
-                modelBuilder.Entity<GarageDetail>().HasData(garageDetailFaker.Generate());
+                garageDetailList.Add(garageDetailFaker.Generate());
             }
 
             for (int i = 1; i <= 100; i++)
             {
                 lotFaker.RuleFor(l => l.LotId, i)
                     .RuleFor(l => l.LotNumber, f => f.Random.Replace("#?"))
-                    .RuleFor(l => l.LotStatus, f => f.PickRandom<LotStatus>())
-                    .RuleFor(l => l.GarageId, f => f.Random.Int(1, 25));
+                    .RuleFor(l => l.LotStatus, f => LotStatus.Free)
+                    .RuleFor(l => l.GarageId, f => f.Random.Int(1, 14));
 
-                modelBuilder.Entity<Lot>().HasData(lotFaker.Generate());
+                lotList.Add(lotFaker.Generate());
             }
+
+            modelBuilder.Entity<Garage>().HasData(garageList);
+            modelBuilder.Entity<GarageDetail>().HasData(garageDetailList);
+            modelBuilder.Entity<Lot>().HasData(lotList);
         }
 
         private void SeedRandomReviewData(ModelBuilder modelBuilder)
         {
+            var reviewList = new List<Review>();
+
             var reveiwFaker = new Faker<Review>();
 
             for (int i = 1; i <= 40; i++)
@@ -388,15 +539,18 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(r => r.Content, f => f.Lorem.Paragraph())
                     .RuleFor(r => r.ReviewStatus, Status.Activate)
                     .RuleFor(r => r.CustomerId, f => f.Random.Int(1, 20))
-                    .RuleFor(r => r.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(r => r.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(r => r.CreatedAt, now);
 
-                modelBuilder.Entity<Review>().HasData(reveiwFaker.Generate());
+                reviewList.Add(reveiwFaker.Generate());
             }
+            modelBuilder.Entity<Review>().HasData(reviewList);
         }
 
         private void SeedRandomCouponData(ModelBuilder modelBuilder)
         {
+            var couponList = new List<Coupon>();
+
             var couponFaker = new Faker<Coupon>();
 
             for (int i = 1; i <= 30; i++)
@@ -418,65 +572,92 @@ namespace GraduationThesis_CarServices.Models
                     })
                     .RuleFor(c => c.CouponStartDate, f => f.Date.Recent())
                     .RuleFor(c => c.CouponEndDate, f => f.Date.Soon())
-                    .RuleFor(c => c.CouponMinSpend, f => f.Random.Float(1, 20))
-                    .RuleFor(c => c.CouponMaxSpend, f => f.Random.Float(60, 100))
+                    .RuleFor(c => c.CouponMinSpend, f => f.Random.Int(10, 20))
+                    .RuleFor(c => c.CouponMaxSpend, f => f.Random.Int(60, 100))
                     .RuleFor(c => c.NumberOfTimesToUse, f => f.Random.Int(1, 10))
                     .RuleFor(c => c.CouponStatus, f => f.PickRandom<CouponStatus>())
-                    .RuleFor(c => c.GarageId, f => f.Random.Int(1, 25))
+                    .RuleFor(c => c.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(c => c.CreatedAt, now);
 
-                modelBuilder.Entity<Coupon>().HasData(couponFaker.Generate());
+                couponList.Add(couponFaker.Generate());
             }
+            modelBuilder.Entity<Coupon>().HasData(couponList);
         }
 
         private void SeedRandomBookingData(ModelBuilder modelBuilder)
         {
+            var bookingList = new List<Booking>();
+            var bookingDetailList = new List<BookingDetail>();
+            var bookingMechanicList = new List<BookingMechanic>();
+
             var bookingFaker = new Faker<Booking>();
             var bookingDetailFaker = new Faker<BookingDetail>();
+            var bookingMechanicFaker = new Faker<BookingMechanic>();
 
             for (int i = 1; i <= 15; i++)
             {
                 bookingFaker.RuleFor(b => b.BookingId, i)
+                    .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
-                    .RuleFor(b => b.PaymentMethod, f => "Tra sau")
-                    .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
+                    // .RuleFor(b => b.PaymentMethod, f => "Tra sau")
+                    .RuleFor(b => b.TotalPrice, f => f.Random.Int(100, 1000))
+                    .RuleFor(b => b.FinalPrice, (f, g) => g.TotalPrice)
+                    // .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
+                    //.RuleFor(b => b.IsAccepted, f => true)
                     .RuleFor(b => b.CreatedAt, now)
                     .RuleFor(b => b.CarId, f => f.Random.Int(1, 20))
-                    .RuleFor(b => b.GarageId, f => f.Random.Int(1, 25));
+                    .RuleFor(b => b.GarageId, f => f.Random.Int(1, 14))
+                    .RuleFor(b => b.IsAccepted, f => true)
+                    .RuleFor(b => b.CreatedAt, f => now);
 
-                modelBuilder.Entity<Booking>().HasData(bookingFaker.Generate());
+                bookingList.Add(bookingFaker.Generate());
             }
 
             for (int i = 1; i <= 50; i++)
             {
                 bookingDetailFaker.RuleFor(s => s.BookingDetailId, i)
-                    .RuleFor(s => s.ProductCost, f => f.Random.Float(50, 200))
-                    .RuleFor(s => s.ServiceCost, f => f.Random.Float(50, 200))
+                    .RuleFor(s => s.ProductPrice, f => f.Random.Int(50, 200))
+                    .RuleFor(s => s.ServicePrice, f => f.Random.Int(50, 200))
+                    .RuleFor(s => s.BookingServiceStatus, f => f.PickRandom<BookingServiceStatus>())
                     .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
-                    .RuleFor(s => s.ServiceDetailId, f => f.Random.Int(1, 3))
-                    .RuleFor(s => s.ProductId, f => f.Random.Int(1, 30))
-                    .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 19));
+                    .RuleFor(s => s.ServiceDetailId, f => f.Random.Int(1, 32))
+                    .RuleFor(s => s.ProductId, f => f.Random.Int(1, 8))
+                    .RuleFor(s => s.CreatedAt, f => now);
 
-                modelBuilder.Entity<BookingDetail>().HasData(bookingDetailFaker.Generate());
+                bookingDetailList.Add(bookingDetailFaker.Generate());
             }
-        }
 
-        private void SeedRandomReportData(ModelBuilder modelBuilder)
-        {
-            var reportFaker = new Faker<Report>();
-
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 50; i++)
             {
-                reportFaker.RuleFor(r => r.ReportId, i)
-                    .RuleFor(r => r.Date, f => f.Date.Past())
-                    .RuleFor(r => r.Notes, f => f.Lorem.Text())
-                    .RuleFor(r => r.Description, f => f.Lorem.Paragraph())
-                    .RuleFor(r => r.ReportStatus, f => Status.Activate)
-                    .RuleFor(r => r.CreatedAt, now);
+                bookingMechanicFaker.RuleFor(b => b.BookingMechanicId, i)
+                    .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
+                    .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
-                modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
+                bookingMechanicList.Add(bookingMechanicFaker.Generate());
             }
+
+            modelBuilder.Entity<Booking>().HasData(bookingList);
+            modelBuilder.Entity<BookingDetail>().HasData(bookingDetailList);
+            modelBuilder.Entity<BookingMechanic>().HasData(bookingMechanicList);
         }
+
+        // private void SeedRandomReportData(ModelBuilder modelBuilder)
+        // {
+        //     var reportFaker = new Faker<Report>();
+
+        //     for (int i = 1; i <= 15; i++)
+        //     {
+        //         reportFaker.RuleFor(r => r.ReportId, i)
+        //             .RuleFor(r => r.Date, f => f.Date.Past())
+        //             .RuleFor(r => r.Notes, f => f.Lorem.Text())
+        //             .RuleFor(r => r.Description, f => f.Lorem.Paragraph())
+        //             .RuleFor(r => r.ReportStatus, f => Status.Activate)
+        //             .RuleFor(r => r.CreatedAt, now);
+
+        //         modelBuilder.Entity<Report>().HasData(reportFaker.Generate());
+        //     }
+        // }
     }
+#pragma warning restore CS1591
 }

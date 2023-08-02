@@ -7,9 +7,13 @@ namespace GraduationThesis_CarServices.Services.IService
     {
         Task<List<UserListResponseDto>?> View(PageDto page);
         Task<UserDetailResponseDto?> Detail(int id);
-        Task<bool> Create(UserCreateRequestDto createUserDto);
-        Task<bool> Update(UserUpdateRequestDto updateUserDto);
-        Task<bool> UpdateRole(UserRoleRequestDto requestDto);
-        Task<bool> UpdateStatus(UserStatusRequestDto requestDto);
+        Task Create(UserCreateRequestDto createUserDto);
+        Task CustomerFirstLoginUpdate(UserUpdateRequestDto updateUserDto, int userId);
+        Task UpdateStatus(UserStatusRequestDto requestDto);
+        Task<CustomerDetailResponseDto> CustomerDetail(int userId);
+        Task<List<CustomerListResponseDto>> SearchCustomer(string search);
+        Task<List<CustomerListResponseDto>> FilterCustomer(PageDto page);
+        Task<List<UserListResponseDto>?> SearchUser(string search, int roleId);
+        Task<List<UserListResponseDto>> FilterUser(PageDto page, int roleId);
     }
 }

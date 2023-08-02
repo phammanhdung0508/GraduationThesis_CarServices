@@ -1,13 +1,22 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using AutoMapper;
+using Azure.Storage.Blobs;
+using Firebase.Auth;
+using Firebase.Storage;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
+using QRCoder;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
@@ -22,13 +31,16 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMechanicRepository mechanicRepository;
         private readonly ILotRepository lotRepository;
         private readonly ICarRepository carRepository;
+        private readonly IConfiguration configuration;
+        private readonly HttpClient httpClient;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IBookingDetailRepository bookingDetailRepository, IProductRepository productRepository,
         IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
-        ICouponRepository couponRepository, IMechanicRepository mechanicRepository)
+        ICouponRepository couponRepository, IMechanicRepository mechanicRepository, IConfiguration configuration)
         {
             this.mapper = mapper;
+            this.httpClient = new HttpClient();
             this.bookingRepository = bookingRepository;
             this.bookingDetailRepository = bookingDetailRepository;
             this.lotRepository = lotRepository;
@@ -38,13 +50,51 @@ namespace GraduationThesis_CarServices.Services.Service
             this.carRepository = carRepository;
             this.couponRepository = couponRepository;
             this.mechanicRepository = mechanicRepository;
+            this.configuration = configuration;
         }
 
-        public async Task<List<BookingListResponseDto>?> View(PageDto page)
+        public async Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId)
         {
             try
             {
-                var list = mapper.Map<List<BookingListResponseDto>>(await bookingRepository.View(page));
+                var list = await bookingDetailRepository.FilterBookingDetailByBookingId(bookingId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (list is not null):
+                        throw new MyException("The booking doesn't exist.", 404);
+                }
+
+                return mapper.Map<List<BookingDetailStatusForBookingResponseDto>>(list);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> View(PageDto page)
+        {
+            try
+            {
+                (var listObj, var count) = await bookingRepository.View(page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -62,12 +112,137 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<BookingListResponseDto>?> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto)
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByStatus(FilterByStatusRequestDto requestDto)
+        {
+            try
+            {
+                var status = requestDto.BookingStatus;
+
+                if (!typeof(BookingStatus).IsEnumDefined(status))
+                {
+                    throw new MyException("The status number is out of avaliable range.", 404);
+                }
+
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingByStatus(status, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto)
+        {
+            try
+            {
+                var status = requestDto.BookingStatus;
+                DateTime? dateFrom = null;
+                DateTime? dateTo = null;
+
+                if (requestDto.DateFrom is not null)
+                {
+                    dateFrom = DateTime.Parse(requestDto.DateFrom!);
+                }
+
+                if (requestDto.DateTo is not null)
+                {
+                    dateTo = DateTime.Parse(requestDto.DateTo!);
+                }
+
+                if (status is not null && !typeof(BookingStatus).IsEnumDefined(status!))
+                {
+                    throw new MyException("The status number is out of avaliable range.", 404);
+                }
+
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingStatusAndDate(dateFrom, dateTo, status, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> SearchByBookingCode(SearchBookingByUserRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await bookingRepository.SearchByBookingCode(requestDto.UserId, requestDto.Search, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto)
         {
             try
             {
@@ -79,13 +254,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var page = new PageDto
-                {
-                    PageIndex = requestDto.PageIndex,
-                    PageSize = requestDto.PageSize
-                };
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
 
-                var list = mapper.Map<List<BookingListResponseDto>>(await bookingRepository.FilterBookingByGarageId(requestDto.GarageId, page));
+                (var listObj, var count) = await bookingRepository.FilterBookingByGarage(requestDto.GarageId, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -103,7 +278,44 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                (var listObj, var count) = await bookingRepository.FilterBookingByCustomer(requestDto.UserId, page);
+
+                var listDto = mapper.Map<List<FilterByCustomerResponseDto>>(listObj);
+
+                var list = new GenericObject<List<FilterByCustomerResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
                 }
             }
         }
@@ -120,13 +332,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The booking doesn't exist.", 404);
                 }
 
-                var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id),
-                otp => otp.AfterMap((src, des) =>
-                {
-                    des.BookingStatus = src!.BookingStatus.ToString();
-                    des.PaymentStatus = src.PaymentStatus.ToString();
-                    des.BookingStatus = src.BookingStatus.ToString();
-                }));
+                var booking = mapper.Map<Booking?, BookingDetailResponseDto>(await bookingRepository.Detail(id));
 
                 return booking;
             }
@@ -144,7 +350,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -181,7 +387,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await Task.Run(() =>
                 {
-                    CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours);
+                    CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours, dateSelect);
                 });
 
                 var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
@@ -190,7 +396,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 await Task.Run(() =>
                 {
-                    UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours);
+                    UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours, requestDto.TotalEstimatedTimeServicesTake);
                 });
 
                 watch.Stop();
@@ -212,7 +418,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -220,7 +426,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private int GetMinEstimatedTime(int i, List<Booking> listBooking)
         {
             var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
-            .Min(l => l.TotalEstimatedCompletionTime);
+            .Min(l => /*l.TotalEstimatedCompletionTime*/ l.CustomersCanReceiveTheCarTime);
 
             return minEstimatedTimePerHour;
         }
@@ -228,7 +434,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private (int? bookingInFirstHourCount, int? bookingInNextHourCount) CountBookingPerHour(int num, int i, List<Booking> listBooking)
         {
             var bookingInFirstHourCount = listBooking?
-            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).Count();
+            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).Count();
             var bookingInNextHourCount = listBooking?
             .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + num)).Count();
 
@@ -240,14 +446,19 @@ namespace GraduationThesis_CarServices.Services.Service
             listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
         }
 
-        private void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours)
+        private void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
             if (sequenceLength > 1)
             {
                 for (int i = from; i <= to; i++)
                 {
-                    listHours.AsParallel().FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
-                    .Equals(i))!.EstimatedTimeCanBeBook = estimatedTime - i;
+                    // listHours.AsParallel().FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
+                    // .Equals(i))!.EstimatedTimeCanBeBook = estimatedTime - i;
+
+                    if (totalEstimatedTimeServicesTake > estimatedTime - i)
+                    {
+                        UpdateListHours(i, listHours);
+                    }
                 }
             }
         }
@@ -257,11 +468,11 @@ namespace GraduationThesis_CarServices.Services.Service
             for (int i = openAt; i <= closeAt; i++)
             {
                 var time = new TimeSpan(i, 00, 00);
-                listHours.Add(new BookingPerHour { Hour = dateSelect.Add(time).ToString("h:mm:ss tt") });
+                listHours.Add(new BookingPerHour { Hour = dateSelect.Add(time).ToString("HH:mm:ss") });
             }
         }
 
-        private void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours)
+        private void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
             for (int i = 0; i <= isAvailableList.Count - 1; i++)
             {
@@ -271,36 +482,61 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
                 else
                 {
-                    listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
-                        .Equals(isAvailableList[i]))!.EstimatedTimeCanBeBook = 1;
+                    // listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours
+                    //     .Equals(isAvailableList[i]))!.EstimatedTimeCanBeBook = 1;
 
-                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 1, isAvailableList[i] + 1, isAvailableList[i] + 1, sequenceLength, isAvailableList, listHours);
+                    if (totalEstimatedTimeServicesTake > 1)
+                    {
+                        UpdateListHours(isAvailableList[i], listHours);
+                    }
+
+                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 1, isAvailableList[i] + 1, isAvailableList[i] + 1, sequenceLength, isAvailableList, listHours, totalEstimatedTimeServicesTake);
 
                     sequenceLength = 1;
                 }
 
                 if (isAvailableList[i + 1].Equals(isAvailableList.Last()))
                 {
-                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours);
+                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours, totalEstimatedTimeServicesTake);
                     break;
                 }
             }
         }
 
-        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours)
+        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours, DateTime dateSelect)
         {
             for (int i = openAt; i <= closeAt; i++)
             {
+                var current = DateTime.Now;
+                var convertHour = 0;
+                var selectedHour = i;
+
+                switch (current.Hour)
+                {
+                    case var hour when hour > 12:
+                        convertHour = hour - 12;
+                        break;
+                    default:
+                        convertHour = current.Hour;
+                        break;
+                }
+
                 var bookingCount = listBooking?
                 .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i)).Count();
 
                 var bookingInOneHours = listBooking?
-                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime == 1).Count();
+                .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime == 1).Count();
+
+                var test1 = i - convertHour < 4;
+                var test2 = openAt <= current.Hour && current.Hour <= closeAt;
+                var test3 = current.Date == dateSelect.Date;
 
                 switch (bookingCount)
                 {
+                    case var bookingCout when i - convertHour < 4 && (openAt <= current.Hour && current.Hour <= closeAt) && (current.Date == dateSelect.Date):
+                        UpdateListHours(i, listHours);
+                        break;
                     case var bookingCout when bookingCout == lotCount:
-                        var selectedHour = i;
                         var minEstimatedTime = GetMinEstimatedTime(i, listBooking!);
 
                         //If all Booking have estimated time all > 2 skip to the next available Hour
@@ -330,19 +566,24 @@ namespace GraduationThesis_CarServices.Services.Service
 
                             if (bookingInFirstHourCout + bookingInNextHourCout == lotCount && minEstimatedTimePerHour > 1)
                             {
-                                var durationFirstHour = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && b.TotalEstimatedCompletionTime > 1).FirstOrDefault()!.TotalEstimatedCompletionTime;
-                                if(durationFirstHour > 1){
+                                var durationFirstHour = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) &&
+                                 /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).FirstOrDefault()!./*TotalEstimatedCompletionTime*/CustomersCanReceiveTheCarTime;
+                                if (durationFirstHour > 1)
+                                {
                                     for (int b = i + 1; b < i + durationFirstHour; b++)
                                     {
                                         UpdateListHours(b, listHours);
                                     }
                                     z = (int)durationFirstHour;
                                     i = i + z - 1;
-                                    var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && b.TotalEstimatedCompletionTime > 1).Count();
-                                    if(isBookin + (int)bookingInFirstHourCout! == lotCount){
+                                    var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).Count();
+                                    if (isBookin + (int)bookingInFirstHourCout! == lotCount)
+                                    {
                                         UpdateListHours(i + 1, listHours);
                                     }
-                                }else{
+                                }
+                                else
+                                {
                                     UpdateListHours(i + z, listHours);
                                 }
                             }
@@ -364,7 +605,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 var currentDay = DateTime.Now;
 
                 var garage = await garageRepository.GetGarage(requestDto.GarageId);
-                var IsCarExist = await carRepository.IsCarExist(requestDto.CarId);
+                var isCarExist = await carRepository.IsCarExist(requestDto.CarId);
+
+                var isCarAvalible = await carRepository.IsCarAvalible(requestDto.CarId);
 
                 if (requestDto.CouponId > 0)
                 {
@@ -378,46 +621,59 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 for (int i = 0; i < requestDto.ServiceList.Count; i++)
                 {
-                    var serviceDuration = await serviceRepository.GetDuration(requestDto.ServiceList[i].ServiceDetailId);
+                    var serviceDuration = await serviceRepository.GetDuration(requestDto.ServiceList[i]);
                     totalEstimated += serviceDuration;
                 }
 
+                var bookingAt = bookingTime.TimeOfDay.Hours;
+
                 var bookingCheck = new BookingCheckRequestDto { DateSelected = requestDto.DateSelected, GarageId = requestDto.GarageId };
                 var listHours = await IsBookingAvailable(bookingCheck);
-                var isAvailableHours = listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours == bookingTime.TimeOfDay.Hours);
+                var isAvailableHours = listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours == bookingAt);
+
+                var openAt = DateTime.ParseExact(garage!.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+                var closeAt = DateTime.ParseExact(garage!.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
 
                 switch (false)
                 {
-                    case var isExist when isExist == IsCarExist:
-                        throw new MyException("The car doesn't exist.", 404);
+                    case var isNull when isNull == (requestDto.CarId != 0):
+                        throw new MyException("CarId không được null.", 404);
+                    case var isAvalible when isAvalible == isCarAvalible:
+                        throw new MyException("Xin lỗi xe của bạn không khả dụng.", 404);
+                    case var isExist when isExist == isCarExist:
+                        throw new MyException("Xin lỗi xe của bạn không tônf tại.", 404);
                     case var isTime when isTime == (bookingTime >= currentDay):
-                        throw new MyException("The selected time must be greater than or equal to the current time.", 404);
+                        throw new MyException("Ngày được chọn phải lớn hơn hoặc trùng ngày hiện tại.", 404);
                     case var isEmpty when isEmpty == (requestDto.ServiceList.Count > 0):
-                        throw new MyException("Must select the service before booking.", 404);
-                    case var isFalse when isFalse == (isAvailableHours!.IsAvailable == true && isAvailableHours.EstimatedTimeCanBeBook > totalEstimated):
-                        throw new MyException("Estimated hours for service will conflict with another booking.", 404);
+                        throw new MyException("Phải chọn ít nhất một dịch vụ trước khi đặt đơn.", 404);
+                    case var isFalse when isFalse == (openAt <= bookingAt && bookingAt <= closeAt):
+                        throw new MyException("Xin lỗi khung giờ khongo trong khung giờ làm việc.", 404);
+                    case var isMany when isMany == (requestDto.ServiceList.Count < 3):
+                        throw new MyException("Chỉ đặt được tối đa là 3 dịch vụ.", 404);
                 }
 
                 var listBooking = await bookingRepository.FilterBookingByTimePerDay(bookingTime, requestDto.GarageId);
                 var lotCount = garage!.Lots.Count;
 
-                if (lotCount - listBooking!.Count == 1)
-                {
-                    Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
-                    if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
-                    {
-                        await garageRepository.Update(garage);
-                        await Run(requestDto, bookingTime, totalEstimated);
-                    }
-                    else
-                    {
-                        throw new MyException("Sorry, there is someone before you booked this.", 409);
-                    }
-                }
-                else
-                {
-                    await Run(requestDto, bookingTime, totalEstimated);
-                }
+                // if (lotCount - listBooking!.Count == 1)
+                // {
+                //     Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
+                //     if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
+                //     {
+                //         await garageRepository.Update(garage);
+                //         await Run(requestDto, bookingTime, totalEstimated);
+                //     }
+                //     else
+                //     {
+                //         throw new MyException("Sorry, there is someone before you booked this.", 409);
+                //     }
+                // }
+                // else
+                // {
+                //     await Run(requestDto, bookingTime, totalEstimated);
+                // }
+
+                await Run(requestDto, bookingTime, totalEstimated);
 
                 watch.Stop();
                 Debug.WriteLine($"\nTotal run time (Milliseconds) Create(): {watch.ElapsedMilliseconds}\n");
@@ -436,9 +692,26 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
+        }
+
+        private string GenerateRandomString()
+        {
+            const string chars = "0123456789ABCDEF";
+            var random = new Random();
+
+            var result = new StringBuilder();
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+            result.Append(random.Next(10, 100)); // Two random digits
+            result.Append(chars[random.Next(chars.Length)]); // One random character
+
+            return result.ToString();
         }
 
         private async Task Run(BookingCreateRequestDto requestDto, DateTime bookingTime, int totalEstimated)
@@ -449,78 +722,142 @@ namespace GraduationThesis_CarServices.Services.Service
                 otp => otp.AfterMap((src, des) =>
                 {
                     var now = DateTime.Now;
+                    des.BookingCode = GenerateRandomString();
                     des.BookingTime = bookingTime;
+                    des.PaymentStatus = PaymentStatus.Unpaid;
+                    des.BookingStatus = BookingStatus.Pending;
+                    des.IsAccepted = true;
                     des.CreatedAt = now;
-                    switch (now.Date)
-                    {
-                        case var nowDate when nowDate < bookingTime.Date:
-                            des.BookingStatus = BookingStatus.NotStart;
-                            break;
-                        case var nowDate when nowDate == bookingTime.Date:
-                            des.BookingStatus = BookingStatus.AppointmentDay;
-                            break;
-                    }
                 }));
 
                 var bookingId = await bookingRepository.Create(booking);
 
-                float discountedPrice = 0;
-                float originalPrice = 0;
+                var checkOutDto = new CheckOutRequestDto() { ServiceList = requestDto.ServiceList, CouponId = requestDto.CouponId };
 
-                var listService = mapper.Map<List<ServiceListDto>, List<BookingDetail>>(requestDto.ServiceList,
-                otp => otp.AfterMap((src, des) =>
+                var checkOut = await RunCheckOut(checkOutDto, true, bookingId, requestDto.MechanicId);
+
+                if (requestDto.MechanicId != 0)
                 {
-                    for (int i = 0; i < requestDto.ServiceList.Count; i++)
+                    var bookingMechanic = new BookingMechanic()
                     {
-                        float productCost = 0, serviceCost = 0;
-                        if (requestDto.ServiceList[i].ProductId == 0)
-                        {
-                            des[i].ProductId = null;
-                        }
-                        if (requestDto.ServiceList[i].ProductId > 0)
-                        {
-                            productCost = productRepository.GetPrice(src[i].ProductId);
-                        }
-                        if (requestDto.ServiceList[i].ServiceDetailId > 0)
-                        {
-                            serviceCost = serviceRepository.GetPrice(src[i].ServiceDetailId);
-                        }
-                        originalPrice += productCost + serviceCost;
-                        des[i].BookingId = bookingId;
-                        des[i].ProductCost = productCost;
-                        des[i].ServiceCost = serviceCost;
+                        WorkingDate = bookingTime,
+                        BookingId = bookingId,
+                        MechanicId = requestDto.MechanicId
+                    };
+
+                    await mechanicRepository.CreateBookingMechanic(bookingMechanic);
+                }
+
+                booking.TotalPrice = checkOut.Item3;
+                booking.FinalPrice = checkOut.Item3;
+                booking.TotalEstimatedCompletionTime = totalEstimated;
+                booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
+
+                await bookingRepository.Update(booking);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task<(decimal, decimal, decimal)> RunCheckOut(CheckOutRequestDto requestDto, bool isCreateNew, int? bookingId, int? mechanicId)
+        {
+            try
+            {
+                switch (false)
+                {
+                    case var isFalse when isFalse == (requestDto.ServiceList.Any(s => s > 0)):
+                        throw new MyException("Id can't take 0 value!", 404);
+                    case var isFalse when isFalse == (requestDto.CouponId != 0):
+                        requestDto.CouponId = null;
+                        break;
+                }
+
+                decimal discountedPrice = 0;
+                decimal originalPrice = 0;
+                decimal totalPrice = 0;
+
+                var listService = requestDto.ServiceList;
+                var listBookingDetail = new List<BookingDetail>();
+
+                for (int i = 0; i < listService.Count; i++)
+                {
+                    //get default product id
+                    decimal productPrice = 0;
+                    decimal servicePrice = serviceRepository.GetPrice(listService[i]);
+                    var product = productRepository.GetDefaultProduct(listService[i]);
+
+                    if (product is not null)
+                    {
+                        productPrice = product.ProductPrice;
                     }
-                }));
 
-                await bookingDetailRepository.Create(listService);
+                    originalPrice += productPrice + servicePrice;
 
-                if (requestDto.CouponId > 0)
-                {
-                    var coupon = await couponRepository.Detail(requestDto.CouponId);
-
-                    switch (coupon!.CouponType)
+                    if (isCreateNew == true)
                     {
-                        case CouponType.Percent:
-                            discountedPrice = originalPrice * (coupon.CouponValue / 100);
-                            break;
-                        case CouponType.FixedAmount:
-                            discountedPrice = originalPrice - coupon.CouponValue;
-                            break;
+                        var bookingDetail = new BookingDetail()
+                        {
+                            ProductPrice = productPrice,
+                            ServicePrice = servicePrice,
+                            BookingServiceStatus = BookingServiceStatus.NotStart,
+                            ProductId = product is null ? null : product.ProductId,
+                            ServiceDetailId = listService[i],
+                            //MechanicId = mechanicId,
+                            BookingId = bookingId
+                        };
+
+                        listBookingDetail.Add(bookingDetail);
                     }
                 }
 
-                if (discountedPrice > 0)
+                if (isCreateNew == true)
                 {
-                    booking.TotalPrice = discountedPrice;
+                    await bookingDetailRepository.Create(listBookingDetail);
+                }
+
+                if (requestDto.CouponId is not null)
+                {
+                    var coupon = await couponRepository.GetCouponTypeAndCouponValue(requestDto.CouponId);
+
+                    switch (coupon!.Item1)
+                    {
+                        case CouponType.Percent:
+                            discountedPrice = originalPrice * (coupon.Item2 / 100);
+                            totalPrice = originalPrice - discountedPrice;
+                            break;
+                        case CouponType.FixedAmount:
+                            discountedPrice = coupon.Item2;
+                            totalPrice = originalPrice - discountedPrice;
+                            break;
+                    }
                 }
                 else
                 {
-                    booking.TotalPrice = originalPrice;
+                    totalPrice = originalPrice;
                 }
 
-                booking.TotalEstimatedCompletionTime = totalEstimated;
+                return (originalPrice, discountedPrice, totalPrice);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
 
-                await bookingRepository.Update(booking);
+        public async Task<CheckOutResponseDto> CheckOut(CheckOutRequestDto requestDto)
+        {
+            try
+            {
+                var checkOut = await RunCheckOut(requestDto, false, null, null);
+
+                return new CheckOutResponseDto
+                {
+                    OriginalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item1),
+                    DiscountedPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item2),
+                    TotalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item3)
+                };
             }
             catch (Exception e)
             {
@@ -536,92 +873,469 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task UpdateStatus(BookingStatusRequestDto requestDto)
+        public async Task ConfirmAcceptedBooking(bool isAccepted, int bookingId)
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-
-            var b = await bookingRepository.Detail(requestDto.BookingId);
-
-            switch (false)
+            try
             {
-                case var isExist when isExist == (b != null):
+                if (isAccepted is true)
+                {
+                    var booking = await bookingRepository.Detail(bookingId);
+                    booking!.IsAccepted = isAccepted;
+
+                    await bookingRepository.Update(booking);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus)
+        {
+            try
+            {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+
+                var booking = await bookingRepository.Detail(bookingId);
+
+                if (booking is null)
+                {
                     throw new MyException("The booking doesn't exist.", 404);
+                }
+
+                switch (bookingStatus)
+                {
+                    case BookingStatus.CheckIn:
+                        await UpdateLotStatus(LotStatus.Assigned, booking!);
+                        break;
+                    case BookingStatus.Processing:
+                        await UpdateLotStatus(LotStatus.BeingUsed, booking!);
+                        break;
+                    case BookingStatus.Completed:
+
+                        switch (false)
+                        {
+                            case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
+                                throw new MyException("All service detail must finish before updating the booking status.", 404);
+                            case var isAccepted when isAccepted == (booking.IsAccepted is true):
+                                throw new MyException("This booking is not accepted by customer.", 404);
+                        }
+
+                        var bookingDetails = await bookingDetailRepository.FilterBookingDetailByBookingId(bookingId);
+
+                        foreach (var bookingDetail in bookingDetails)
+                        {
+                            if (bookingDetail.BookingServiceStatus == BookingServiceStatus.Error &&
+                            !bookingDetails.Any(b => b.BookingServiceStatus == BookingServiceStatus.NotStart))
+                            {
+                                booking!.FinalPrice -= bookingDetail.ServicePrice;
+                            }
+                        }
+
+                        await bookingRepository.Update(booking);
+
+                        await UpdateLotStatus(LotStatus.Free, booking!);
+                        break;
+                }
+
+                booking!.BookingStatus = bookingStatus;
+
+                await bookingRepository.Update(booking);
+
+                watch.Stop();
+                Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
             }
-
-            var booking = mapper.Map<BookingStatusRequestDto, Booking>(requestDto, b!);
-            await bookingRepository.Update(booking);
-
-            switch (requestDto.BookingStatus)
+            catch (Exception e)
             {
-                case BookingStatus.CheckIn:
-                    await UpdateLotStatus(LotStatus.Assigned, booking);
-                    break;
-                case BookingStatus.Processing:
-                    await UpdateLotStatus(LotStatus.BeingUsed, booking);
-                    break;
-                case BookingStatus.Completed:
-                    await UpdateLotStatus(LotStatus.Free, booking);
-                    break;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
             }
-
-            watch.Stop();
-            Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
         }
 
         private async Task UpdateLotStatus(LotStatus status, Booking booking)
         {
-            if (status == LotStatus.Assigned)
+            switch (status)
             {
-                var lot = await lotRepository.GetFreeLotInGarage((int)booking.GarageId!);
-                var licensePlate = await carRepository.GetLicensePlate((int)booking.CarId!);
+                case LotStatus.Assigned:
+                    var lot1 = await lotRepository.GetFreeLotInGarage((int)booking.GarageId!);
+                    var licensePlate = await carRepository.GetLicensePlate((int)booking.CarId!);
 
-                lot.LotStatus = status;
-                lot.IsAssignedFor = licensePlate;
+                    lot1.LotStatus = status;
+                    lot1.IsAssignedFor = licensePlate;
 
-                //await lotRepository.Update(lot);
+                    await AssigneMechanicForBooking(booking);
 
-                await AssigneMechanicForBooking(booking);
-            }
-            else
-            {
-                var lot = await lotRepository.GetLotByLicensePlate((int)booking.GarageId!, booking.Car.CarLicensePlate);
+                    await lotRepository.Update(lot1);
+                    break;
+                default:
+                    var lot = await lotRepository.GetLotByLicensePlate((int)booking.GarageId!, booking.Car.CarLicensePlate);
 
-                lot.LotStatus = status;
-                if (status == LotStatus.Free)
-                {
-                    lot.IsAssignedFor = null;
-                }
+                    if (lot.LotStatus == LotStatus.Free)
+                    {
+                        lot.IsAssignedFor = null;
+                    }
 
-                await lotRepository.Update(lot);
+                    await lotRepository.Update(lot);
+                    break;
             }
         }
 
         private async Task AssigneMechanicForBooking(Booking booking)
         {
-            var bookingDetailList = await bookingDetailRepository.FilterServiceBookingByBookingId(booking.BookingId);
-            var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
+            var isCustomerPickMainMechanic = await mechanicRepository.IsCustomerPickMainMechanic(booking.BookingTime);
 
-            switch (false)
+            if (isCustomerPickMainMechanic is null)
             {
-                case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
-                    throw new MyException("There are not enough mechanic for booking.", 404);
+                var listLv3Mechanic = await mechanicRepository.FilterMechanicsByGarage((int)booking.GarageId!);
+
+                if (listLv3Mechanic.Count == 0)
+                {
+                    throw new MyException("This garage don't have any Lv3 Mechanic.", 404);
+                }
+
+                var pickLv3MechanicMinWork = listLv3Mechanic.OrderBy(m => m.BookingMechanics.Count).First();
+
+                var bookingMechanic = new BookingMechanic()
+                {
+                    WorkingDate = booking.BookingTime,
+                    BookingId = booking.BookingId,
+                    MechanicId = pickLv3MechanicMinWork.MechanicId
+                };
+
+                await mechanicRepository.CreateBookingMechanic(bookingMechanic);
             }
 
-            var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
+            var mechanicList = await mechanicRepository.FilterMechanicsAvailableByGarage((int)booking.GarageId!);
 
-            for (int i = 0; i < bookingDetailList.Count; i++)
+            var numService = booking.BookingDetails.Count();
+
+            var pickRandomMechanic = mechanicList.OrderBy(m => m.BookingMechanics.Count).Take(numService).ToList();
+
+            foreach (var mechanic in pickRandomMechanic)
             {
-                bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
-                var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
-                minWorkingHour[i].TotalWorkingHours += estimatedTime;
+                var bookingMechanic = new BookingMechanic()
+                {
+                    WorkingDate = booking.BookingTime,
+                    BookingId = booking.BookingId,
+                    MechanicId = mechanic.MechanicId
+                };
+
+                await mechanicRepository.CreateBookingMechanic(bookingMechanic);
             }
 
-            await bookingDetailRepository.Update(bookingDetailList);
+            // var bookingDetailList = await bookingDetailRepository.FilterBookingDetailByBookingId(booking.BookingId);
+            // var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
+
+            // switch (false)
+            // {
+            //     case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
+            //         throw new MyException("There are not enough mechanic for booking.", 404);
+            // }
+
+            // var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
+
+            // //Index out of range bug
+            // for (int i = 0; i < bookingDetailList.Count; i++)
+            // {
+            //     //bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
+            //     var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
+            //     //minWorkingHour[i].TotalBookingApplied += estimatedTime;
+            // }
+
+            // await bookingDetailRepository.Update(bookingDetailList);
+        }
+
+        public async Task GenerateQRCode(int bookingId)
+        {
+            try
+            {
+                string url = $"https://localhost:7006/api/booking/run-qr/{bookingId}";
+
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                var qrCodeImage = qrCode.GetGraphic(20);
+
+                await using (MemoryStream stream = new MemoryStream())
+                {
+                    qrCodeImage.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    byte[] imageBytes = stream.ToArray();
+                    var base64String = "data:image/png;base64," + Convert.ToBase64String(imageBytes);
+
+                    byte[] imgBytes = Convert.FromBase64String(base64String.Split(',')[1]);
+
+                    var blobServiceClient = new BlobServiceClient(configuration["BlobStorage:ConnectionString"]!);
+                    var blobContainerClient = blobServiceClient.GetBlobContainerClient(configuration["BlobStorage:Container"]!);
+                    var blobName = GenerateRandomString()+"_qr_code.jpg";
+
+                    using (MemoryStream blobstream = new MemoryStream(imgBytes))
+                    {
+                        stream.Position = 0;
+                        blobContainerClient.UploadBlob(blobName, blobstream);
+                    }
+                }
+
+                // string qrCodeImageBase64;
+                // await using (var ms = new MemoryStream())
+                // {
+                //     qrCodeImage.Save(ms, ImageFormat.Png);
+                //     byte[] imageBytes = ms.ToArray();
+                //     qrCodeImageBase64 = "data:image/png;base64," + Convert.ToBase64String(imageBytes);
+                // }
+
+                // string qrCodeImageUrl = qrCodeImageBase64;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task RunQRCode(int bookingId)
+        {
+            //var url = $"https://project20230606170014.azurewebsites.net/api/booking/update-status-booking/{bookingId}&3";
+            var url = $"https://localhost:7006/api/booking/update-status-booking/{bookingId}&3";
+            var data = "{\"status\": \"updated status\"}";
+
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
+                };
+
+                var response = await httpClient.SendAsync(request);
+                var statusCode = response.StatusCode;
+
+                Console.WriteLine($"Response Status Code: {statusCode}");
+            }
+        }
+
+        public async Task<BookingRevenueResponseDto> CountRevune(int garageId)
+        {
+            try
+            {
+                var isGarageExist = await garageRepository.IsGarageExist(garageId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isGarageExist:
+                        throw new MyException("The garage doesn't exist.", 404);
+                }
+
+                (var amountEarned, var serviceEarned,
+                var productEarned, var sumPaid, var sumUnpaid,
+                var countPaid, var countUnpaid) = await bookingRepository.CountRevenue(garageId);
+
+                var revenue = new BookingRevenueResponseDto
+                {
+                    AmountEarned = amountEarned,
+                    ServiceEarned = serviceEarned,
+                    ProductEarned = productEarned,
+                    SumPaid = sumPaid,
+                    SumUnPaid = sumUnpaid,
+                    CountPaid = countPaid,
+                    CountUnpaid = countUnpaid
+                };
+
+                return revenue;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<CountBookingPerStatusDto> CountBookingPerStatus()
+        {
+            try
+            {
+                (var pendingCount,
+                var canceledCount,
+                var checkInCount,
+                var processingCount,
+                var completedCount) = await bookingRepository.CountBookingPerStatus();
+
+                var count = new CountBookingPerStatusDto()
+                {
+                    Pending = pendingCount,
+                    Canceled = canceledCount,
+                    CheckIn = checkInCount,
+                    Processing = processingCount,
+                    Completed = completedCount
+                };
+
+                return count;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<FilterByBookingStatusResponseDto>> FilterBookingByStatusCustomer(int bookingStatus, int userId)
+        {
+            try
+            {
+                if (!typeof(BookingStatus).IsEnumDefined(bookingStatus))
+                {
+                    throw new MyException("The status number is out of avaliable range.", 404);
+                }
+
+                var list = await bookingRepository.FilterBookingByStatusCustomer(bookingStatus, userId);
+
+                var listDto = mapper.Map<List<FilterByBookingStatusResponseDto>>(list);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<BookingDetailForCustomerResponseDto> DetailBookingForCustomer(int bookingId)
+        {
+            try
+            {
+                var isBookingExist = await bookingRepository.IsBookingExist(bookingId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == isBookingExist:
+                        throw new MyException("The booking doesn't exist.", 404);
+                }
+
+                var serviceSelectList = new List<GroupServiceBookingDetailDto>();
+
+                var serviceGroupList = new List<string> { };
+
+                var booking = await bookingRepository.DetailBookingForCustomer(bookingId);
+
+                var listBookingDetails = await serviceRepository.GetServiceForBookingDetail(bookingId);
+
+                foreach (var item in listBookingDetails)
+                {
+                    serviceGroupList.Add(item.ServiceDetail.Service.ServiceGroup);
+                }
+
+                foreach (var item in serviceGroupList.Distinct())
+                {
+                    var serviceList = listBookingDetails.Where(s => s.ServiceDetail.Service.ServiceGroup.Equals(item)).ToList();
+
+                    var serviceDtoList = mapper.Map<List<ServiceListBookingDetailDto>>(serviceList);
+
+                    serviceSelectList.Add(new GroupServiceBookingDetailDto { ServiceGroup = item, serviceListBookingDetailDtos = serviceDtoList });
+                }
+
+                var bookingDto = mapper.Map<BookingDetailForCustomerResponseDto>(booking,
+                obj => obj.AfterMap((src, des) =>
+                {
+                    des.groupServiceBookingDetailDtos = serviceSelectList;
+                }));
+
+                return bookingDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
         }
     }
 }

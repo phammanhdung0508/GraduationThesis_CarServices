@@ -4,7 +4,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface IBookingDetailRepository
     {
-        Task<List<BookingDetail>> FilterServiceBookingByBookingId(int bookingId);
+        Task<List<BookingDetail>> FilterBookingDetailByBookingId(int bookingId);
         Task Create(List<BookingDetail> serviceBooking);
         Task Update(List<BookingDetail> serviceBookings);
     }

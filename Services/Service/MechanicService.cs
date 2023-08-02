@@ -3,7 +3,7 @@ using AutoMapper;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.WorkingSchedule;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -22,11 +22,22 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<MechanicListResponseDto>> View(PageDto page)
+        public async Task<GenericObject<List<MechanicListResponseDto>>> View(PageDto page)
         {
             try
             {
-                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.View(page));
+                (var listObj, var count, var listTotal) = await mechanicRepository.View(page);
+
+                var listDto = mapper.Map<List<MechanicListResponseDto>>(listObj,
+                obj => obj.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        des[i].TotalOrders = listTotal[i];
+                    }
+                }));
+
+                var list = new GenericObject<List<MechanicListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -44,7 +55,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -61,7 +72,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.FilterMechanicsByGarageId(garageId));
+                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.FilterMechanicsByGarage(garageId));
 
                 return list;
             }
@@ -79,7 +90,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -112,24 +123,60 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<WorkingScheduleListResponseDto>> FilterWorkingSchedulesByMechanicId(int mechanicId)
+        // public async Task<List<WorkingScheduleListResponseDto>> FilterWorkingSchedulesByMechanicId(int mechanicId)
+        // {
+        //     try
+        //     {
+        //         var isMechanicExist = await mechanicRepository.IsMechanicExist(mechanicId);
+
+        //         switch (false)
+        //         {
+        //             case var isExist when isExist == isMechanicExist:
+        //                 throw new MyException("The mechanic doesn't exist.", 404);
+        //         }
+
+        //         var list = mapper.Map<List<WorkingScheduleListResponseDto>>(await mechanicRepository.FilterWorkingSchedulesByMechanicId(mechanicId));
+
+        //         return list;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         switch (e)
+        //         {
+        //             case MyException:
+        //                 throw;
+        //             default:
+        //                 var inner = e.InnerException;
+        //                 while (inner != null)
+        //                 {
+        //                     Console.WriteLine(inner.StackTrace);
+        //                     inner = inner.InnerException;
+        //                 }
+        //                 Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+        //                 throw;
+        //         }
+        //     }
+        // }
+
+        public async Task<List<MechanicWorkForGarageResponseDto>> GetMechanicByGarage(int garageId)
         {
             try
-            {
-                var isMechanicExist = await mechanicRepository.IsMechanicExist(mechanicId);
+            {   
+                var isGarageExist = await garageRepository.IsGarageExist(garageId);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isMechanicExist:
-                        throw new MyException("The mechanic doesn't exist.", 404);
+                    case var isExist when isExist == isGarageExist:
+                        throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var list = mapper.Map<List<WorkingScheduleListResponseDto>>(await mechanicRepository.FilterWorkingSchedulesByMechanicId(mechanicId));
+                var list = mapper.Map<List<MechanicWorkForGarageResponseDto>>
+                (await mechanicRepository.FilterMechanicsByGarage(garageId));
 
                 return list;
             }
@@ -147,7 +194,36 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
+                }
+            }
+        }
+
+
+        public async Task<List<MechanicWorkForBookingResponseDto>> GetMechanicByBooking(int bookingId)
+        {
+            try
+            {
+                var list = mapper.Map<List<MechanicWorkForBookingResponseDto>>
+                (await mechanicRepository.GetMechanicByBooking(bookingId));
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
                 }
             }
         }

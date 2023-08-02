@@ -14,7 +14,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserFirstName { get; set; }
         [MaxLength(20)]
         public string UserLastName { get; set; }
-        [MaxLength(50)]
+        [MaxLength(200)]
         public string UserEmail { get; set; }
         [MaxLength(1024)]
         [Required]
@@ -26,24 +26,32 @@ namespace GraduationThesis_CarServices.Models.Entity
         public byte[] PasswordSalt { get; set; }
         [MaxLength(1024)]
         public string UserImage { get; set; }
-        [MaxLength(12)]
+        [MaxLength(16)]
         public string UserPhone { get; set; }
         [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }
         [Column(TypeName = "date")]
-        public Nullable<DateTime> UserDateOfBirth { get; set; }
+        public DateTime? UserDateOfBirth { get; set; }
         [MaxLength(1024)]
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
         public Status UserStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
-        [MaxLength(1024)]
+        public string OTP {get; set;}
+        public DateTime ExpiredIn {get; set;}
+        [Column(TypeName = "tinyint")]
+        public int EmailConfirmed {get; set;}
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime RefreshTokenCreated { get; set; }
+        public DateTime RefreshTokenExpires { get; set; }
 
         /*-------------------------------------------------*/
         public virtual Customer Customer { get; set; }
         public virtual Mechanic Mechanic { get; set; }
-        public Nullable<int> RoleId { get; set; }
+
+        /*-------------------------------------------------*/
+        public int? RoleId { get; set; }
         public virtual Role Role { get; set; }
 
         /*-------------------------------------------------*/

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-
 namespace project.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+// [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -18,20 +17,20 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
-    {
-        string[] names = new string[] { "name1", "name2", "name3" };
-        Random rnd = new Random();
-        int index = rnd.Next(names.Length);
-        Console.WriteLine($"Name: {names[index]}");
+    // [HttpGet(Name = "GetWeatherForecast")]
+    // public IEnumerable<WeatherForecast> Get()
+    // {
+    //     string[] names = new string[] { "name1", "name2", "name3" };
+    //     Random rnd = new Random();
+    //     int index = rnd.Next(names.Length);
+    //     Console.WriteLine($"Name: {names[index]}");
 
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
-    }
+    //     return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+    //     {
+    //         Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+    //         TemperatureC = Random.Shared.Next(-20, 55),
+    //         Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+    //     })
+    //     .ToArray();
+    // }
 }

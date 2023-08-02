@@ -12,11 +12,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             this.context = context;
         }
-        public async Task<List<BookingDetail>> FilterServiceBookingByBookingId(int bookingId)
+        public async Task<List<BookingDetail>> FilterBookingDetailByBookingId(int bookingId)
         {
             try
             {
-                var list = await context.BookingDetails.Where(s => s.BookingId == bookingId).ToListAsync();
+                var list = await context.BookingDetails.Include(b => b.ServiceDetail)
+                .ThenInclude(s => s.Service).Where(s => s.BookingId == bookingId).ToListAsync();
 
                 return list;
             }

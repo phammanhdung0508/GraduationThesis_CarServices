@@ -3,6 +3,7 @@ using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -18,28 +19,36 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly IMapper mapper;
         private readonly IGarageRepository garageRepository;
         private readonly GeocoderConfiguration geocoderConfiguration;
-        public GarageService(IMapper mapper, IGarageRepository garageRepository, GeocoderConfiguration geocoderConfiguration)
+        private readonly IBookingService bookingService;
+        public GarageService(IMapper mapper, IGarageRepository garageRepository, GeocoderConfiguration geocoderConfiguration, IBookingService bookingService)
         {
             this.garageRepository = garageRepository;
             this.mapper = mapper;
             this.geocoderConfiguration = geocoderConfiguration;
+            this.bookingService = bookingService;
         }
 
-        public async Task<List<GarageListResponseDto>?> View(PageDto page)
+        public async Task<List<GarageAdminListResponseDto>> ViewAllForAdmin(PageDto page)
         {
-
             try
             {
-                var list = mapper.Map<List<Garage>?, List<GarageListResponseDto>>(await garageRepository.View(page),
+                var list = await garageRepository.View(page);
+
+                return mapper.Map<List<Garage>?, List<GarageAdminListResponseDto>>(list,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < des.Count; i++)
                     {
+                        (var totalServices, var totalOrders) = garageRepository.GetServicesAndBookingsPerGarage(src![i].GarageId);
+                        if (list![i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                            des[i].TotalOrders = totalOrders;
+                            des[i].TotalServices = totalServices;
+                        }
                         des[i].GarageStatus = src![i].GarageStatus.ToString();
                     }
                 }));
-
-                return list;
             }
             catch (Exception e)
             {
@@ -55,7 +64,75 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<GarageListResponseDto>?> View(PageDto page)
+        {
+
+            try
+            {
+                var list = await garageRepository.View(page);
+
+                return mapper.Map<List<Garage>?, List<GarageListResponseDto>>(list,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        if (list![i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
+                        }
+                        des[i].GarageStatus = src![i].GarageStatus.ToString();
+                    }
+                }));
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<GarageListMobileMapResponseDto>> GetAllCoordinates()
+        {
+            try
+            {
+                var list = await garageRepository.GetAllCoordinates();
+
+                var listDto = mapper.Map<List<GarageListMobileMapResponseDto>>(list);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
                 }
             }
         }
@@ -93,7 +170,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -114,6 +191,11 @@ namespace GraduationThesis_CarServices.Services.Service
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
+                    des.AvaliableCoupon = src.Coupons.Count;
+                    if (src.Reviews.Count != 0)
+                    {
+                        des.Rating = src.Reviews.Sum(r => r.Rating) / src.Reviews.Count;
+                    }
 
                     var presentTime = DateTime.Now.TimeOfDay;
                     var openAt = DateTime.ParseExact(src.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
@@ -146,7 +228,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -183,7 +265,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -222,7 +304,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -265,11 +347,11 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
- 
+
         public async Task UpdateStatus(GarageStatusRequestDto requestDto)
         {
             try
@@ -300,7 +382,88 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
+                }
+            }
+        }
+        public async Task<List<GarageListResponseDto>?> FilterGaragesByDateAndService(FilterGarageRequestDto requestDto)
+        {
+            try
+            {
+                var filteredGaragesByService = await garageRepository.GetGrageFilterByDateAndService(requestDto.ServiceList);
+
+                foreach (var garage in filteredGaragesByService!.ToList())
+                {
+                    var checkBooking = new BookingCheckRequestDto()
+                    {
+                        DateSelected = requestDto.DateSelected,
+                        GarageId = garage.GarageId
+                    };
+
+                    //Remove garage which is full on select date
+                    var isFalse = bookingService.IsBookingAvailable(checkBooking).Result.All(g => g.IsAvailable is false);
+
+                    if (isFalse)
+                    {
+                        filteredGaragesByService!.Remove(garage);
+                    }
+                }
+
+                var filteredGarages = new List<Garage>();
+
+                if (requestDto.Latitude is not null &&
+                requestDto.Longitude is not null &&
+                requestDto.RadiusInKm is not null)
+                {
+                    const double earthRadiusInKm = 6371.01;
+
+                    foreach (var garage in filteredGaragesByService!)
+                    {
+                        double lat1 = Math.PI * requestDto.Latitude.Value / 180.0;
+                        double lon1 = Math.PI * requestDto.Longitude.Value / 180.0;
+                        double lat2 = Math.PI * garage.GarageLatitude / 180.0;
+                        double lon2 = Math.PI * garage.GarageLongitude / 180.0;
+
+                        double dlon = lon2 - lon1;
+                        double dlat = lat2 - lat1;
+                        var a = Math.Pow(Math.Sin(dlat / 2), 2) + Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(dlon / 2), 2);
+                        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                        var distanceInKm = earthRadiusInKm * c;
+
+                        if (distanceInKm <= requestDto.RadiusInKm)
+                        {
+                            filteredGarages.Add(garage);
+                        }
+                    }
+                }
+
+                return mapper.Map<List<GarageListResponseDto>>
+                (filteredGarages, opt => opt.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < filteredGarages.Count; i++)
+                    {
+                        if (filteredGarages[i].Reviews.Count != 0)
+                        {
+                            des[i].Rating = filteredGarages[i].Reviews.Sum(r => r.Rating) / filteredGarages[i].Reviews.Count;
+                        }
+                    }
+                }));
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
                 }
             }
         }
@@ -356,45 +519,11 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<GarageListResponseDto>?> FilterGaragesWithCoupon(PageDto page)
-        {
-            try
-            {
-                var list = await garageRepository.FilterCoupon(page);
-                return mapper.Map<List<GarageListResponseDto>>
-                    (list, opt => opt.AfterMap((src, des) =>
-                    {
-                        for (int i = 0; i < list?.Count; i++)
-                        {
-                            if (list[i].Reviews.Count != 0)
-                            {
-                                des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
-                            }
-                        }
-                    }));
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
-                }
-            }
-        }
+        // public async Task<List<Garage>>
     }
 }

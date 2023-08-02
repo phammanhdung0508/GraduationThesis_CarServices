@@ -4,7 +4,9 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Review;
+using GraduationThesis_CarServices.Models.DTO.Service;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 
@@ -25,12 +27,16 @@ namespace GraduationThesis_CarServices.Services.Service
             this.garageRepository = garageRepository;
         }
 
-        public async Task<List<ReviewListResponseDto>?> View(PageDto page)
+        public async Task<GenericObject<List<ReviewListResponseDto>>> View(PageDto page)
         {
 
             try
             {
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.View(page));
+                (var listObj, var count) = await reviewRepository.View(page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -48,12 +54,45 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<List<ReviewListResponseDto>?> FilterReviewByGarageId(PagingReviewPerGarageRequestDto requestDto)
+        public async Task<GenericObject<List<ReviewListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count) = await reviewRepository.SearchByName(requestDto.Search, page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<ReviewListResponseDto>>> FilterReviewByGarage(FilterByGarageRequestDto requestDto)
         {
             try
             {
@@ -65,13 +104,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var page = new PageDto
-                {
-                    PageIndex = requestDto.PageIndex,
-                    PageSize = requestDto.PageSize
-                };
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
 
-                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterReviewByGarageId(requestDto.GarageId, page));
+                (var listObj, var count) = await reviewRepository.FilterReviewByGarage(requestDto.GarageId, page);
+
+                var listDto = mapper.Map<List<ReviewListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<ReviewListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -89,8 +128,43 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
+            }
+        }
+
+        public async Task<List<ReviewListResponseDto>?> FilterAllReview(ReviewFilterRequestDto requestDto)
+        {
+            try
+            {
+                DateTime? dateFrom = null;
+                DateTime? dateTo = null;
+
+                if (requestDto.DateFrom is not null)
+                {
+                    dateFrom = DateTime.Parse(requestDto.DateFrom!);
+                }
+
+                if (requestDto.DateTo is not null)
+                {
+                    dateTo = DateTime.Parse(requestDto.DateTo!);
+                }
+
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                var list = mapper.Map<List<ReviewListResponseDto>>(await reviewRepository.FilterAllReview(requestDto.GarageId, dateFrom, dateTo, page));
+
+                return list;
+
+            }
+            catch (System.Exception)
+            {
+
+                throw;
             }
         }
 
@@ -122,18 +196,20 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task Create(ReviewCreateRequestDto requestDto)
+        public async Task Create(ReviewCreateRequestDto requestDto, int userId)
         {
             try
             {
+                int customerId = await userRepository.GetCustomerId(userId);
+
                 var isInRange = false;
-                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
                 var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
+
                 if (requestDto.Rating >= 0 && requestDto.Rating <= 5)
                 {
                     isInRange = true;
@@ -141,7 +217,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 switch (false)
                 {
-                    case var isExist when isExist == isCustomerExist:
+                    case var isExist when isExist == (customerId != 0):
                         throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist == isGarageExist:
                         throw new MyException("The garage doesn't exist.", 404);
@@ -150,11 +226,12 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 var review = mapper.Map<ReviewCreateRequestDto, Review>(requestDto,
-                            otp => otp.AfterMap((src, des) =>
-                            {
-                                des.ReviewStatus = Status.Activate;
-                                des.CreatedAt = DateTime.Now;
-                            }));
+                otp => otp.AfterMap((src, des) =>
+                {
+                    des.ReviewStatus = Status.Activate;
+                    des.CreatedAt = DateTime.Now;
+                    des.CustomerId = customerId;
+                }));
 
                 await reviewRepository.Create(review);
             }
@@ -172,7 +249,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -213,7 +290,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -248,7 +325,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

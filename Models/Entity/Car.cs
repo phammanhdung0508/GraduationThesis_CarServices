@@ -11,27 +11,25 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int CarId { get; set; }
         [MaxLength(20)]
-        public string CarColor { get; set; }
-        [MaxLength(20)]
         public string CarModel { get; set; }
         [MaxLength(20)]
         public string CarBrand { get; set; }
         [MaxLength(10)]
         public string CarLicensePlate { get; set; }
-        [Column(TypeName = "smallint")]
-        public int CarYear { get; set; }
-        [MaxLength(20)]
-        public string CarBodyType { get; set; }
+        [MaxLength(2240)]
+        public string CarDescription { get; set; }
         [MaxLength(20)]
         public string CarFuelType { get; set; }
         public int NumberOfCarLot {get; set;}
         [Column(TypeName = "tinyint")]
+        public CarStatus CarBookingStatus { get; set; }
+        [Column(TypeName = "tinyint")]
         public Status CarStatus { get; set; }
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
 
         /*-------------------------------------------------*/

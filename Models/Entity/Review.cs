@@ -16,14 +16,14 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string Content { get; set; }
         [Column(TypeName = "tinyint")]
         public Status ReviewStatus {get; set;}
-        public Nullable<DateTime> CreatedAt { get; set; }
-        public Nullable<DateTime> UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
         
-        public Nullable<int> GarageId { get; set; }
+        public int? GarageId { get; set; }
         public virtual Garage Garage { get; set; }
     }
 }

@@ -16,19 +16,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-
-        public async Task<List<Product>?> View(PageDto page)
+        public Product GetDefaultProduct(int serviceDetailId)
         {
             try
             {
-                var list = await PagingConfiguration<Product>
-                .Get(context.Products
-                .Where(p => p.ProductStatus == Status.Activate)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
-                .Include(p => p.Service)
-                , page);
-                return list;
+                var product = context.ServiceDetails.Include(s => s.Service).ThenInclude(s => s.Products)
+                .Where(s => s.ServiceDetailId == serviceDetailId)
+                .SelectMany(s => s.Service.Products).FirstOrDefault();
+
+                return product!;
             }
             catch (Exception)
             {
@@ -36,7 +32,60 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsProductExist(int productId){
+        public async Task<(List<Product>, int count)> View(PageDto page)
+        {
+            try
+            {
+                var query = context.Products.AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Product>.Get(query.Include(p => p.Category).Include(p => p.Service), page);
+
+                return (list, count);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Product>, int count)> SearchByName(PageDto page, string searchString)
+        {
+            try
+            {
+                var searchTrim = searchString.Trim().Replace(" ", "").ToLower();
+                var query = context.Products.Where(s => s.ProductName.ToLower().Trim().Replace(" ", "").Contains(searchTrim)).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Product>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> CountProductData()
+        {
+            try
+            {
+                var count = await context.Products.CountAsync();
+
+                return count;
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<bool> IsProductExist(int productId)
+        {
             try
             {
                 var check = await context.Products
@@ -56,8 +105,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Products
                 .Where(p => p.ServiceId == serviceId && p.ProductQuantity > 0)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
+                .Include(p => p.Category)
                 .Include(p => p.Service)
                 .ToListAsync();
 
@@ -75,8 +123,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var product = await context.Products
                 .Where(p => p.ProductId == id)
-                .Include(p => p.Subcategory)
-                .ThenInclude(s => s.Category)
+                .Include(p => p.Category)
                 .Include(p => p.Service)
                 .FirstOrDefaultAsync();
                 return product;
@@ -87,12 +134,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<bool> IsDuplicatedProduct(Product product){
+        public async Task<bool> IsDuplicatedProduct(Product product)
+        {
             try
             {
                 var check = await context.Products
                 .Where(p => p.ProductName.Equals(product.ProductName)
-                && p.ProductDetailDescription.Equals(product.ProductDetailDescription)
                 && p.ProductPrice == product.ProductPrice
                 && p.ProductStatus == Status.Activate).AnyAsync();
 
@@ -130,7 +177,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public float GetPrice(int productId)
+        public decimal GetPrice(int productId)
         {
             try
             {

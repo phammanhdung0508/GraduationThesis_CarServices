@@ -21,15 +21,15 @@ namespace GraduationThesis_CarServices.Services.Service
             this.userRepository = userRepository;
         }
 
-        public async Task<List<CarListResponseDto>?> FilterUserCar(int customerId)
+        public async Task<List<CarListResponseDto>?> FilterUserCar(int userId)
         {
             try
             {
-                var isCustomerExist = await userRepository.IsCustomerExist(customerId);
+                int customerId = await userRepository.GetCustomerId(userId);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isCustomerExist:
+                    case var isExist when isExist == (customerId != 0):
                         throw new MyException("The customer doesn't exist.", 404);
                 }
 
@@ -52,7 +52,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
@@ -86,21 +86,22 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<bool> Create(CarCreateRequestDto requestDto)
+        public async Task Create(CarCreateRequestDto requestDto, int userId)
         {
             try
             {
-                var isCustomerExist = await userRepository.IsCustomerExist(requestDto.CustomerId);
+                int customerId = await userRepository.GetCustomerId(userId);
+
                 var isLicensePlateExist = await carRepository.IsLicensePlate(requestDto.CarLicensePlate);
 
                 switch (false)
                 {
-                    case var isExist when isExist == isCustomerExist:
+                    case var isExist when isExist == (customerId != 0):
                         throw new MyException("The customer doesn't exist.", 404);
                     case var isExist when isExist != isLicensePlateExist:
                         throw new MyException("The license plate already exists.", 404);
@@ -109,11 +110,12 @@ namespace GraduationThesis_CarServices.Services.Service
                 var car = mapper.Map<CarCreateRequestDto, Car>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
+                    des.CarBookingStatus = CarStatus.Available;
                     des.CarStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
+                    des.CustomerId = customerId;
                 }));
                 await carRepository.Create(car);
-                return true;
             }
             catch (Exception e)
             {
@@ -129,12 +131,12 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<bool> Update(CarUpdateRequestDto requestDto)
+        public async Task Update(CarUpdateRequestDto requestDto)
         {
             try
             {
@@ -152,7 +154,6 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await carRepository.Update(car);
-                return true;
             }
             catch (Exception e)
             {
@@ -168,12 +169,12 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }
 
-        public async Task<bool> UpdateStatus(CarStatusRequestDto requestDto)
+        public async Task UpdateStatus(CarStatusRequestDto requestDto)
         {
             try
             {
@@ -187,7 +188,6 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var car = mapper.Map<CarStatusRequestDto, Car>(requestDto, c!);
                 await carRepository.Update(car);
-                return true;
             }
             catch (Exception e)
             {
@@ -203,7 +203,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             inner = inner.InnerException;
                         }
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw new MyException("Internal Server Error", 500);
+                        throw;
                 }
             }
         }

@@ -1,92 +1,72 @@
-using AutoMapper;
-using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.DTO.Report;
-using GraduationThesis_CarServices.Models.Entity;
-using GraduationThesis_CarServices.Paging;
-using GraduationThesis_CarServices.Repositories.IRepository;
-using Microsoft.EntityFrameworkCore;
+// using GraduationThesis_CarServices.Repositories.IRepository;
+// using GraduationThesis_CarServices.Models;
+// using GraduationThesis_CarServices.Models.DTO.Page;
+// using GraduationThesis_CarServices.Models.Entity;
+// using GraduationThesis_CarServices.Paging;
+// using Microsoft.EntityFrameworkCore;
 
-namespace GraduationThesis_CarServices.Repositories.Repository
-{
-    public class ReportRepository : IReportRepository
-    {
-        public IMapper mapper { get; }
-        public DataContext context { get; }
-        public ReportRepository(DataContext context, IMapper mapper)
-        {
-            this.context = context;
-            this.mapper = mapper;
-        }
+// namespace GraduationThesis_CarServices.Repositories.Repository
+// {
+//     public class ReportRepository : IReportRepository
+//     {
+//         public DataContext context { get; }
+//         public ReportRepository(DataContext context)
+//         {
+//             this.context = context;
+//         }
 
-        public async Task<List<ReportDto>?> View(PageDto page)
-        {
-            try
-            {
-                List<Report> list = await PagingConfiguration<Report>.Get(context.Reports, page);
-                return mapper.Map<List<ReportDto>>(list);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+//         public async Task<List<Report>?> View(PageDto page)
+//         {
+//             try
+//             {
+//                 var list = await PagingConfiguration<Report>.Get(context.Reports, page);
 
-        public async Task<ReportDto?> Detail(int id)
-        {
-            try
-            {
-                ReportDto report = mapper.Map<ReportDto>(await context.Reports.FirstOrDefaultAsync(c => c.ReportId == id));
-                return report;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+//                 return list;
+//             }
+//             catch (Exception)
+//             {
+//                 throw;
+//             }
+//         }
 
-        public async Task Create(CreateReportDto reportDto)
-        {
-            try
-            {
-                Report report = mapper.Map<Report>(reportDto);
-                context.Reports.Add(report);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+//         public async Task<Report?> Detail(int id)
+//         {
+//             try
+//             {
+//                 var report = await context.Reports.FirstOrDefaultAsync(c => c.ReportId == id);
 
-        public async Task Update(UpdateReportDto reportDto)
-        {
-            try
-            {
-                var report = context.Reports.FirstOrDefault(r => r.ReportId == reportDto.ReportId)!;
-                mapper.Map<UpdateReportDto, Report?>(reportDto, report);
-                context.Reports.Update(report);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+//                 return report;
+//             }
+//             catch (Exception)
+//             {
+//                 throw;
+//             }
+//         }
 
-        public async Task Delete(DeleteReportDto reportDto)
-        {
-            try
-            {
-                var report = context.Reports.FirstOrDefault(r => r.ReportId == reportDto.ReportId)!;
-                mapper.Map<DeleteReportDto, Report?>(reportDto, report);
-                context.Reports.Update(report);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-    }
-}
+//         public async Task Create(Report report)
+//         {
+//             try
+//             {
+//                 context.Reports.Add(report);
+//                 await context.SaveChangesAsync();
+//             }
+//             catch (Exception)
+//             {
+//                 throw;
+//             }
+//         }
+
+//         public async Task Update(Report report)
+//         {
+//             try
+//             {
+//                 context.Reports.Update(report);
+//                 await context.SaveChangesAsync();
+//             }
+//             catch (Exception)
+//             {
+//                 throw;
+//             }
+//         }
+//     }
+// }

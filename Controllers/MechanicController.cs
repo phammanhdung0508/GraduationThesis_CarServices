@@ -1,11 +1,12 @@
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Services.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GraduationThesis_CarServices.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/mechanic")]
     public class MechanicController : ControllerBase
     {
         private readonly IMechanicService mechanicService;
@@ -14,6 +15,21 @@ namespace GraduationThesis_CarServices.Controllers
             this.mechanicService = mechanicService;
         }
 
+        /// <summary>
+        /// View all mechanics. [Admin]
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("view-all-mechanic")]
+        public async Task<IActionResult> ViewAll(PageDto page)
+        {
+            var list = await mechanicService.View(page);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Filter Mechanics by specific garage. [Admin]
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("get-garage-mechanic/{garageId}")]
         public async Task<IActionResult> FilterMechanics(int garageId)
         {
@@ -21,6 +37,10 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// View detail a specific Mechainc.
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-mechanic/{mechanicId}")]
         public async Task<IActionResult> DetailMechanic(int mechanicId)
         {
@@ -28,17 +48,27 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(mechanic);
         }
 
-        [HttpGet("get-working-schedule-mechanic/{mechanicId}")]
-        public async Task<IActionResult> FilterWorkingSchedules(int mechanicId)
+        /// <summary>
+        /// Allow Customers to view which mechanic has been applied to their booking. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-mechanic-by-booking/{bookingId}")]
+        public async Task<IActionResult> GetMechanicByBooking(int bookingId)
         {
-            var list = await mechanicService.FilterWorkingSchedulesByMechanicId(mechanicId);
+            var list = await mechanicService.GetMechanicByBooking(bookingId);
+
             return Ok(list);
         }
 
-        [HttpPost("view-all-mechanic")]
-        public async Task<IActionResult> View(PageDto page)
+        /// <summary>
+        /// Filter mechanic working on the specific garage. [Customer]
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("get-mechanic-by-garage/{garageId}")]
+        public async Task<IActionResult> GetMechanicByGarage(int garageId)
         {
-            var list = await mechanicService.View(page)!;
+            var list = await mechanicService.GetMechanicByGarage(garageId);
+
             return Ok(list);
         }
     }

@@ -11,10 +11,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int GarageDetailId { get; set; }
 
         /*-------------------------------------------------*/
-        public Nullable<int> GarageId { get; set; }
+        public int? GarageId { get; set; }
         public virtual Garage Garage { get; set; }
         
-        public Nullable<int> ServiceId { get; set; }
+        public int? ServiceId { get; set; }
         public virtual Service Service { get; set; }
     }
 }

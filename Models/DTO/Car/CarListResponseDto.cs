@@ -10,5 +10,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Car
         public string CarLicensePlate { get; set; }
         public string CarFuelType { get; set; }
         public int NumberOfCarLot {get; set;}
+        public string CarStatus { get; set; }
     }
 }

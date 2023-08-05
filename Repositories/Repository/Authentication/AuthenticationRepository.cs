@@ -107,7 +107,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                         break;
                     case var isPhone when !string.IsNullOrEmpty(isPhone.Phone):
                         //For mobile test
-                        if (login.Phone!.Equals("1"))
+                        if (login.Phone!.Equals("1") || login.Phone!.Equals("2"))
                         {
                             _user = await query.FirstOrDefaultAsync(u => u.UserPhone.Equals(login.Phone));
                             isEmailVerify = true;
@@ -143,7 +143,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     throw new MyException("Xin lỗi, tài khoản của bạn đã bị khóa.", 404);
                 }
 
-                if (_user!.RoleId == 2 && _user.Garages is not null)
+                if ((_user!.RoleId == 2 && _user.Garages is not null) ||
+                (_user!.RoleId == 5 && _user.Garages is not null))
                 {
                     var garageId = await context.Garages.Where(g => g.UserId == _user!.UserId).Select(g => g.GarageId).FirstOrDefaultAsync();
                     user = mapper.Map<UserLoginDto>(_user);

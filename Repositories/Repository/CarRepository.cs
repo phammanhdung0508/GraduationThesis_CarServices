@@ -33,7 +33,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
-                var isAvalible = await context.Cars.Where(c => c.CarId == carId && c.CarBookingStatus == CarStatus.Available).AnyAsync();
+                var isAvalible = await context.Cars.Where(c => c.CarId == carId && 
+                c.CarBookingStatus == CarStatus.Available).AnyAsync();
 
                 return isAvalible;
             }

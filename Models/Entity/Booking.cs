@@ -17,6 +17,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         public DateTime BookingTime { get; set; }
         public string PaymentMethod { get; set; }
         [Column(TypeName = "decimal(10,3)")]
+        public decimal OriginalPrice { get; set; } = 0;
+        [Column(TypeName = "decimal(10,3)")]
+        public decimal DiscountPrice { get; set; } = 0;
+        [Column(TypeName = "decimal(10,3)")]
         public decimal TotalPrice { get; set; }
         [Column(TypeName = "decimal(10,3)")]
         public decimal FinalPrice { get; set; }
@@ -27,6 +31,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]
         public BookingStatus BookingStatus { get; set; }
+        public string QrImage { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

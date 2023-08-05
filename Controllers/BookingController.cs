@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +16,12 @@ namespace GraduationThesis_bookingServices.Controllers
     public class BookingController : ControllerBase
     {
         public readonly IBookingService bookingService;
+        public readonly FCMSendNotificationMobile fCMSendNotificationMobile;
 
-        public BookingController(IBookingService bookingService)
+        public BookingController(IBookingService bookingService, FCMSendNotificationMobile fCMSendNotificationMobile)
         {
             this.bookingService = bookingService;
+            this.fCMSendNotificationMobile = fCMSendNotificationMobile;
         }
 
         /// <summary>
@@ -40,6 +44,37 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             var booking = await bookingService.DetailBookingForCustomer(bookingId);
             return Ok(booking);
+        }
+
+        /// <summary>
+        /// View detail of a specific Booking. [Staff]
+        /// </summary>
+        //[Authorize(Roles = "Staff")]
+        [Route("detail-booking-for-staff/{bookingId}")]
+        [AcceptVerbs("GET")]
+        public async Task<IActionResult> DetailBookingForStaff(int bookingId)
+        {
+            var booking = await bookingService.RunQRCode(bookingId);
+            return Ok(booking);
+        }
+
+        /// <summary>
+        /// Filter list booking by date for staff. [Staff]
+        /// </summary>
+        [Authorize(Roles = "Staff")]
+        [HttpGet("get-booking-by-date-for-staff")]
+        public async Task<IActionResult> FilterListBookingByGarageAndDate([FromQuery][Required] string date)
+        {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
+            var list = await bookingService.FilterListBookingByGarageAndDate(garageId, date);
+
+            return Ok(list);
         }
 
         /// <summary>
@@ -66,7 +101,7 @@ namespace GraduationThesis_bookingServices.Controllers
             var token = handler.ReadJwtToken(encodedToken);
 
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
-            
+
             var list = await bookingService.FilterBookingByStatusCustomer(bookingStatus, userId);
             return Ok(list);
         }
@@ -192,17 +227,6 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Generate new QR code for Customer when they check-in. [Customer]
-        /// </summary>
-        [Authorize(Roles = "Customer")]
-        [HttpGet("generate-qr-code/{bookingId}")]
-        public async Task<IActionResult> GenerateQRCode(int bookingId)
-        {
-            await bookingService.GenerateQRCode(bookingId);
-            throw new MyException("Successfully.", 200);
-        }
-
-        /// <summary>
         /// Update booking status.
         /// </summary>
         //[Authorize(Roles = "Staff")]
@@ -216,19 +240,6 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Run a specific function after a user scan QR code.
-        /// </summary>
-        // [HttpGet]
-        [Authorize(Roles = "Staff")]
-        [Route("run-qr/{bookingId}")]
-        [AcceptVerbs("GET")]
-        public async Task<IActionResult> RunQR(int bookingId)
-        {
-            await bookingService.RunQRCode(bookingId);
-            throw new MyException("Successfully.", 200);
-        }
-
-        /// <summary>
         /// Count Bookings for every booking status. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
@@ -238,9 +249,9 @@ namespace GraduationThesis_bookingServices.Controllers
             var count = await bookingService.CountBookingPerStatus();
             return Ok(count);
         }
-    
+
         /// <summary>
-        /// Count Bookings for every booking status. [Customer]
+        /// Get booking detail status by booking for customer. [Customer]
         /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpGet("get-booking-detail-status-by-booking-customer/{bookingId}")]
@@ -249,6 +260,25 @@ namespace GraduationThesis_bookingServices.Controllers
             var list = await bookingService.GetBookingDetailStatusByBooking(bookingId);
 
             return Ok(list);
+        }
+
+        /// <summary>
+        /// Get booking detail status by booking for staff. [staff]
+        /// </summary>
+        //[Authorize(Roles = "Staff")]
+        [HttpGet("get-booking-detail-status-by-booking-staff/{bookingId}")]
+        public async Task<IActionResult> GetBookingServiceStatusByBooking(int bookingId)
+        {
+            var booking = await bookingService.GetBookingServiceStatusByBooking(bookingId);
+
+            return Ok(booking);
+        }
+
+        [HttpPost("push-notification/{idToken}")]
+        public async Task<IActionResult> PushNotification(string idToken)
+        {
+            await fCMSendNotificationMobile.SendMessagesToSpecificDevices(idToken);
+            throw new MyException("Successfully.", 200);
         }
     }
 }

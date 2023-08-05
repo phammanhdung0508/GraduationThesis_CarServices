@@ -13,9 +13,8 @@ namespace GraduationThesis_CarServices.Services.IService
         Task Create(BookingCreateRequestDto requestDto);
         Task UpdateStatus(int bookingId, BookingStatus bookingStatus);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
-        Task GenerateQRCode(int bookingId);
         Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto);
-        Task RunQRCode(int bookingId);
+        Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId);
         Task<GenericObject<List<BookingListResponseDto>>> SearchByBookingCode(SearchBookingByUserRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByStatus(FilterByStatusRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto);
@@ -26,5 +25,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<BookingDetailForCustomerResponseDto> DetailBookingForCustomer(int bookingId);
         Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId);
         Task ConfirmAcceptedBooking(bool isAccepted, int bookingId);
+        Task<List<HourDto>> FilterListBookingByGarageAndDate(int bookingId, string date);
+        Task<BookingServiceStatusForStaffResponseDto> GetBookingServiceStatusByBooking(int bookingId);
     }
 }

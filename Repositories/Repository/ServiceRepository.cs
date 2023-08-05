@@ -218,7 +218,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await context.BookingDetails.Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                var list = await context.BookingDetails
+                .Include(b => b.ServiceDetail).ThenInclude(s => s.Service).ThenInclude(s => s.Products)
                 .Where(b => b.BookingId == bookingId).ToListAsync();
 
                 return list;

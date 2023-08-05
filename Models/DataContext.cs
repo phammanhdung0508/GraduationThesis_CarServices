@@ -58,7 +58,7 @@ namespace GraduationThesis_CarServices.Models
             this.SeedRandomGarageData(modelBuilder);
             this.SeedRandomReviewData(modelBuilder);
             this.SeedRandomCouponData(modelBuilder);
-            this.SeedRandomBookingData(modelBuilder);
+            // this.SeedRandomBookingData(modelBuilder);
             //this.SeedRandomReportData(modelBuilder);
             watch.Stop();
             Console.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
@@ -427,7 +427,7 @@ namespace GraduationThesis_CarServices.Models
 
             var garageMechanicFaker = new Faker<GarageMechanic>();
 
-            for (int i = 1; i <= 60; i++)
+            for (int i = 1; i <= 100; i++)
             {
                 garageMechanicFaker.RuleFor(w => w.GarageMechanicId, i)
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 14))
@@ -445,7 +445,7 @@ namespace GraduationThesis_CarServices.Models
 
             var carFaker = new Faker<Car>();
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 25; i++)
             {
                 carFaker.RuleFor(c => c.CarId, i)
                     .RuleFor(c => c.CarModel, f => f.Vehicle.Model())
@@ -600,15 +600,18 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
                     // .RuleFor(b => b.PaymentMethod, f => "Tra sau")
-                    .RuleFor(b => b.TotalPrice, f => f.Random.Int(100, 1000))
+                    .RuleFor(b => b.OriginalPrice, f => f.Random.Int(100, 1000))
+                    .RuleFor(b => b.DiscountPrice, f => f.Random.Int(00, 30))
+                    .RuleFor(b => b.TotalPrice, (f, g) => g.OriginalPrice - g.DiscountPrice)
                     .RuleFor(b => b.FinalPrice, (f, g) => g.TotalPrice)
                     // .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                     //.RuleFor(b => b.IsAccepted, f => true)
                     .RuleFor(b => b.CreatedAt, now)
-                    .RuleFor(b => b.CarId, f => f.Random.Int(1, 20))
+                    .RuleFor(b => b.CarId, f => f.Random.Int(1, 25))
                     .RuleFor(b => b.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(b => b.IsAccepted, f => true)
+                    .RuleFor(b => b.QrImage, f => "https://media.istockphoto.com/id/828088276/vi/vec-to/m%C3%A3-qr-minh-h%E1%BB%8Da.jpg?s=612x612&w=0&k=20&c=5qgn5q4gI0tuO6m_IEL90CpyOlifFa2ku0xA5gOWiOA=")
                     .RuleFor(b => b.CreatedAt, f => now);
 
                 bookingList.Add(bookingFaker.Generate());

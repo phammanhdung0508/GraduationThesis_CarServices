@@ -10,7 +10,10 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string BookingDay { get; set; }
         public string GarageAddress { get; set; }
         public string BookingStatus { get; set; }
-        public string Price { get; set; }
+        public string QrImage { get; set; }
+        public string DiscountPrice { get; set; }
+        public string TotalPrice { get; set; }
+        public string FinalPrice { get; set; }
         public List<GroupServiceBookingDetailDto> groupServiceBookingDetailDtos {get; set;}
     }
 

@@ -314,7 +314,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             var list = await context.Bookings.Include(b => b.Car).ThenInclude(c => c.Customer)
             .ThenInclude(c => c.User).Include(b => b.Garage)
-            .Where(b => (int)b.BookingStatus == bookingStatus && b.Car.Customer.User.UserId == userId)
+            .Where(b => (int)b.BookingStatus == bookingStatus &&
+            b.Car.Customer.User.UserId == userId)
             .ToListAsync();
 
             return list;
@@ -342,6 +343,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Garages.Where(g => g.GarageId == garageId)
                 .SelectMany(g => g.Bookings).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Booking>> FilterListBookingByGarageAndDate(int garageId, DateTime date)
+        {
+            try
+            {
+                var list = await context.Bookings.Include(b => b.Garage).Include(b => b.Car)
+                .Where(b => b.Garage.GarageId == garageId && b.BookingTime.Date.Equals(date)).ToListAsync();
 
                 return list;
             }

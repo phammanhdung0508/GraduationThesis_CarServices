@@ -40,7 +40,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var count = await query.CountAsync();
 
-                var list = await PagingConfiguration<Product>.Get(query.Include(p => p.Category).Include(p => p.Service), page);
+                var list = await PagingConfiguration<Product>.Get(query.Include(p => p.Category), page);
 
                 return (list, count);
             }

@@ -63,7 +63,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<Coupon?> Detail(int id)
+        public async Task<Coupon?> Detail(int? id)
         {
             try
             {
@@ -99,24 +99,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 await context.SaveChangesAsync();
             }
             catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<(CouponType, decimal)> GetCouponTypeAndCouponValue(int? couponId)
-        {
-            try
-            {
-                var coupon = await context.Coupons.Where(c => c.CouponId == couponId).Select(c => new
-                {
-                    c.CouponType,
-                    c.CouponValue
-                }).FirstOrDefaultAsync();
-
-                return (coupon!.CouponType, coupon.CouponValue);
-            }
-            catch (System.Exception)
             {
                 throw;
             }

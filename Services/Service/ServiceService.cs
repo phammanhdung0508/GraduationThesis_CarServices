@@ -69,11 +69,19 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 foreach (var item in serviceGroupList)
                 {
-                    var serviceList = serviceListByGarage.Where(s => s.ServiceGroup.Equals(item)).ToList();
+                    var serviceList = serviceListByGarage.Where(s => s.ServiceGroup.Equals(item) &&
+                    s.ServiceDetails.Count >= 2).ToList();
 
                     var serviceDtoList = mapper.Map<List<ServicListDto>>(serviceList);
 
-                    serviceSelectList.Add(new ServiceSelectResponseDto { ServiceGroup = item, ServicListDtos = serviceDtoList });
+                    if (serviceList.Count > 0)
+                    {
+                        serviceSelectList.Add(new ServiceSelectResponseDto { ServiceGroup = item, ServicListDtos = serviceDtoList });
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
 
                 return serviceSelectList;
@@ -159,7 +167,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<GenericObject<List<ServiceDetailListResponseDto>>> FilterServiceByGarage(FilterByGarageRequestDto requestDto)
+        public async Task<GenericObject<List<ServiceOfServiceDetailDto>>> FilterServiceByGarage(FilterByGarageRequestDto requestDto)
         {
             try
             {
@@ -167,9 +175,9 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 (var listObj, var count) = await serviceRepository.FilterServiceByGarage(requestDto.GarageId, page);
 
-                var listDto = mapper.Map<List<ServiceDetailListResponseDto>>(listObj);
+                var listDto = mapper.Map<List<ServiceOfServiceDetailDto>>(listObj);
 
-                var list = new GenericObject<List<ServiceDetailListResponseDto>>(listDto, count);
+                var list = new GenericObject<List<ServiceOfServiceDetailDto>>(listDto, count);
 
                 return list;
             }
@@ -274,13 +282,15 @@ namespace GraduationThesis_CarServices.Services.Service
                 if (await serviceRepository.IsServiceExist(requestDto.ServiceId))
                 {
                     var s = await serviceRepository.Detail(requestDto.ServiceId);
+
                     var service = mapper.Map<ServiceUpdateRequestDto,
-                    GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!,
-                    otp => otp.AfterMap((src, des) =>
-                    {
-                        des.UpdatedAt = DateTime.Now;
-                    }));
+                    GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
+
                     await serviceRepository.Update(service);
+                }
+                else
+                {
+                    throw new MyException("The service doesn't exist.", 404);
                 }
             }
             catch (Exception e)
@@ -302,16 +312,29 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UpdateStatus(ServiceStatusRequestDto requestDto)
+        public async Task UpdateStatus(int serviceId)
         {
             try
             {
-                if (await serviceRepository.IsServiceExist(requestDto.ServiceId))
+                if (await serviceRepository.IsServiceExist(serviceId))
                 {
-                    var s = await serviceRepository.Detail(requestDto.ServiceId);
-                    var service = mapper.Map<ServiceStatusRequestDto,
-                    GraduationThesis_CarServices.Models.Entity.Service>(requestDto, s!);
+                    var service = await serviceRepository.Detail(serviceId);
+
+                    switch (service!.ServiceStatus)
+                    {
+                        case Status.Activate:
+                            service.ServiceStatus = Status.Deactivate;
+                            break;
+                        case Status.Deactivate:
+                            service.ServiceStatus = Status.Activate;
+                            break;
+                    }
+
                     await serviceRepository.Update(service);
+                }
+                else
+                {
+                    throw new MyException("The service doesn't exist.", 404);
                 }
             }
             catch (Exception e)

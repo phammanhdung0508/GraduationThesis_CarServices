@@ -121,11 +121,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                         break;
                 }
 
-                if (!isEmailVerify)
-                {
-                    throw new MyException("Tài khoản này chưa được xác thực.", 404);
-                }
-
                 if (_user is null)
                 {
                     throw new MyException("Tài khoản đăng nhập không tồn tại.", 404);
@@ -134,8 +129,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 {
                     if (!encryptConfiguration.VerifyPasswordHash(login.Password, _user.PasswordHash, _user.PasswordSalt))
                     {
-                        throw new MyException("Mật khẩu xác nhận không khớp.", 404);
+                        throw new MyException("Mật khẩu của bạn không đúng.", 404);
                     }
+                }
+
+                if (!isEmailVerify)
+                {
+                    throw new MyException("Tài khoản này chưa được xác thực.", 404);
                 }
 
                 if (_user?.UserStatus == 0)
@@ -143,12 +143,17 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     throw new MyException("Xin lỗi, tài khoản của bạn đã bị khóa.", 404);
                 }
 
-                if ((_user!.RoleId == 2 && _user.Garages is not null) ||
-                (_user!.RoleId == 5 && _user.Garages is not null))
+                if (_user!.RoleId == 5 && _user.Garages is not null)
                 {
-                    var garageId = await context.Garages.Where(g => g.UserId == _user!.UserId).Select(g => g.GarageId).FirstOrDefaultAsync();
                     user = mapper.Map<UserLoginDto>(_user);
-                    user.GarageId = garageId;
+                    user.GarageId = await context.Garages.Where(g => g.UserId == _user!.ManagerId)
+                    .Select(g => g.GarageId).FirstOrDefaultAsync();
+                }
+                else if (_user!.RoleId == 2 && _user.Garages is not null)
+                {
+                    user = mapper.Map<UserLoginDto>(_user);
+                    user.GarageId = await context.Garages.Where(g => g.UserId == _user!.UserId)
+                    .Select(g => g.GarageId).FirstOrDefaultAsync();
                 }
                 else
                 {
@@ -275,7 +280,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                 await userRepository.Update(user);
 
-                //SendSMSWithTwilio(formatPhone, otp);
+                SendSMSWithTwilio(formatPhone, otp);
 
                 //await tokenConfiguration.Send(otp, recipientEmail);
             }
@@ -400,17 +405,23 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
         {
             try
             {
-                var formatPhone = "+84" + requestDto.UserPhone.Substring(1, 9);
-
-                //var encodeEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
-                var isUserPhoneExist = await userRepository.IsUserPhoneExist(formatPhone);
-
                 switch (false)
                 {
-                    case var isExist when isExist != isUserPhoneExist:
-                        throw new MyException("Số điện thoại đăng kí của bạn đã toàn tại.", 404);
-                    case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
+                    case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
+                        throw new MyException("Số điện thoại không được để trống.", 404);
+                    case var isFalse when isFalse == requestDto.UserPhone.All(char.IsDigit):
+                        throw new MyException("Số điện thoại không được nhập kí tự khác ngoài số.", 404);
+                    case var isFalse when isFalse == requestDto.UserPassword.Equals(requestDto.PasswordConfirm):
                         throw new MyException("Mật khẩu của bạn không khớp với mật khẩu xác nhận.", 404);
+                }
+
+                var formatPhone = "+84" + requestDto.UserPhone.Substring(1, 9);
+
+                var isUserPhoneExist = await userRepository.IsUserPhoneExist(formatPhone);
+
+                if (isUserPhoneExist)
+                {
+                    throw new MyException("Số điện thoại đăng kí của bạn đã tồn tại.", 404);
                 }
 
                 encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);

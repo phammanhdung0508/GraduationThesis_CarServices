@@ -1,6 +1,7 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using GraduationThesis_CarServices.Enum;
 
 namespace GraduationThesis_CarServices.Models.Entity
 {
@@ -9,7 +10,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int BookingMechanicId { get; set; }
-        public DateTime WorkingDate {get; set;}
+        public DateTime WorkingDate { get; set; }
+        public Status BookingMechanicStatus { get; set; }
 
         /*-------------------------------------------------*/
         public int? BookingId { get; set; }

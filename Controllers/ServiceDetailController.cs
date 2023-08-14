@@ -66,22 +66,11 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific service detail.
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPut("update-service-detail")]
         public async Task<IActionResult> UpdateServiceDetail(ServiceDetailUpdateRequestDto serviceDetail)
         {
             await serviceDetailService.Update(serviceDetail);
-            throw new MyException("Successfully.", 200);
-        }
-
-        /// <summary>
-        /// Updates a specific service detail status.
-        /// </summary>
-        [Authorize(Roles = "Admin")]
-        [HttpPut("update-price-service-detail")]
-        public async Task<IActionResult> UpdatePriceServiceDetail(ServiceDetailPriceRequestDto serviceDetail)
-        {
-            await serviceDetailService.UpdatePrice(serviceDetail);
             throw new MyException("Successfully.", 200);
         }
     }

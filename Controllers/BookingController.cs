@@ -16,12 +16,10 @@ namespace GraduationThesis_bookingServices.Controllers
     public class BookingController : ControllerBase
     {
         public readonly IBookingService bookingService;
-        public readonly FCMSendNotificationMobile fCMSendNotificationMobile;
 
-        public BookingController(IBookingService bookingService, FCMSendNotificationMobile fCMSendNotificationMobile)
+        public BookingController(IBookingService bookingService)
         {
             this.bookingService = bookingService;
-            this.fCMSendNotificationMobile = fCMSendNotificationMobile;
         }
 
         /// <summary>
@@ -81,7 +79,7 @@ namespace GraduationThesis_bookingServices.Controllers
         /// View revenue of a specific Garage. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-revenue-by-garage/garageId={garageId}")]
+        [HttpGet("get-revenue-by-garage/{garageId}")]
         public async Task<IActionResult> CountRevune(int garageId)
         {
             var revenue = await bookingService.CountRevune(garageId);
@@ -202,19 +200,16 @@ namespace GraduationThesis_bookingServices.Controllers
         ///         "customerName": "name",
         ///         "customerPhone": "phone",
         ///         "customerEmail": "email",
-        ///         "dateSelected": "MM/dd/yyyy",
-        ///         "timeSelected": "hh:mm:ss",
+        ///         "dateSelected": "12/12/2023",
+        ///         "timeSelected": "08:00:00",
         ///         "serviceList": [
-        ///             {
-        ///                 "serviceDetailId": 1
-        ///             }
+        ///             1
         ///         ],
-        ///         "mechanicId": 1,
+        ///         "mechanicId": 0,
         ///         "carId": 1,
         ///         "garageId": 1,
-        ///         "couponId": 1,
+        ///         "couponId": 0,
         ///
-        ///         "versionNumber": "AAAAAAAAEBM=" /*version number get when call garage detail. Must have*/
         ///     }
         ///
         /// </remarks>
@@ -222,8 +217,8 @@ namespace GraduationThesis_bookingServices.Controllers
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
-            await bookingService.Create(bookingCreateRequestDto);
-            throw new MyException("Successfully.", 200);
+            var response = await bookingService.Create(bookingCreateRequestDto);
+            return Ok(response);
         }
 
         /// <summary>
@@ -242,11 +237,11 @@ namespace GraduationThesis_bookingServices.Controllers
         /// <summary>
         /// Count Bookings for every booking status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
         [HttpGet("count-booking-per-status")]
-        public async Task<IActionResult> CountBookingPerStatus()
+        public async Task<IActionResult> CountBookingPerStatus(int? garageId)
         {
-            var count = await bookingService.CountBookingPerStatus();
+            var count = await bookingService.CountBookingPerStatus(garageId);
+
             return Ok(count);
         }
 
@@ -263,9 +258,9 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Get booking detail status by booking for staff. [staff]
+        /// Get booking detail status by booking for staff. [Staff]
         /// </summary>
-        //[Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff")]
         [HttpGet("get-booking-detail-status-by-booking-staff/{bookingId}")]
         public async Task<IActionResult> GetBookingServiceStatusByBooking(int bookingId)
         {
@@ -274,10 +269,25 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(booking);
         }
 
-        [HttpPost("push-notification/{idToken}")]
-        public async Task<IActionResult> PushNotification(string idToken)
+        /// <summary>
+        /// Update a booking detail status. [Staff]
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Put status:
+        ///     {
+        ///         "NotStart": "0",
+        ///         "Done": "1",
+        ///         "Error": "2"
+        ///     }
+        ///
+        /// </remarks>
+        [Authorize(Roles = "Staff")]
+        [HttpPut("update-booking-detail-status/{bookingDetailId}&{status}")]
+        public async Task<IActionResult> UpdateBookingDetailStatus(int bookingDetailId, int status)
         {
-            await fCMSendNotificationMobile.SendMessagesToSpecificDevices(idToken);
+            await bookingService.UpdateBookingDetailStatus(bookingDetailId, status);
             throw new MyException("Successfully.", 200);
         }
     }

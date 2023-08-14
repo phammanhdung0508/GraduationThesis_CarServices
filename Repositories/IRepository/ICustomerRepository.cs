@@ -4,7 +4,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 {
     public interface ICustomerRepository
     {
-        Task Create(Customer customer);
+        Task<int> Create(Customer customer);
         Task<Customer?> Detail(int customerId);
     }
 }

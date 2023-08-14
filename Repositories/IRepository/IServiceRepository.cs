@@ -15,7 +15,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         decimal GetPrice(int serviceId);
         Task<int> GetDuration(int serviceId);
         Task<(List<Service>, int count)> SearchByName(string search, PageDto page);
-        Task<(List<ServiceDetail>, int count)> FilterServiceByGarage(int garageId, PageDto page);
+        Task<(List<Service>, int count)> FilterServiceByGarage(int garageId, PageDto page);
         Task<List<Service>> GetServiceByServiceGroup(int garageId);
         Task<List<BookingDetail>> GetServiceForBookingDetail(int bookingId);
     }

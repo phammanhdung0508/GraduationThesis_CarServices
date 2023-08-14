@@ -178,15 +178,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Booking>?> FilterBookingByTimePerDay(DateTime dateTime, int garageId)
+        public async Task<int> CountBookingByTimePerDay(DateTime dateTime, int garageId)
         {
             try
             {
-                var list = await context.Bookings
+                var count = await context.Bookings
                 .Where(b => b.BookingTime.Equals(dateTime) && b.GarageId.Equals(garageId))
-                .ToListAsync();
+                .CountAsync();
 
-                return list;
+                return count;
             }
             catch (System.Exception)
             {
@@ -264,26 +264,29 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Bookings.Where(b => b.GarageId == garageId & b.BookingStatus.Equals(BookingStatus.Completed)
-                & b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
+                var query = context.Bookings.Where(b => b.GarageId == garageId &&
+                b.BookingStatus.Equals(BookingStatus.Completed) &&
+                b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
 
-                var amountEarned = await query.SumAsync(b => b.TotalPrice);
+                var amountEarned = await query.SumAsync(b => b.FinalPrice);
 
                 var serviceEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ServicePrice);
 
                 var productEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ProductPrice);
 
-                var paidQuery = context.Bookings.Where(b => b.GarageId == garageId & b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
+                var paidQuery = context.Bookings.Where(b => b.GarageId == garageId &&
+                b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
 
                 var countPaid = await paidQuery.CountAsync();
 
-                var sumPaid = await paidQuery.SumAsync(b => b.TotalPrice);
+                var sumPaid = await paidQuery.SumAsync(b => b.FinalPrice);
 
-                var unpaidQuery = context.Bookings.Where(b => b.GarageId == garageId & b.PaymentStatus.Equals(PaymentStatus.Unpaid)).AsQueryable();
+                var unpaidQuery = context.Bookings.Where(b => b.GarageId == garageId &&
+                b.PaymentStatus.Equals(PaymentStatus.Unpaid)).AsQueryable();
 
                 var countUnpaid = await unpaidQuery.CountAsync();
 
-                var sumUnpaid = await unpaidQuery.SumAsync(b => b.TotalPrice);
+                var sumUnpaid = await unpaidQuery.SumAsync(b => b.FinalPrice);
 
                 return (amountEarned, serviceEarned, productEarned, sumPaid, sumUnpaid, countPaid, countUnpaid);
             }
@@ -293,21 +296,30 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<(int, int, int, int, int)> CountBookingPerStatus()
+        public async Task<(int, int, int)> CountBookingPerStatus(int? garageId)
         {
-            var list = await context.Bookings.ToListAsync();
+            try
+            {
+                var query = context.Bookings.AsQueryable();;
 
-            var pendingCount = list.Where(b => b.BookingStatus == BookingStatus.Pending).Count();
+                if (garageId is not null)
+                {
+                    query = context.Bookings.Where(g => g.GarageId == garageId).AsQueryable();
+                }
 
-            var canceledCount = list.Where(b => b.BookingStatus == BookingStatus.Canceled).Count();
+                var pending = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Pending)).CountAsync();
 
-            var checkInCount = list.Where(b => b.BookingStatus == BookingStatus.CheckIn).Count();
+                var canceled = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Canceled)).CountAsync();
 
-            var processingCount = list.Where(b => b.BookingStatus == BookingStatus.CheckIn).Count();
+                var completed = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Completed)).CountAsync();
 
-            var completedCount = list.Where(b => b.BookingStatus == BookingStatus.Completed).Count();
-
-            return (pendingCount, canceledCount, checkInCount, processingCount, completedCount);
+                return (pending, canceled, completed);
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
         }
 
         public async Task<List<Booking>> FilterBookingByStatusCustomer(int bookingStatus, int userId)
@@ -315,7 +327,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             var list = await context.Bookings.Include(b => b.Car).ThenInclude(c => c.Customer)
             .ThenInclude(c => c.User).Include(b => b.Garage)
             .Where(b => (int)b.BookingStatus == bookingStatus &&
-            b.Car.Customer.User.UserId == userId)
+            b.Car.Customer.User.UserId == userId &&
+            b.IsAccepted == true)
             .ToListAsync();
 
             return list;
@@ -357,7 +370,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.Bookings.Include(b => b.Garage).Include(b => b.Car)
-                .Where(b => b.Garage.GarageId == garageId && b.BookingTime.Date.Equals(date)).ToListAsync();
+                .Where(b => b.Garage.GarageId == garageId &&
+                b.BookingTime.Date.Equals(date) &&
+                (b.BookingStatus.Equals(BookingStatus.Pending) ||
+                b.BookingStatus.Equals(BookingStatus.CheckIn) ||
+                b.BookingStatus.Equals(BookingStatus.Processing) ||
+                b.BookingStatus.Equals(BookingStatus.Completed))).ToListAsync();
 
                 return list;
             }

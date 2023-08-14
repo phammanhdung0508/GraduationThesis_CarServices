@@ -7,5 +7,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<List<BookingDetail>> FilterBookingDetailByBookingId(int bookingId);
         Task Create(List<BookingDetail> serviceBooking);
         Task Update(List<BookingDetail> serviceBookings);
+        Task<BookingDetail?> Detail(int bookingDetailId);
     }
 }

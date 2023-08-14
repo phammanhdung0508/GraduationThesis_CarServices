@@ -20,7 +20,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-available-products-for-service/serviceId={serviceId}")]
+        [HttpGet("get-available-products-for-service/{serviceId}")]
         public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
         {
             var productList = await productService.FilterAvailableProductForService(serviceId)!;
@@ -52,38 +52,68 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
+        /// <summary>
+        /// Creates new a product. [Admin]
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Post create new product.
+        ///     {
+        ///         "ProductName": "Rửa xe Product",
+        ///         "ProductImage": "Image",
+        ///         "ProductDetailDescription": "Description",
+        ///         "ProductPrice": 100, /* 100 = 100k */
+        ///         "ProductQuantity": 10,
+        ///         "ServiceId": 1,
+        ///         "CategoryId": 1
+        ///     }
+        ///
+        /// </remarks>
         [Authorize(Roles = "Admin")]
         [HttpPost("create-product")]
         public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
         {
             await productService.Create(product);
             throw new MyException("Successfully.", 200);
-
         }
 
+        /// <summary>
+        /// Updates a specific product. [Admin]
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Put update a specific product.
+        ///     {
+        ///         "ProductId": 1,
+        ///         "ProductName": "Rửa xe Product New",
+        ///         "ProductImage": "Image New",
+        ///         "ProductDetailDescription": "Description New",
+        ///         "ProductPrice": 100, /* 100 = 100k */
+        ///         "ProductQuantity": 10,
+        ///         "ServiceId": 1,
+        ///         "CategoryId": 1
+        ///     }
+        ///
+        /// </remarks>
+        
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-price-product")]
-        public async Task<IActionResult> UpdatePriceProduct(ProductPriceRequestDto product)
+        [HttpPut("update-product")]
+        public async Task<IActionResult> Update(ProductUpdateRequestDto product)
         {
-            await productService.UpdatePrice(product);
+            await productService.Update(product);
             throw new MyException("Successfully.", 200);
-
         }
 
+        /// <summary>
+        /// Updates a specific product status. [Admin]
+        /// </summary>
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-status-product")]
-        public async Task<IActionResult> UpdateStatusProduct(ProductStatusRequestDto product)
+        [HttpPut("update-status/{productId}")]
+        public async Task<IActionResult> UpdateStatus(int productId)
         {
-            await productService.UpdateStatus(product);
-            throw new MyException("Successfully.", 200);
-
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPut("update-quantity-product")]
-        public async Task<IActionResult> UpdateQuantityProduct(ProductQuantityRequestDto product)
-        {
-            await productService.UpdateQuantity(product);
+            await productService.UpdateStatus(productId);
             throw new MyException("Successfully.", 200);
 
         }

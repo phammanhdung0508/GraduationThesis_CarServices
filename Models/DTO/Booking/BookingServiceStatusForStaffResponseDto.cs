@@ -15,11 +15,13 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
     public class MechanicServiceStatusForStaffDto
     {
         public string MechanicName { get; set; }
+        public bool IsMainMechanic {get; set;} = false; 
         public string MechanicImage { get; set; }
     }
 
     public class ServiceStatusForStaffDto
     {
+        public int BookingDetailId { get; set; }
         public string ServiceName { get; set; }
         public string BookingServiceStatus {get; set;}
     }

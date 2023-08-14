@@ -19,7 +19,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View detail a specific Garage.
+        /// View detail a specific Garage. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin, Manager, Customer")]
         [HttpGet("detail-garage/{id}")]

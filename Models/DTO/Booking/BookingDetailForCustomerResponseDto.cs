@@ -3,6 +3,8 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
     public class BookingDetailForCustomerResponseDto
     {
+        public int GarageId { get; set; }
+        public string GaragePhone { get; set; }
         public string CarName { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
@@ -14,13 +16,13 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string DiscountPrice { get; set; }
         public string TotalPrice { get; set; }
         public string FinalPrice { get; set; }
-        public List<GroupServiceBookingDetailDto> groupServiceBookingDetailDtos {get; set;}
+        public List<GroupServiceBookingDetailDto> GroupServiceBookingDetailDtos {get; set;}
     }
 
     public class GroupServiceBookingDetailDto
     {
         public string ServiceGroup { get; set; }
-        public List<ServiceListBookingDetailDto> serviceListBookingDetailDtos {get; set;}
+        public List<ServiceListBookingDetailDto> ServiceListBookingDetailDtos {get; set;}
     }
 
     public class ServiceListBookingDetailDto

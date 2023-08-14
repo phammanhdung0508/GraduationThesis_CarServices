@@ -198,9 +198,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
 
-                return context.Users
+                return await context.Users
                 .OrderByDescending(b => b.UserId)
-                .Select(b => b.UserId).First();
+                .Select(b => b.UserId).FirstAsync();
             }
             catch (Exception)
             {

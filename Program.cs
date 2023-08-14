@@ -6,6 +6,7 @@ using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Middleware;
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.PaymentGateway;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Repositories.Repository;
 using GraduationThesis_CarServices.Repositories.Repository.Authentication;
@@ -24,6 +25,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+// Register HttpContextAccessor in the Dependency Injection
+builder.Services.AddHttpContextAccessor();
 
 //builder.WebHost.ConfigureKestrel(options => options.Listen(System.Net.IPAddress.Parse("172.16.5.7"), 7132));
 
@@ -116,6 +120,7 @@ builder.Services.AddSingleton<EncryptConfiguration>();
 builder.Services.AddSingleton<GeocoderConfiguration>();
 
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+builder.Services.AddScoped<IVNPayPaymentGateway, VNPayPaymentGateway>();
 builder.Services.AddScoped<IGarageRepository, GarageRepository>();
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

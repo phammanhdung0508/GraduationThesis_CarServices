@@ -64,13 +64,11 @@ namespace GraduationThesis_CarServices.Services.Service
                 var car = mapper
                 .Map<CarDetailResponseDto>(await carRepository.Detail(id));
 
-                switch (false)
+                return false switch
                 {
-                    case var isExist when isExist == (car != null):
-                        throw new MyException("The car doesn't exist.", 404);
-                }
-
-                return car;
+                    var isExist when isExist == (car != null) => throw new MyException("The car doesn't exist.", 404),
+                    _ => car,
+                };
             }
             catch (Exception e)
             {

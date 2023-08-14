@@ -2,7 +2,6 @@ using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Enum;
-using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
@@ -16,18 +15,23 @@ namespace GraduationThesis_CarServices.Services.Service
     {
         private readonly IMapper mapper;
         private readonly IUserRepository userRepository;
+        private readonly ICarRepository carRepository;
         private readonly ICustomerRepository customerRepository;
+        private readonly IGarageRepository garageRepository;
+        private readonly IMechanicRepository mechanicRepository;
         private readonly EncryptConfiguration encryptConfiguration;
-        private readonly GeocoderConfiguration geocoderConfiguration;
 
-        public UserService(IMapper mapper, IUserRepository userRepository,
-        EncryptConfiguration encryptConfiguration, GeocoderConfiguration geocoderConfiguration, ICustomerRepository customerRepository)
+        public UserService(IMapper mapper, IUserRepository userRepository, IGarageRepository garageRepository,
+        EncryptConfiguration encryptConfiguration, ICarRepository carRepository, ICustomerRepository customerRepository,
+        IMechanicRepository mechanicRepository)
         {
-            this.customerRepository = customerRepository;
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.encryptConfiguration = encryptConfiguration;
-            this.geocoderConfiguration = geocoderConfiguration;
+            this.carRepository = carRepository;
+            this.customerRepository = customerRepository;
+            this.garageRepository = garageRepository;
+            this.mechanicRepository = mechanicRepository;
         }
 
         public async Task<List<UserListResponseDto>?> View(PageDto page)
@@ -263,32 +267,164 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task Create(UserCreateRequestDto requestDto)
+        public async Task CreateMechanic(MechanicCreateRequestDto requestDto, int? garageId)
         {
             try
             {
+                if (garageId is not null)
+                {
+                    var encryptEmail = string.Empty;
+
+                    switch (false)
+                    {
+                        case var isFalse when isFalse == requestDto.UserPassword.Equals(requestDto.PasswordConfirm):
+                            throw new MyException("Mật khẩu xác nhận không khớp.", 404);
+                        case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
+                            throw new MyException("Số điện thoại không được để trống.", 404);
+                        case var isFalse when isFalse == requestDto.UserPhone.All(char.IsDigit):
+                            throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
+                    }
+
+                    if (requestDto.UserEmail is not null)
+                    {
+                        encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail!);
+                    }
+                    encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
+
+                    var user = mapper.Map<User>(requestDto,
+                    opt => opt.AfterMap((src, des) =>
+                    {
+                        des.UserEmail = encryptEmail;
+                        des.PasswordHash = password_hash;
+                        des.PasswordSalt = password_salt;
+                    }));
+
+                    var userId = await userRepository.Create(user);
+
+                    string level = string.Empty;
+
+                    switch (requestDto.Level)
+                    {
+                        case 1:
+                            level = MechanicLevel.Level1.ToString();
+                            break;
+                        case 2:
+                            level = MechanicLevel.Level2.ToString();
+                            break;
+                        case 3:
+                            level = MechanicLevel.Level3.ToString();
+                            break;
+                    }
+
+                    var mechanic = new Mechanic() { Level = level, UserId = userId, MechanicStatus = MechanicStatus.Available };
+
+                    var mechanicId = await mechanicRepository.Create(mechanic);
+
+                    var garageMechanic = new GarageMechanic() { GarageId = garageId, MechanicId = mechanicId };
+
+                    await garageRepository.CreateGarageMechanic(garageMechanic);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task Create(UserCreateRequestDto requestDto, int? garageId)
+        {
+            try
+            {
+                var encryptEmail = string.Empty;
+
                 switch (false)
                 {
-                    case var isExist when isExist == (requestDto.UserPassword.Equals(requestDto.PasswordConfirm)):
-                        throw new MyException("Your password and confirm password isn't match.", 404);
+                    case var isFalse when isFalse == (requestDto.RoleId > 0 && requestDto.RoleId <= 5):
+                        throw new MyException("RoleId không tồn tại.", 404);
+                    case var isFalse when isFalse == requestDto.UserPassword.Equals(requestDto.PasswordConfirm):
+                        throw new MyException("Mật khẩu xác nhận không khớp.", 404);
                 }
 
+                if (requestDto.UserEmail is not null)
+                {
+                    encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail!);
+                }
                 encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
-                var encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
 
-                var user = mapper.Map<UserCreateRequestDto, User>(requestDto,
+                var user = mapper.Map<User>(requestDto,
                 opt => opt.AfterMap((src, des) =>
                 {
                     des.UserEmail = encryptEmail;
                     des.PasswordHash = password_hash;
                     des.PasswordSalt = password_salt;
-                    des.UserStatus = Status.Activate;
-                    des.EmailConfirmed = 0;
-                    des.CreatedAt = DateTime.Now;
-                    des.RoleId = 2;
+                    des.RoleId = 5;
                 }));
 
-                await userRepository.Create(user);
+                switch (requestDto.RoleId)
+                {
+                    case 1:
+                        switch (false)
+                        {
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
+                                throw new MyException("Số điện thoại không được để trống.", 404);
+                            case var isFalse when isFalse == requestDto.UserPhone.All(char.IsDigit):
+                                throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarModel):
+                                throw new MyException("Mẫu xe không được để trống.", 404);
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarBrand):
+                                throw new MyException("Thương hiệu xe không được để trống.", 404);
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarLicensePlate):
+                                throw new MyException("Biển số xe không được để trống.", 404);
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarFuelType):
+                                throw new MyException("Loại nhiên liệu xe không được để trống.", 404);
+                            case var isFalse when isFalse == requestDto.NumberOfCarLot is not null:
+                                throw new MyException("Số ghế xe không được để trống.", 404);
+                        }
+
+                        await userRepository.Create(user);
+
+                        var customer = new Customer() { User = user };
+
+                        var customerId = await customerRepository.Create(customer);
+
+                        var car = mapper.Map<UserCreateRequestDto, Car>(requestDto,
+                        obj => obj.AfterMap((src, des) =>
+                        {
+                            des.CustomerId = customerId;
+                        }));
+
+                        await carRepository.Create(car);
+                        break;
+                    case 2:
+                        if (string.IsNullOrEmpty(requestDto.UserEmail))
+                        {
+                            throw new MyException("Email không được để trống.", 404);
+                        }
+
+                        await userRepository.Create(user);
+                        break;
+                    case 5:
+                        if (garageId is not null)
+                        {
+                            var managerId = await garageRepository.GetManagerId(garageId);
+                            user.ManagerId = managerId;
+                            await userRepository.Create(user);
+                        }
+                        break;
+                }
             }
             catch (Exception e)
             {

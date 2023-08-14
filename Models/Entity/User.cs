@@ -36,10 +36,11 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
         public Status UserStatus { get; set; }
-        public string OTP {get; set;}
-        public DateTime ExpiredIn {get; set;}
+        public string OTP { get; set; }
+        public DateTime ExpiredIn { get; set; }
         [Column(TypeName = "tinyint")]
-        public int EmailConfirmed {get; set;}
+        public int EmailConfirmed { get; set; }
+        public int? ManagerId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string RefreshToken { get; set; }

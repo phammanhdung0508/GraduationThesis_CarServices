@@ -14,14 +14,12 @@ namespace GraduationThesis_CarServices.Controllers
     public class AuthenticationController : ControllerBase
     {
         private static UserLoginDto? _user;
-        private readonly DataContext context;
         private readonly IAuthenticationRepository authenticationRepository;
         private readonly IUserRepository userRepository;
-        public AuthenticationController(DataContext context, IAuthenticationRepository authenticationRepository, IUserRepository userRepository)
+        public AuthenticationController(IAuthenticationRepository authenticationRepository, IUserRepository userRepository)
         {
             this.userRepository = userRepository;
             this.authenticationRepository = authenticationRepository;
-            this.context = context;
         }
 
         /// <summary>

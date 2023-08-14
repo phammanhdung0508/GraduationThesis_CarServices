@@ -58,5 +58,20 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+
+        public async Task<BookingDetail?> Detail(int bookingDetailId)
+        {
+            try
+            {
+                var bookingDetail = await context.BookingDetails
+                .Where(b => b.BookingDetailId == bookingDetailId).FirstOrDefaultAsync();
+
+                return bookingDetail;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
     }
 }

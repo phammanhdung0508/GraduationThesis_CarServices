@@ -8,5 +8,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string GarageImage { get; set; }
         public string FullAddress {get; set;}
         public string GarageStatus {get; set;}
+        public double GarageLatitude { get; set; }
+        public double GarageLongitude { get; set; }
     }
 }

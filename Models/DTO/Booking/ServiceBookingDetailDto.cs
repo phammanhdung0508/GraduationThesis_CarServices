@@ -1,10 +1,9 @@
-#nullable disable
 namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
     public class ServiceBookingDetailDto
     {
-        public string ServiceName { get; set; }
-        public string ServiceImage { get; set; }
-        public double ServicePrice { get; set; }
+        public int ServiceId { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
+        public string ServiceImage { get; set; } = string.Empty;
     }
 }

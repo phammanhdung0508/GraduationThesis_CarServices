@@ -1,26 +1,24 @@
-#nullable disable
-
 namespace GraduationThesis_CarServices.Models.DTO.Garage
 {
     public class GarageDetailResponseDto
     {
         public int GarageId { get; set; }
-        public string GarageName { get; set; }
-        public string GarageImage { get; set; }
-        public string GarageContactInformation { get; set; }
-        public string GarageAbout { get; set; }
-        public string GarageFullAddress {get; set;}
-        public string GarageAddress { get; set; }
-        public string GarageWard { get; set; }
-        public string GarageDistrict { get; set; }
-        public string GarageCity { get; set; }
-        public string HoursOfOperation { get; set; }
-        public string IsOpen { get; set; }
+        public string GarageName { get; set; } = string.Empty;
+        public string GarageImage { get; set; } = string.Empty;
+        public string GarageContactInformation { get; set; } = string.Empty;
+        public string GarageAbout { get; set; } = string.Empty;
+        public string GarageFullAddress {get; set;} = string.Empty;
+        public string GarageAddress { get; set; } = string.Empty;
+        public string GarageWard { get; set; } = string.Empty;
+        public string GarageDistrict { get; set; } = string.Empty;
+        public string GarageCity { get; set; } = string.Empty;
+        public string HoursOfOperation { get; set; } = string.Empty;
+        public string IsOpen { get; set; } = string.Empty;
         public double Rating { get; set; }
         public int AvaliableCoupon {get; set;}
 
-        public byte[] VersionNumber { get; set; }
+        public byte[]? VersionNumber { get; set; } 
         
-        public ICollection<ReviewGarageDto> ReviewGarageDto { get; set; }
+        public ManagerGarageDto? ManagerGarageDto { get; set; }
     }
 }

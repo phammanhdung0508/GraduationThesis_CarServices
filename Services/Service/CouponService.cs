@@ -129,7 +129,17 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 Random random = new Random();
-                string code = new string(Enumerable.Repeat(chars, 10).Select(s => s[random.Next(s.Length)]).ToArray());
+                string code = "CARME" + new string(Enumerable.Repeat(chars, 7).Select(s => s[random.Next(s.Length)]).ToArray());
+
+                startDate = DateTime.Parse(requestDto.CouponStartDate);
+
+                switch(false){
+                    case var isFalse when isFalse == (requestDto.CouponMinSpend <= requestDto.CouponMaxSpend):
+                        throw new MyException("Số tiền tối thiểu phải nhỏ hơn hoặc bằng số tiền tối đa của coupon.");
+                    case var isFalse when isFalse == (requestDto.NumberOfTimesToUse > 0):
+                        throw new MyException("Số lần sử dụng coupon không được nhận số 0.");
+                    case var isFalse when isFalse == (requestDto.)
+                }
 
                 var coupon = mapper.Map<CouponCreateRequestDto, Coupon>(requestDto,
                 otp => otp.AfterMap((src, des) =>

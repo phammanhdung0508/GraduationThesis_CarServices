@@ -87,7 +87,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var mechanic = await context.Mechanics
-                .Where(m => m.MechanicId == mechanicId).Include(m => m.User)
+                .Where(m => m.UserId == mechanicId).Include(m => m.User)
                 .ThenInclude(u => u.Role).FirstOrDefaultAsync();
 
                 return mechanic;
@@ -222,7 +222,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var bookingMechanic = await context.BookingMechanics
-                .Where(b => b.MechanicId == mechanicId &&
+                .Where(b => b.UserId == mechanicId &&
                 b.BookingId == bookingId).FirstOrDefaultAsync();
 
                 return bookingMechanic;

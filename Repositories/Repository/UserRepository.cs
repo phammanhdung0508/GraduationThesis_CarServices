@@ -117,6 +117,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 string pattern = @"\+84?\d{10}";
+
+                if (Regex.Match(search, pattern).Success is false &&
+                search.All(char.IsDigit) is true)
+                {
+                    search = "+84" + search!.Substring(1, 9);
+                }
+
                 var match = Regex.Match(search, pattern);
 
                 var list = context.Users.Include(c => c.Customer).Include(c => c.Role).AsQueryable();
@@ -125,7 +132,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 switch (match.Success)
                 {
                     case true:
-                        return await list.Where(c => c.UserPhone.Contains(search) && c.RoleId == roleId).ToListAsync();
+                        return await list.Where(c => c.UserPhone.Equals(search) && c.RoleId == roleId).ToListAsync();
                     case false:
                         return await list.Where(c => (c.UserFirstName.ToLower().Trim() + c.UserLastName.ToLower().Trim()).Contains(searchTrim)
                         || c.UserFirstName.ToLower().Contains(searchTrim)
@@ -191,9 +198,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
 
-                return context.Users
+                return await context.Users
                 .OrderByDescending(b => b.UserId)
-                .Select(b => b.UserId).First();
+                .Select(b => b.UserId).FirstAsync();
             }
             catch (Exception)
             {

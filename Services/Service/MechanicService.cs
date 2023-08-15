@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using AutoMapper;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
@@ -60,7 +62,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<MechanicListResponseDto>> FilterMechanicsByGarageId(int garageId)
+        public async Task<List<MechanicListResponseDto>> FilterMechanicsByGarage(int garageId)
         {
             try
             {
@@ -95,19 +97,51 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<List<MechanicListResponseDto>> FilterMechanicsByBooking(int bookingId)
+        {
+            try
+            {
+                var list = mapper.Map<List<MechanicListResponseDto>>
+                (await mechanicRepository.GetMechanicByBooking(bookingId));
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<MechanicDetailResponseDto?> Detail(int mechanicId)
         {
             try
             {
-                var mechanic = mapper.Map<MechanicDetailResponseDto>(await mechanicRepository.Detail(mechanicId));
+                var mechanic = await mechanicRepository.Detail(mechanicId);
 
-                switch (false)
+                var countBookingMechanicApplied = await mechanicRepository.CountBookingMechanicApplied(mechanicId);
+
+                return false switch
                 {
-                    case var isExist when isExist == (mechanic != null):
-                        throw new MyException("The mechanic doesn't exist.", 404);
-                }
-
-                return mechanic;
+                    var isExist when isExist == (mechanic is not null) => throw new MyException("The mechanic doesn't exist.", 404),
+                    _ => mapper.Map<MechanicDetailResponseDto>(mechanic,
+                                    obj => obj.AfterMap((src, des) =>
+                                    {
+                                        des.TotalBookingApplied = countBookingMechanicApplied;
+                                    })),
+                };
             }
             catch (Exception e)
             {
@@ -166,7 +200,7 @@ namespace GraduationThesis_CarServices.Services.Service
         public async Task<List<MechanicWorkForGarageResponseDto>> GetMechanicByGarage(int garageId)
         {
             try
-            {   
+            {
                 var isGarageExist = await garageRepository.IsGarageExist(garageId);
 
                 switch (false)
@@ -199,7 +233,6 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-
         public async Task<List<MechanicWorkForBookingResponseDto>> GetMechanicByBooking(int bookingId)
         {
             try
@@ -208,6 +241,84 @@ namespace GraduationThesis_CarServices.Services.Service
                 (await mechanicRepository.GetMechanicByBooking(bookingId));
 
                 return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task AddAvaliableMechanicToBooking(EditMechanicBookingRequestDto requestDto)
+        {
+            try
+            {
+                var isExist = await mechanicRepository.IsMechanicExist(requestDto.MechanicId);
+
+                switch (false)
+                {
+                    case var isFalse when isFalse == 
+                    (requestDto.MechanicId != 0 &&
+                    requestDto.BookingId != 0):
+                        throw new MyException("MechanicId and BookingId dont take 0 value.", 404);
+                    case var isFalse when isFalse == isExist:
+                        throw new MyException("The mechanic doesn't exist.", 404);
+                }
+
+                var bookingMechanic = mapper.Map<BookingMechanic>(requestDto);
+
+                await mechanicRepository.CreateBookingMechanic(bookingMechanic);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task RemoveMechanicfromBooking(EditMechanicBookingRequestDto requestDto)
+        {
+            try
+            {
+                var isExist = await mechanicRepository.IsMechanicExist(requestDto.MechanicId);
+
+                switch (false)
+                {
+                    case var isFalse when isFalse == 
+                    (requestDto.MechanicId != 0 &&
+                    requestDto.BookingId != 0):
+                        throw new MyException("MechanicId and BookingId dont take 0 value.", 404);
+                    case var isFalse when isFalse == isExist:
+                        throw new MyException("The mechanic doesn't exist.", 404);
+                }
+
+                var bookingMechanic = await mechanicRepository.DetailBookingMechanic(requestDto.MechanicId, requestDto.BookingId);
+                bookingMechanic!.BookingMechanicStatus = Status.Deactivate;
+                await mechanicRepository.UpdateBookingMechanic(bookingMechanic);
             }
             catch (Exception e)
             {

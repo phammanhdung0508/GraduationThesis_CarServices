@@ -3,17 +3,14 @@ using System.Globalization;
 using System.Text;
 using AutoMapper;
 using Azure.Storage.Blobs;
-using Firebase.Auth;
-using Firebase.Storage;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using Google.Cloud.Storage.V1;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Mapping;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
+using GraduationThesis_CarServices.PaymentGateway;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Services.IService;
 using QRCoder;
@@ -22,6 +19,7 @@ namespace GraduationThesis_CarServices.Services.Service
 {
     public class BookingService : IBookingService
     {
+        private readonly IVNPayPaymentGateway iVNPayPaymentGateway;
         private readonly IBookingDetailRepository bookingDetailRepository;
         private readonly IBookingRepository bookingRepository;
         private readonly IProductRepository productRepository;
@@ -32,15 +30,16 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ILotRepository lotRepository;
         private readonly ICarRepository carRepository;
         private readonly IConfiguration configuration;
-        private readonly HttpClient httpClient;
+        //private readonly HttpClient httpClient;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IBookingDetailRepository bookingDetailRepository, IProductRepository productRepository,
         IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
-        ICouponRepository couponRepository, IMechanicRepository mechanicRepository, IConfiguration configuration)
+        ICouponRepository couponRepository, IMechanicRepository mechanicRepository, IConfiguration configuration,
+        IVNPayPaymentGateway iVNPayPaymentGateway)
         {
             this.mapper = mapper;
-            this.httpClient = new HttpClient();
+            //httpClient = new HttpClient();
             this.bookingRepository = bookingRepository;
             this.bookingDetailRepository = bookingDetailRepository;
             this.lotRepository = lotRepository;
@@ -51,6 +50,7 @@ namespace GraduationThesis_CarServices.Services.Service
             this.couponRepository = couponRepository;
             this.mechanicRepository = mechanicRepository;
             this.configuration = configuration;
+            this.iVNPayPaymentGateway = iVNPayPaymentGateway;
         }
 
         public async Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId)
@@ -66,6 +66,43 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 return mapper.Map<List<BookingDetailStatusForBookingResponseDto>>(list);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<BookingServiceStatusForStaffResponseDto> GetBookingServiceStatusByBooking(int bookingId)
+        {
+            try
+            {
+                var booking = await bookingRepository.Detail(bookingId);
+
+                foreach (var item in booking!.BookingMechanics)
+                {
+                    if (item.BookingMechanicStatus.Equals(Status.Deactivate))
+                    {
+                        booking.BookingMechanics.Remove(item);
+                    }
+                }
+
+                var bookingDto = mapper.Map<BookingServiceStatusForStaffResponseDto>(booking);
+
+                return bookingDto;
             }
             catch (Exception e)
             {
@@ -423,7 +460,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private int GetMinEstimatedTime(int i, List<Booking> listBooking)
+        private static int GetMinEstimatedTime(int i, List<Booking> listBooking)
         {
             var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
             .Min(l => /*l.TotalEstimatedCompletionTime*/ l.CustomersCanReceiveTheCarTime);
@@ -431,7 +468,7 @@ namespace GraduationThesis_CarServices.Services.Service
             return minEstimatedTimePerHour;
         }
 
-        private (int? bookingInFirstHourCount, int? bookingInNextHourCount) CountBookingPerHour(int num, int i, List<Booking> listBooking)
+        private static (int? bookingInFirstHourCount, int? bookingInNextHourCount) CountBookingPerHour(int num, int i, List<Booking> listBooking)
         {
             var bookingInFirstHourCount = listBooking?
             .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).Count();
@@ -441,12 +478,12 @@ namespace GraduationThesis_CarServices.Services.Service
             return (bookingInFirstHourCount, bookingInNextHourCount);
         }
 
-        private void UpdateListHours(int num, List<BookingPerHour> listHours)
+        private static void UpdateListHours(int num, List<BookingPerHour> listHours)
         {
             listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
         }
 
-        private void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
+        private static void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
             if (sequenceLength > 1)
             {
@@ -463,7 +500,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private void CreateListHourPerDay(int openAt, int closeAt, List<BookingPerHour> listHours, DateTime dateSelect)
+        private static void CreateListHourPerDay(int openAt, int closeAt, List<BookingPerHour> listHours, DateTime dateSelect)
         {
             for (int i = openAt; i <= closeAt; i++)
             {
@@ -472,7 +509,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
+        private static void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
             for (int i = 0; i <= isAvailableList.Count - 1; i++)
             {
@@ -503,7 +540,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours, DateTime dateSelect)
+        private static void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours, DateTime dateSelect)
         {
             for (int i = openAt; i <= closeAt; i++)
             {
@@ -595,11 +632,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task Create(BookingCreateRequestDto requestDto)
+        public async Task<PaymentLinkDto> Create(BookingCreateRequestDto requestDto)
         {
             try
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
+
+                var response = new PaymentLinkDto();
 
                 var bookingTime = DateOnly.Parse(requestDto.DateSelected).ToDateTime(TimeOnly.Parse(requestDto.TimeSelected));
                 var currentDay = DateTime.Now;
@@ -619,7 +658,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var totalEstimated = 0;
 
-                for (int i = 0; i < requestDto.ServiceList.Count; i++)
+                for (int i = 0; i < requestDto.ServiceList!.Count; i++)
                 {
                     var serviceDuration = await serviceRepository.GetDuration(requestDto.ServiceList[i]);
                     totalEstimated += serviceDuration;
@@ -637,46 +676,47 @@ namespace GraduationThesis_CarServices.Services.Service
                 switch (false)
                 {
                     case var isNull when isNull == (requestDto.CarId != 0):
-                        throw new MyException("CarId không được null.", 404);
+                        throw new MyException("Car ID không được null!", 404);
                     case var isAvalible when isAvalible == isCarAvalible:
                         throw new MyException("Xin lỗi xe của bạn không khả dụng.", 404);
                     case var isExist when isExist == isCarExist:
-                        throw new MyException("Xin lỗi xe của bạn không tônf tại.", 404);
+                        throw new MyException("Xin lỗi xe của bạn không tồn tại.", 404);
                     case var isTime when isTime == (bookingTime >= currentDay):
                         throw new MyException("Ngày được chọn phải lớn hơn hoặc trùng ngày hiện tại.", 404);
                     case var isEmpty when isEmpty == (requestDto.ServiceList.Count > 0):
                         throw new MyException("Phải chọn ít nhất một dịch vụ trước khi đặt đơn.", 404);
                     case var isFalse when isFalse == (openAt <= bookingAt && bookingAt <= closeAt):
-                        throw new MyException("Xin lỗi khung giờ khongo trong khung giờ làm việc.", 404);
-                    case var isMany when isMany == (requestDto.ServiceList.Count < 3):
+                        throw new MyException("Xin lỗi khung giờ không trong khung giờ làm việc.", 404);
+                    case var isMany when isMany == (requestDto.ServiceList.Count <= 3):
                         throw new MyException("Chỉ đặt được tối đa là 3 dịch vụ.", 404);
                 }
 
-                var listBooking = await bookingRepository.FilterBookingByTimePerDay(bookingTime, requestDto.GarageId);
+                var listBookingCount = await bookingRepository.CountBookingByTimePerDay(bookingTime, requestDto.GarageId);
                 var lotCount = garage!.Lots.Count;
 
-                // if (lotCount - listBooking!.Count == 1)
-                // {
-                //     Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
-                //     if (requestDto.VersionNumber.SequenceEqual(garage!.VersionNumber))
-                //     {
-                //         await garageRepository.Update(garage);
-                //         await Run(requestDto, bookingTime, totalEstimated);
-                //     }
-                //     else
-                //     {
-                //         throw new MyException("Sorry, there is someone before you booked this.", 409);
-                //     }
-                // }
-                // else
-                // {
-                //     await Run(requestDto, bookingTime, totalEstimated);
-                // }
-
-                await Run(requestDto, bookingTime, totalEstimated);
+                if (lotCount - listBookingCount == 1)
+                {
+                    var getGarageVersionNumber = await garageRepository.GetGarageVersionNumber(requestDto.GarageId);
+                    Debug.WriteLine($"{System.Text.Encoding.Default.GetString(garage!.VersionNumber)}");
+                    if (getGarageVersionNumber!.SequenceEqual(garage!.VersionNumber))
+                    {
+                        await garageRepository.Update(garage);
+                        response = await Run(requestDto, bookingTime, totalEstimated);
+                    }
+                    else
+                    {
+                        throw new MyException("Xin lỗi, đã có ai đó đặt đơn hàng trước bạn.", 409);
+                    }
+                }
+                else
+                {
+                    response = await Run(requestDto, bookingTime, totalEstimated);
+                }
 
                 watch.Stop();
                 Debug.WriteLine($"\nTotal run time (Milliseconds) Create(): {watch.ElapsedMilliseconds}\n");
+
+                return response;
             }
             catch (Exception e)
             {
@@ -697,7 +737,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        private string GenerateRandomString()
+        private static string GenerateRandomString()
         {
             const string chars = "0123456789ABCDEF";
             var random = new Random();
@@ -714,20 +754,14 @@ namespace GraduationThesis_CarServices.Services.Service
             return result.ToString();
         }
 
-        private async Task Run(BookingCreateRequestDto requestDto, DateTime bookingTime, int totalEstimated)
+        private async Task<PaymentLinkDto> Run(BookingCreateRequestDto requestDto, DateTime bookingTime, int totalEstimated)
         {
             try
             {
                 var booking = mapper.Map<BookingCreateRequestDto, Booking>(requestDto,
                 otp => otp.AfterMap((src, des) =>
                 {
-                    var now = DateTime.Now;
-                    des.BookingCode = GenerateRandomString();
                     des.BookingTime = bookingTime;
-                    des.PaymentStatus = PaymentStatus.Unpaid;
-                    des.BookingStatus = BookingStatus.Pending;
-                    des.IsAccepted = true;
-                    des.CreatedAt = now;
                 }));
 
                 var bookingId = await bookingRepository.Create(booking);
@@ -748,12 +782,28 @@ namespace GraduationThesis_CarServices.Services.Service
                     await mechanicRepository.CreateBookingMechanic(bookingMechanic);
                 }
 
+                booking.OriginalPrice = checkOut.Item1;
+                booking.DiscountPrice = checkOut.Item2;
                 booking.TotalPrice = checkOut.Item3;
-                booking.FinalPrice = checkOut.Item3;
+                booking.FinalPrice = checkOut.Item3 - 100;
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
 
-                await bookingRepository.Update(booking);
+                await GenerateQRCode(booking);
+
+                var payment = new PaymentRequest()
+                {
+                    CarId = requestDto.CarId,
+                    BookingId = bookingId,
+                    PaymentId = booking.BookingCode,
+                    PaymentContent = $"Thanh toán đơn hàng: {booking.BookingCode}",
+                    PaymentRefId = GenerateRandomString(),
+                    RequiredAmount = 100000,
+                };
+
+                var response = await iVNPayPaymentGateway.Create(payment);
+
+                return response;
             }
             catch (Exception)
             {
@@ -767,7 +817,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 switch (false)
                 {
-                    case var isFalse when isFalse == (requestDto.ServiceList.Any(s => s > 0)):
+                    case var isFalse when isFalse == requestDto.ServiceList.Any(s => s > 0):
                         throw new MyException("Id can't take 0 value!", 404);
                     case var isFalse when isFalse == (requestDto.CouponId != 0):
                         requestDto.CouponId = null;
@@ -819,19 +869,22 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 if (requestDto.CouponId is not null)
                 {
-                    var coupon = await couponRepository.GetCouponTypeAndCouponValue(requestDto.CouponId);
+                    var coupon = await couponRepository.Detail(requestDto.CouponId);
 
-                    switch (coupon!.Item1)
+                    switch (coupon!.CouponType)
                     {
                         case CouponType.Percent:
-                            discountedPrice = originalPrice * (coupon.Item2 / 100);
+                            discountedPrice = originalPrice * (coupon.CouponValue / 100);
                             totalPrice = originalPrice - discountedPrice;
                             break;
                         case CouponType.FixedAmount:
-                            discountedPrice = coupon.Item2;
+                            discountedPrice = coupon.CouponValue;
                             totalPrice = originalPrice - discountedPrice;
                             break;
                     }
+
+                    coupon.NumberOfTimesToUse--;
+                    await couponRepository.Update(coupon);
                 }
                 else
                 {
@@ -854,9 +907,10 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 return new CheckOutResponseDto
                 {
-                    OriginalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item1),
-                    DiscountedPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item2),
-                    TotalPrice = String.Format(CultureInfo.InvariantCulture, "{0:0.000} VND", checkOut.Item3)
+                    OriginalPrice = FormatCurrency.FormatNumber(checkOut.Item1) + " VND",
+                    DiscountedPrice = FormatCurrency.FormatNumber(checkOut.Item2) + " VND",
+                    TotalPrice = FormatCurrency.FormatNumber(checkOut.Item3) + " VND",
+                    Deposit = FormatCurrency.FormatNumber(100) + " VND",
                 };
             }
             catch (Exception e)
@@ -927,18 +981,18 @@ namespace GraduationThesis_CarServices.Services.Service
                     case BookingStatus.CheckIn:
                         await UpdateLotStatus(LotStatus.Assigned, booking!);
                         break;
-                    case BookingStatus.Processing:
-                        await UpdateLotStatus(LotStatus.BeingUsed, booking!);
-                        break;
+                    // case BookingStatus.Processing:
+                    //     await UpdateLotStatus(LotStatus.BeingUsed, booking!);
+                    //     break;
                     case BookingStatus.Completed:
 
-                        switch (false)
-                        {
-                            case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
-                                throw new MyException("All service detail must finish before updating the booking status.", 404);
-                            case var isAccepted when isAccepted == (booking.IsAccepted is true):
-                                throw new MyException("This booking is not accepted by customer.", 404);
-                        }
+                        // switch (false)
+                        // {
+                        //     case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
+                        //         throw new MyException("All service detail must finish before updating the booking status.", 404);
+                        //     case var isAccepted when isAccepted == (booking.IsAccepted is true):
+                        //         throw new MyException("This booking is not accepted by customer.", 404);
+                        // }
 
                         var bookingDetails = await bookingDetailRepository.FilterBookingDetailByBookingId(bookingId);
 
@@ -952,6 +1006,12 @@ namespace GraduationThesis_CarServices.Services.Service
                         }
 
                         await bookingRepository.Update(booking);
+
+                        var car = await carRepository.Detail(booking.Car.CarId);
+
+                        car!.CarBookingStatus = CarStatus.NotAvailable;
+
+                        await carRepository.Update(car);
 
                         await UpdateLotStatus(LotStatus.Free, booking!);
                         break;
@@ -991,7 +1051,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     var lot1 = await lotRepository.GetFreeLotInGarage((int)booking.GarageId!);
                     var licensePlate = await carRepository.GetLicensePlate((int)booking.CarId!);
 
-                    lot1.LotStatus = status;
+                    lot1.LotStatus = LotStatus.BeingUsed;
                     lot1.IsAssignedFor = licensePlate;
 
                     await AssigneMechanicForBooking(booking);
@@ -1030,6 +1090,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     WorkingDate = booking.BookingTime,
                     BookingId = booking.BookingId,
+                    BookingMechanicStatus = Status.Activate,
                     MechanicId = pickLv3MechanicMinWork.MechanicId
                 };
 
@@ -1040,6 +1101,8 @@ namespace GraduationThesis_CarServices.Services.Service
 
             var numService = booking.BookingDetails.Count();
 
+            //var testOnly = mechanicList.OrderBy(m => m.BookingMechanics.Count).ToList();
+
             var pickRandomMechanic = mechanicList.OrderBy(m => m.BookingMechanics.Count).Take(numService).ToList();
 
             foreach (var mechanic in pickRandomMechanic)
@@ -1048,6 +1111,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     WorkingDate = booking.BookingTime,
                     BookingId = booking.BookingId,
+                    BookingMechanicStatus = Status.Activate,
                     MechanicId = mechanic.MechanicId
                 };
 
@@ -1076,20 +1140,22 @@ namespace GraduationThesis_CarServices.Services.Service
             // await bookingDetailRepository.Update(bookingDetailList);
         }
 
-        public async Task GenerateQRCode(int bookingId)
+        private async Task GenerateQRCode(Booking booking)
         {
             try
             {
-                string url = $"https://localhost:7006/api/booking/run-qr/{bookingId}";
+                //string url = $"https://carserviceappservice.azurewebsites.net/api/booking/run-qr/{booking.BookingId}";
+                string url = $"{booking.BookingId}";
 
                 var qrGenerator = new QRCodeGenerator();
                 var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
                 var qrCode = new QRCode(qrCodeData);
                 var qrCodeImage = qrCode.GetGraphic(20);
 
-                await using (MemoryStream stream = new MemoryStream())
+                await using (var stream = new MemoryStream())
                 {
                     qrCodeImage.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
                     byte[] imageBytes = stream.ToArray();
                     var base64String = "data:image/png;base64," + Convert.ToBase64String(imageBytes);
 
@@ -1097,13 +1163,19 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     var blobServiceClient = new BlobServiceClient(configuration["BlobStorage:ConnectionString"]!);
                     var blobContainerClient = blobServiceClient.GetBlobContainerClient(configuration["BlobStorage:Container"]!);
-                    var blobName = GenerateRandomString()+"_qr_code.jpg";
+                    var blobName = GenerateRandomString() + "_qr_code.jpg";
 
-                    using (MemoryStream blobstream = new MemoryStream(imgBytes))
+                    using (var blobstream = new MemoryStream(imgBytes))
                     {
                         stream.Position = 0;
                         blobContainerClient.UploadBlob(blobName, blobstream);
                     }
+
+                    var blobClient = blobContainerClient.GetBlobClient(blobName);
+
+                    booking!.QrImage = blobClient.Uri.ToString();
+
+                    await bookingRepository.Update(booking);
                 }
 
                 // string qrCodeImageBase64;
@@ -1135,24 +1207,81 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task RunQRCode(int bookingId)
+        public async Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId)
         {
-            //var url = $"https://project20230606170014.azurewebsites.net/api/booking/update-status-booking/{bookingId}&3";
-            var url = $"https://localhost:7006/api/booking/update-status-booking/{bookingId}&3";
-            var data = "{\"status\": \"updated status\"}";
+            // var url = $"https://carserviceappservice.azurewebsites.net/api/booking/update-status-booking/{bookingId}&2";
+            // var data = "{\"status\": \"updated status\"}";
 
-            using (var httpClient = new HttpClient())
+            // using (var httpClient = new HttpClient())
+            // {
+            //     var request = new HttpRequestMessage(HttpMethod.Put, url)
+            //     {
+            //         Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
+            //     };
+
+            //     var response = await httpClient.SendAsync(request);
+            //     var statusCode = response.StatusCode;
+
+            //     Console.WriteLine($"Response Status Code: {statusCode}");
+            // }
+
+            var serviceSelectList = new List<GroupServiceBookingDetailDto>();
+
+            var serviceGroupList = new List<string> { };
+
+            var booking = await bookingRepository.DetailBookingForCustomer(bookingId);
+
+            if (booking is null)
             {
-                var request = new HttpRequestMessage(HttpMethod.Put, url)
-                {
-                    Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
-                };
-
-                var response = await httpClient.SendAsync(request);
-                var statusCode = response.StatusCode;
-
-                Console.WriteLine($"Response Status Code: {statusCode}");
+                throw new MyException("Booking is not exist!", 404);
             }
+
+            var listBookingDetails = await serviceRepository.GetServiceForBookingDetail(bookingId);
+
+            foreach (var item in listBookingDetails)
+            {
+                serviceGroupList.Add(item.ServiceDetail.Service.ServiceGroup);
+            }
+
+            foreach (var item in serviceGroupList.Distinct())
+            {
+                var serviceList = listBookingDetails.Where(s => s.ServiceDetail.Service.ServiceGroup.Equals(item)).ToList();
+
+                var serviceDtoList = mapper.Map<List<BookingDetail>, List<ServiceListBookingDetailDto>>(serviceList,
+                    obj => obj.AfterMap((src, des) =>
+                    {
+                        for (int i = 0; i < src.Count; i++)
+                        {
+                            if (src[i].Product is not null)
+                            {
+                                var serviceName = src[i].ServiceDetail.Service.ServiceName + "@Sản phẩm đi kèm: " + src[i].Product.ProductName;
+                                serviceName = serviceName.Replace("@", "@" + System.Environment.NewLine);
+                                var price = FormatCurrency.FormatNumber(src[i].ServicePrice) + " VND" + "@"
+                                + FormatCurrency.FormatNumber(src[i].ProductPrice) + " VND";
+                                price = price.Replace("@", "@" + System.Environment.NewLine);
+
+                                des[i].ServiceName = serviceName;
+                                des[i].ServicePrice = price;
+                            }
+                            else
+                            {
+                                des[i].ServiceName = src[i].ServiceDetail.Service.ServiceName;
+                                des[i].ServicePrice = FormatCurrency.FormatNumber(src[i].ServicePrice) + " VND";
+                            }
+                        }
+                    }));
+                serviceSelectList.Add(new GroupServiceBookingDetailDto { ServiceGroup = item, ServiceListBookingDetailDtos = serviceDtoList });
+
+
+            }
+
+            var bookingDto = mapper.Map<BookingDetailForStaffResponseDto>(booking,
+                obj => obj.AfterMap((src, des) =>
+                {
+                    des.groupServiceBookingDetailDtos = serviceSelectList;
+                }));
+
+            return bookingDto;
         }
 
         public async Task<BookingRevenueResponseDto> CountRevune(int garageId)
@@ -1173,56 +1302,16 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var revenue = new BookingRevenueResponseDto
                 {
-                    AmountEarned = amountEarned,
-                    ServiceEarned = serviceEarned,
-                    ProductEarned = productEarned,
-                    SumPaid = sumPaid,
-                    SumUnPaid = sumUnpaid,
+                    AmountEarned = FormatCurrency.FormatNumber(amountEarned) + " VND",
+                    ServiceEarned = FormatCurrency.FormatNumber(serviceEarned) + " VND",
+                    ProductEarned = FormatCurrency.FormatNumber(productEarned) + " VND",
+                    SumPaid = FormatCurrency.FormatNumber(sumPaid) + " VND",
+                    SumUnPaid = FormatCurrency.FormatNumber(sumUnpaid) + " VND",
                     CountPaid = countPaid,
                     CountUnpaid = countUnpaid
                 };
 
                 return revenue;
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
-        public async Task<CountBookingPerStatusDto> CountBookingPerStatus()
-        {
-            try
-            {
-                (var pendingCount,
-                var canceledCount,
-                var checkInCount,
-                var processingCount,
-                var completedCount) = await bookingRepository.CountBookingPerStatus();
-
-                var count = new CountBookingPerStatusDto()
-                {
-                    Pending = pendingCount,
-                    Canceled = canceledCount,
-                    CheckIn = checkInCount,
-                    Processing = processingCount,
-                    Completed = completedCount
-                };
-
-                return count;
             }
             catch (Exception e)
             {
@@ -1306,15 +1395,37 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     var serviceList = listBookingDetails.Where(s => s.ServiceDetail.Service.ServiceGroup.Equals(item)).ToList();
 
-                    var serviceDtoList = mapper.Map<List<ServiceListBookingDetailDto>>(serviceList);
+                    var serviceDtoList = mapper.Map<List<BookingDetail>, List<ServiceListBookingDetailDto>>(serviceList,
+                    obj => obj.AfterMap((src, des) =>
+                    {
+                        for (int i = 0; i < src.Count; i++)
+                        {
+                            if (src[i].Product is not null)
+                            {
+                                var serviceName = src[i].ServiceDetail.Service.ServiceName + "@Sản phẩm đi kèm: " + src[i].Product.ProductName;
+                                serviceName = serviceName.Replace("@", System.Environment.NewLine);
+                                var price = FormatCurrency.FormatNumber(src[i].ServicePrice) + " VND" + "@"
+                                + FormatCurrency.FormatNumber(src[i].ProductPrice) + " VND";
+                                price = price.Replace("@", System.Environment.NewLine);
 
-                    serviceSelectList.Add(new GroupServiceBookingDetailDto { ServiceGroup = item, serviceListBookingDetailDtos = serviceDtoList });
+                                des[i].ServiceName = serviceName;
+                                des[i].ServicePrice = price;
+                            }
+                            else
+                            {
+                                des[i].ServiceName = src[i].ServiceDetail.Service.ServiceName;
+                                des[i].ServicePrice = FormatCurrency.FormatNumber(src[i].ServicePrice) + " VND";
+                            }
+                        }
+                    }));
+
+                    serviceSelectList.Add(new GroupServiceBookingDetailDto { ServiceGroup = item, ServiceListBookingDetailDtos = serviceDtoList });
                 }
 
                 var bookingDto = mapper.Map<BookingDetailForCustomerResponseDto>(booking,
                 obj => obj.AfterMap((src, des) =>
                 {
-                    des.groupServiceBookingDetailDtos = serviceSelectList;
+                    des.GroupServiceBookingDetailDtos = serviceSelectList;
                 }));
 
                 return bookingDto;
@@ -1335,6 +1446,114 @@ namespace GraduationThesis_CarServices.Services.Service
                         Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
                         throw;
                 }
+            }
+        }
+
+        public async Task<List<HourDto>> FilterListBookingByGarageAndDate(int bookingId, string date)
+        {
+            try
+            {
+                var dateSelect = DateTime.Parse(date);
+
+                var list = await bookingRepository.FilterListBookingByGarageAndDate(bookingId, dateSelect);
+
+                var listHours = new List<HourDto>();
+
+                foreach (var booking in list)
+                {
+                    if (!listHours.Any(b => b.Hour.Equals(booking.BookingTime.ToString("hh:tt"))))
+                    {
+                        var bookingPerHour = list.Where(b => b.BookingTime.Equals(booking.BookingTime)).ToList();
+
+                        var listDto = mapper.Map<List<BookingListForStaffResponseDto>>(bookingPerHour);
+
+                        var hour = new HourDto() { Hour = booking.BookingTime.ToString("hh:tt"), BookingListForStaffResponseDtos = listDto };
+
+                        listHours.Add(hour);
+                    }
+                }
+
+                return listHours;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<BookingCountResponseDto> CountBookingPerStatus(int? garageId)
+        {
+            try
+            {
+                var count = await bookingRepository.CountBookingPerStatus(garageId);
+
+                var countDto = new BookingCountResponseDto()
+                {
+                    Pending = count.Item1,
+                    Canceled = count.Item2,
+                    Completed = count.Item3
+                };
+
+                return countDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task UpdateBookingDetailStatus(int bookingDetailId, int status)
+        {
+            try
+            {
+                var bookingDetailList = new List<BookingDetail>();
+                var bookingDetail = await bookingDetailRepository.Detail(bookingDetailId);
+
+                switch (false)
+                {
+                    case var isExist when isExist == (bookingDetail is not null):
+                        throw new MyException("The booking detail doesn't exist.", 404);
+                    case var isFalse when isFalse == typeof(BookingServiceStatus).IsEnumDefined(status!):
+                        throw new MyException("The status number is out of avaliable range.", 404);
+                    case var isFalse when isFalse != ((bookingDetail!.BookingServiceStatus != 0) && status == 0):
+                        throw new MyException("Không thể chuyển trạng thái lỗi hoặc xong thành chưa bắt đầu!", 404);
+                }
+
+                bookingDetail.BookingServiceStatus = (BookingServiceStatus)status;
+                bookingDetail.UpdatedAt = DateTime.Now;
+                bookingDetailList.Add(bookingDetail);
+
+                await bookingDetailRepository.Update(bookingDetailList);
+            }
+            catch (System.Exception)
+            {
+                throw;
             }
         }
     }

@@ -152,10 +152,15 @@ namespace GraduationThesis_CarServices.Services.Service
                     des.ProductStatus = Status.Activate;
                     des.CreatedAt = DateTime.Now;
                 }));
+
                 if (!await productRepository.IsDuplicatedProduct(product))
                 {
                     await productRepository.Create(product);
                 }
+                else
+                {
+                    throw new MyException("The product name is exist.", 404);
+                }
             }
             catch (Exception e)
             {
@@ -176,83 +181,65 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UpdatePrice(ProductPriceRequestDto requestDto)
+        public async Task Update(ProductUpdateRequestDto requestDto)
         {
             try
             {
                 if (await productRepository.IsProductExist(requestDto.ProductId))
                 {
                     var p = await productRepository.Detail(requestDto.ProductId);
-                    var product = mapper.Map<ProductPriceRequestDto, Product>(requestDto, p!,
-                    otp => otp.AfterMap((src, des) =>
+
+                    var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!);
+
+                    await productRepository.Update(product);
+                }
+                else
+                {
+                    throw new MyException("The service doesn't exist.", 404);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task UpdateStatus(int productId)
+        {
+            try
+            {
+                if (await productRepository.IsProductExist(productId))
+                {
+                    var product = await productRepository.Detail(productId);
+
+                    switch (product!.ProductStatus)
                     {
-                        des.UpdatedAt = DateTime.Now;
-                    }));
+                        case Status.Activate:
+                            product.ProductStatus = Status.Deactivate;
+                            break;
+                        case Status.Deactivate:
+                            product.ProductStatus = Status.Activate;
+                            break;
+                    }
 
                     await productRepository.Update(product);
                 }
-            }
-            catch (Exception e)
-            {
-                switch (e)
+                else
                 {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-
-        public async Task UpdateStatus(ProductStatusRequestDto requestDto)
-        {
-            try
-            {
-                if (await productRepository.IsProductExist(requestDto.ProductId))
-                {
-                    var p = await productRepository.Detail(requestDto.ProductId);
-                    var product = mapper.Map<ProductStatusRequestDto, Product>(requestDto, p!);
-                    await productRepository.Update(product);
-                }
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
-        public async Task UpdateQuantity(ProductQuantityRequestDto requestDto)
-        {
-            try
-            {
-                if (await productRepository.IsProductExist(requestDto.ProductId))
-                {
-                    var p = await productRepository.Detail(requestDto.ProductId);
-                    var product = mapper.Map<ProductQuantityRequestDto, Product>(requestDto, p!,
-                    otp => otp.AfterMap((src, des) =>
-                    {
-                        des.UpdatedAt = DateTime.Now;
-                    }));
-                    await productRepository.Update(product);
+                    throw new MyException("The service doesn't exist.", 404);
                 }
             }
             catch (Exception e)

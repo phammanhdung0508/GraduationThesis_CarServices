@@ -26,7 +26,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var list = mapper
                 .Map<List<ServiceDetailListResponseDto>>(await serviceDetailRepository.View(page));
-                
+
                 return list;
             }
             catch (Exception e)
@@ -54,7 +54,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var list = mapper
                 .Map<List<ServiceDetailListResponseDto>>(await serviceDetailRepository.FilterService(serviceId));
-                
+
                 return list;
             }
             catch (Exception e)
@@ -133,34 +133,18 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var s = await serviceDetailRepository.Detail(requestDto.ServiceDetailId);
-                var serviceDetail = mapper.Map<ServiceDetailUpdateRequestDto, ServiceDetail>(requestDto, s!);
-                await serviceDetailRepository.Update(serviceDetail);
-            }
-            catch (Exception e)
-            {
-                switch (e)
-                {
-                    case MyException:
-                        throw;
-                    default:
-                        var inner = e.InnerException;
-                        while (inner != null)
-                        {
-                            Console.WriteLine(inner.StackTrace);
-                            inner = inner.InnerException;
-                        }
-                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
-                        throw;
-                }
-            }
-        }
 
-        public async Task UpdatePrice(ServiceDetailPriceRequestDto requestDto)
-        {
-            try
-            {
-                var s = await serviceDetailRepository.Detail(requestDto.ServiceDetailId);
-                var serviceDetail = mapper.Map<ServiceDetailPriceRequestDto, ServiceDetail>(requestDto, s!);
+                switch (false)
+                {
+                    case var isFalse when isFalse == s is not null:
+                        throw new MyException("Chi tiết dịch vụ không tồn tại.", 404);
+                    case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.ServicePrice):
+                        throw new MyException("Chi tiết dịch vụ không để rỗng.", 404);
+                    case var isFalse when isFalse == (requestDto.MaxNumberOfCarLot > requestDto.MinNumberOfCarLot):
+                        throw new MyException("Số ghế lớn nhất không được nhỏ hơn só ghế nhỏ nhất.", 404);
+                }
+
+                var serviceDetail = mapper.Map<ServiceDetailUpdateRequestDto, ServiceDetail>(requestDto, s!);
                 await serviceDetailRepository.Update(serviceDetail);
             }
             catch (Exception e)

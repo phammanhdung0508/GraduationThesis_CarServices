@@ -10,6 +10,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int MechanicId { get; set; }
+        public int UserId { get; set; }
         [Column(TypeName = "tinyint")]
         public MechanicStatus MechanicStatus {get; set;}
         [MaxLength(1024)]

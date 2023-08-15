@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraduationThesis_CarServices.Models
 {
-#pragma warning disable CS1591
     public class DataContext : DbContext
     {
         public DbSet<Booking> Bookings { get; set; }
@@ -29,7 +28,8 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<GarageMechanic> GarageMechanics { get; set; }
         public DbSet<Lot> Lots { get; set; }
         public DbSet<ServiceDetail> ServiceDetails { get; set; }
-        public DbSet<BookingMechanic> BookingMechanics {get; set;}
+        public DbSet<BookingMechanic> BookingMechanics { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -38,33 +38,33 @@ namespace GraduationThesis_CarServices.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            this.OneToOneRelationship(modelBuilder);
-            this.MultipleCascadePathFix(modelBuilder);
-            this.SeedData(modelBuilder);
+            OneToOneRelationship(modelBuilder);
+            MultipleCascadePathFix(modelBuilder);
+            SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             Randomizer.Seed = new Random(200);
-            this.SeedRoleData(modelBuilder);
-            this.SeedCategoryData(modelBuilder);
-            this.SeedServiceData(modelBuilder);
-            this.SeedServiceDetailData(modelBuilder);
-            this.SeedRandomProductData(modelBuilder);
-            this.SeedRandomUserData(modelBuilder);
-            this.SeedRandomGarageMechanicData(modelBuilder);
-            this.SeedRandomCarData(modelBuilder);
-            this.SeedRandomGarageData(modelBuilder);
-            this.SeedRandomReviewData(modelBuilder);
-            this.SeedRandomCouponData(modelBuilder);
-            this.SeedRandomBookingData(modelBuilder);
-            //this.SeedRandomReportData(modelBuilder);
+            SeedRoleData(modelBuilder);
+            SeedCategoryData(modelBuilder);
+            SeedServiceData(modelBuilder);
+            SeedServiceDetailData(modelBuilder);
+            SeedRandomProductData(modelBuilder);
+            SeedRandomUserData(modelBuilder);
+            SeedRandomGarageMechanicData(modelBuilder);
+            SeedRandomCarData(modelBuilder);
+            SeedRandomGarageData(modelBuilder);
+            SeedRandomReviewData(modelBuilder);
+            SeedRandomCouponData(modelBuilder);
+            SeedRandomBookingData(modelBuilder);
+            //SeedRandomReportData(modelBuilder);
             watch.Stop();
             Console.WriteLine($"Total run time: {watch.ElapsedMilliseconds}");
         }
 
-        private void OneToOneRelationship(ModelBuilder modelBuilder)
+        private static void OneToOneRelationship(ModelBuilder modelBuilder)
         {
             // modelBuilder.Entity<Booking>()
             // .HasOne(b => b.Report).WithOne(r => r.Booking)
@@ -81,14 +81,14 @@ namespace GraduationThesis_CarServices.Models
 
             modelBuilder.Entity<User>()
             .HasOne(b => b.Mechanic).WithOne(r => r.User)
-            .HasForeignKey<Mechanic>(e => e.MechanicId)
+            .HasForeignKey<Mechanic>(e => e.UserId)
             //.OnDelete(DeleteBehavior.Cascade)
             ;
 
             // modelBuilder.Entity<Service>().OwnsOne(x => x.ServiceGroup);
         }
 
-        private void MultipleCascadePathFix(ModelBuilder modelBuilder)
+        private static void MultipleCascadePathFix(ModelBuilder modelBuilder)
         {
             //path from User to Review
             modelBuilder.Entity<User>()
@@ -99,7 +99,7 @@ namespace GraduationThesis_CarServices.Models
 
         private readonly DateTime now = DateTime.Now;
 
-        private void SeedRoleData(ModelBuilder modelBuilder)
+        private static void SeedRoleData(ModelBuilder modelBuilder)
         {
             var list = new List<Role>()
             {
@@ -294,27 +294,27 @@ namespace GraduationThesis_CarServices.Models
             modelBuilder.Entity<Service>().HasData(list);
         }
 
-        private void SeedServiceDetailData(ModelBuilder modelBuilder)
+        private static void SeedServiceDetailData(ModelBuilder modelBuilder)
         {
             var list = new List<ServiceDetail>();
-            Random random = new Random();
+            Random random = new();
             int y = 1;
             for (int i = 1; i <= 62; i++)
             {
                 int million = random.Next(1, 4);
                 int hundred = random.Next(1, 9);
-                var price = Decimal.Parse($"{million:N0}{hundred}00");
+                var price = decimal.Parse($"{million:N0}{hundred}00");
                 list.Add(new ServiceDetail { ServiceDetailId = i, MinNumberOfCarLot = 4, MaxNumberOfCarLot = 5, ServicePrice = price, ServiceId = y });
-                price = price + 200;
+                price += 200;
                 list.Add(new ServiceDetail { ServiceDetailId = i + 1, MinNumberOfCarLot = 6, MaxNumberOfCarLot = 7, ServicePrice = price, ServiceId = y });
-                i = i + 1;
-                y = y + 1;
+                i++;
+                y++;
             }
 
             modelBuilder.Entity<ServiceDetail>().HasData(list);
         }
 
-        private void SeedRandomProductData(ModelBuilder modelBuilder)
+        private static void SeedRandomProductData(ModelBuilder modelBuilder)
         {
             var list = new List<Product>{
                 new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml", ProductImage="",
@@ -361,7 +361,7 @@ namespace GraduationThesis_CarServices.Models
             encryptConfiguration.CreatePasswordHash("abc", out byte[] password_hash, out byte[] password_salt);
 
             int m = 0;
-            for (int i = 1; i <= 50; i++)
+            for (int i = 1; i <= 50 + 14; i++)
             {
                 switch (i)
                 {
@@ -376,6 +376,7 @@ namespace GraduationThesis_CarServices.Models
                         break;
                     case > 30 and <= 49:
                         mechanicFaker.RuleFor(m => m.MechanicId, ++m)
+                            .RuleFor(m => m.UserId, f => i)
                             .RuleFor(m => m.Level, f => f.PickRandom(levelList))
                             .RuleFor(m => m.MechanicStatus, f => MechanicStatus.Available);
 
@@ -383,7 +384,7 @@ namespace GraduationThesis_CarServices.Models
                         break;
                 }
 
-                userFaker.RuleFor(u => u.UserId, i)
+                _ = userFaker.RuleFor(u => u.UserId, i)
                     .RuleFor(u => u.UserFirstName, f => f.Name.FirstName())
                     .RuleFor(u => u.UserLastName, f => f.Name.LastName())
                     .RuleFor(u => u.UserEmail, (f, u) => encryptConfiguration.Base64Encode(f.Internet.Email(u.UserFirstName, u.UserLastName)))
@@ -402,15 +403,23 @@ namespace GraduationThesis_CarServices.Models
                         switch (i)
                         {
                             case <= 20:
-                                return 1;
+                                return 1; //Customer
                             case > 20 and <= 30:
-                                return 2;
+                                return 5; //Staff
                             case > 30 and <= 49:
-                                return 3;
+                                return 3; //Mechanic
                             case 50:
-                                return 4;
-                            default: return 1;
+                                return 4; //Admin
+                            default: return 2; //Manager
                         }
+                    })
+                    .RuleFor(u => u.ManagerId, f =>
+                    {
+                        if (i > 20 && i <= 30)
+                        {
+                            return i - 20 + 50;
+                        }
+                        return null;
                     });
 
                 userList.Add(userFaker.Generate());
@@ -421,13 +430,13 @@ namespace GraduationThesis_CarServices.Models
             modelBuilder.Entity<User>().HasData(userList);
         }
 
-        private void SeedRandomGarageMechanicData(ModelBuilder modelBuilder)
+        private static void SeedRandomGarageMechanicData(ModelBuilder modelBuilder)
         {
             var garageMechanicList = new List<GarageMechanic>();
 
             var garageMechanicFaker = new Faker<GarageMechanic>();
 
-            for (int i = 1; i <= 60; i++)
+            for (int i = 1; i <= 100; i++)
             {
                 garageMechanicFaker.RuleFor(w => w.GarageMechanicId, i)
                     .RuleFor(w => w.GarageId, f => f.Random.Int(1, 14))
@@ -445,7 +454,7 @@ namespace GraduationThesis_CarServices.Models
 
             var carFaker = new Faker<Car>();
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 25; i++)
             {
                 carFaker.RuleFor(c => c.CarId, i)
                     .RuleFor(c => c.CarModel, f => f.Vehicle.Model())
@@ -480,13 +489,13 @@ namespace GraduationThesis_CarServices.Models
                     .RuleFor(g => g.GarageName, "Me " + "Garage")
                     .RuleFor(g => g.GarageAbout, f => f.Lorem.Paragraph())
                     .RuleFor(g => g.GarageImage, f => f.Image.PicsumUrl())
-                    .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("####.###.###"))
+                    .RuleFor(g => g.GarageContactInformation, f => f.Random.Replace("+84#########"))
                     // .RuleFor(g => g.FromTo, "Monday to Saturday")
                     .RuleFor(g => g.OpenAt, "08:00 AM")
                     .RuleFor(g => g.CloseAt, "05:00 PM")
                     .RuleFor(g => g.GarageStatus, Status.Activate)
                     .RuleFor(g => g.CreatedAt, now)
-                    .RuleFor(g => g.UserId, f => f.Random.Int(21, 30));
+                    .RuleFor(g => g.UserId, f => /*f.Random.Int(21, 30)*/ 50 + i);
 
                 var garage = garageFaker.Generate();
 
@@ -556,7 +565,7 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 30; i++)
             {
                 couponFaker.RuleFor(c => c.CouponId, i)
-                    .RuleFor(c => c.CouponCode, f => f.Random.Replace("##?###???#"))
+                    .RuleFor(c => c.CouponCode, f => f.Random.Replace("CARME###???#"))
                     .RuleFor(c => c.CouponDescription, f => f.Lorem.Paragraph())
                     .RuleFor(c => c.CouponType, f => f.PickRandom<CouponType>())
                     .RuleFor(c => c.CouponValue, (f, g) =>
@@ -594,21 +603,24 @@ namespace GraduationThesis_CarServices.Models
             var bookingDetailFaker = new Faker<BookingDetail>();
             var bookingMechanicFaker = new Faker<BookingMechanic>();
 
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 50; i++)
             {
                 bookingFaker.RuleFor(b => b.BookingId, i)
                     .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
                     // .RuleFor(b => b.PaymentMethod, f => "Tra sau")
-                    .RuleFor(b => b.TotalPrice, f => f.Random.Int(100, 1000))
+                    .RuleFor(b => b.OriginalPrice, f => f.Random.Int(100, 1000))
+                    .RuleFor(b => b.DiscountPrice, f => f.Random.Int(00, 30))
+                    .RuleFor(b => b.TotalPrice, (f, g) => g.OriginalPrice - g.DiscountPrice)
                     .RuleFor(b => b.FinalPrice, (f, g) => g.TotalPrice)
                     // .RuleFor(b => b.PaymentStatus, f => f.PickRandom<PaymentStatus>())
                     .RuleFor(b => b.BookingStatus, f => f.PickRandom<BookingStatus>())
                     //.RuleFor(b => b.IsAccepted, f => true)
                     .RuleFor(b => b.CreatedAt, now)
-                    .RuleFor(b => b.CarId, f => f.Random.Int(1, 20))
+                    .RuleFor(b => b.CarId, f => f.Random.Int(1, 25))
                     .RuleFor(b => b.GarageId, f => f.Random.Int(1, 14))
                     .RuleFor(b => b.IsAccepted, f => true)
+                    .RuleFor(b => b.QrImage, f => "https://media.istockphoto.com/id/828088276/vi/vec-to/m%C3%A3-qr-minh-h%E1%BB%8Da.jpg?s=612x612&w=0&k=20&c=5qgn5q4gI0tuO6m_IEL90CpyOlifFa2ku0xA5gOWiOA=")
                     .RuleFor(b => b.CreatedAt, f => now);
 
                 bookingList.Add(bookingFaker.Generate());
@@ -631,6 +643,7 @@ namespace GraduationThesis_CarServices.Models
             for (int i = 1; i <= 50; i++)
             {
                 bookingMechanicFaker.RuleFor(b => b.BookingMechanicId, i)
+                    .RuleFor(s => s.BookingMechanicStatus, f => Status.Activate)
                     .RuleFor(s => s.BookingId, f => f.Random.Int(1, 15))
                     .RuleFor(s => s.MechanicId, f => f.Random.Int(1, 18));
 
@@ -659,5 +672,4 @@ namespace GraduationThesis_CarServices.Models
         //     }
         // }
     }
-#pragma warning restore CS1591
 }

@@ -1,14 +1,9 @@
-// using GraduationThesis_CarServices.Models.DTO.Page;
-// using GraduationThesis_CarServices.Models.DTO.Payment;
+// using GraduationThesis_CarServices.Models.Entity;
 
 // namespace GraduationThesis_CarServices.Repositories.IRepository
 // {
 //     public interface IPaymentRepository
 //     {
-//         Task<List<PaymentDto>?> View(PageDto page);
-//         Task<PaymentDto?> Detail(int id);
-//         Task Create(CreatePaymentDto paymentDto);
-//         Task Update(UpdatePaymentDto paymentDto);
-//         Task Delete(DeletePaymentDto paymentDto);
+//         Task<Payment?> GetPayment(string paymentId);
 //     }
 // }

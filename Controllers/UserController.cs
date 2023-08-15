@@ -88,13 +88,43 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Creates new a user.
+        /// Creates new customer, manager, staff.
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-user")]
-        public async Task<IActionResult> CreateUser(UserCreateRequestDto userCreateRequestDto)
+        public async Task<IActionResult> CreateUser(UserCreateRequestDto requestDto)
         {
-            await userService.Create(userCreateRequestDto);
+            int? garageId = null;
+            if (requestDto.RoleId == 2 ||
+            requestDto.RoleId == 5)
+            {
+                string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(encodedToken);
+
+                garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+            }
+
+            await userService.Create(requestDto, garageId);
+            throw new MyException("Successfully.", 200);
+        }
+
+        /// <summary>
+        /// Creates new a mechanic.
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpPost("create-mechanic")]
+        public async Task<IActionResult> CreateMechanic(MechanicCreateRequestDto requestDto)
+        {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            var garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
+            await userService.CreateMechanic(requestDto, garageId);
             throw new MyException("Successfully.", 200);
         }
 

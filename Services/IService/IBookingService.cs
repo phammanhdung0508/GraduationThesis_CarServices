@@ -2,6 +2,7 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Paging;
+using GraduationThesis_CarServices.PaymentGateway;
 
 namespace GraduationThesis_CarServices.Services.IService
 {
@@ -10,21 +11,23 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<GenericObject<List<BookingListResponseDto>>> View(PageDto page);
         Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto);
         Task<BookingDetailResponseDto?> Detail(int id);
-        Task Create(BookingCreateRequestDto requestDto);
+        Task<PaymentLinkDto> Create(BookingCreateRequestDto requestDto);
         Task UpdateStatus(int bookingId, BookingStatus bookingStatus);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
-        Task GenerateQRCode(int bookingId);
         Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto);
-        Task RunQRCode(int bookingId);
+        Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId);
         Task<GenericObject<List<BookingListResponseDto>>> SearchByBookingCode(SearchBookingByUserRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByStatus(FilterByStatusRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingStatusAndDate(FilterByStatusAndDateRequestDto requestDto);
         Task<BookingRevenueResponseDto> CountRevune(int garageId);
-        Task<CountBookingPerStatusDto> CountBookingPerStatus();
         Task<CheckOutResponseDto> CheckOut(CheckOutRequestDto requestDto);
         Task<List<FilterByBookingStatusResponseDto>> FilterBookingByStatusCustomer(int bookingStatus, int userId);
         Task<BookingDetailForCustomerResponseDto> DetailBookingForCustomer(int bookingId);
         Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId);
         Task ConfirmAcceptedBooking(bool isAccepted, int bookingId);
+        Task<List<HourDto>> FilterListBookingByGarageAndDate(int bookingId, string date);
+        Task<BookingServiceStatusForStaffResponseDto> GetBookingServiceStatusByBooking(int bookingId);
+        Task<BookingCountResponseDto> CountBookingPerStatus(int? garageId);
+        Task UpdateBookingDetailStatus(int bookingDetailId, int status);
     }
 }

@@ -187,32 +187,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                return mapper.Map<Garage?, GarageDetailResponseDto>(garage,
-                otp => otp.AfterMap((src, des) =>
-                {
-                    des.HoursOfOperation = "From " + src!.OpenAt + " to " + src.CloseAt;
-                    des.AvaliableCoupon = src.Coupons.Count;
-                    if (src.Reviews.Count != 0)
-                    {
-                        des.Rating = src.Reviews.Sum(r => r.Rating) / src.Reviews.Count;
-                    }
-
-                    var presentTime = DateTime.Now.TimeOfDay;
-                    var openAt = DateTime.ParseExact(src.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
-                    var closeAt = DateTime.ParseExact(src.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
-                    var midnight = TimeSpan.Zero;
-
-                    switch (presentTime)
-                    {
-                        case var time when TimeSpan.Compare(time, openAt).Equals(1) && TimeSpan.Compare(time, closeAt).Equals(-1):
-                            des.IsOpen = "Open";
-                            break;
-                        case var time when TimeSpan.Compare(time, closeAt).Equals(1) || TimeSpan.Compare(midnight, openAt).Equals(-1):
-
-                            des.IsOpen = "Closed";
-                            break;
-                    }
-                }));
+                return mapper.Map<GarageDetailResponseDto>(garage);
             }
             catch (Exception e)
             {

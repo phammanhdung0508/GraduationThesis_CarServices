@@ -116,6 +116,26 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific service.
         /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Put update new service.
+        ///     {
+        ///         "ServiceId": 1,
+        ///         "serviceName": "Rửa xe New",
+        ///         "serviceImage": "Image New",
+        ///         "serviceGroup": 2,
+        ///             1 : GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
+        ///             2 : GÓI DỊCH VỤ NGOẠI THẤT
+        ///             3 : GÓI DỊCH VỤ NỘI THẤT
+        ///         "serviceUnit": 2,
+        ///             1 : Lần
+        ///             2 : Gói
+        ///         "serviceDetailDescription": "Description New",
+        ///         "serviceDuration": 2
+        ///     }
+        ///
+        /// </remarks>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-service")]
         public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
@@ -128,10 +148,10 @@ namespace GraduationThesis_CarServices.Controllers
         /// Updates a specific service status.
         /// </summary>
         [Authorize(Roles = "Admin")]
-        [HttpPut("update-status-service")]
-        public async Task<IActionResult> UpdateStatusService(ServiceStatusRequestDto service)
+        [HttpPut("update-status/{serviceId}")]
+        public async Task<IActionResult> UpdateStatusService(int serviceId)
         {
-            await serviceService.UpdateStatus(service);
+            await serviceService.UpdateStatus(serviceId);
             throw new MyException("Successfully.", 200);
         }
 

@@ -48,16 +48,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<(List<ServiceDetail>, int count)> FilterServiceByGarage(int garageId, PageDto page)
+        public async Task<(List<Service>, int count)> FilterServiceByGarage(int garageId, PageDto page)
         {
             try
             {
-                var query = context.Garages.Where(d => d.GarageId == garageId).SelectMany(u => u.GarageDetails)
-                .Select(c => c.Service).SelectMany(s => s.ServiceDetails).Include(s => s.Service).AsQueryable();
+                var query = context.GarageDetails.Where(d => d.GarageId == garageId)
+                .Include(c => c.Service).ThenInclude(s => s.ServiceDetails).Select(s => s.Service).AsQueryable();
 
                 var count = await query.CountAsync();
 
-                var list = await PagingConfiguration<ServiceDetail>.Get(query, page);
+                var list = await PagingConfiguration<Service>.Get(query, page);
 
                 return (list, count);
             }
@@ -218,7 +218,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var list = await context.BookingDetails.Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                var list = await context.BookingDetails
+                .Include(b => b.ServiceDetail).ThenInclude(s => s.Service).ThenInclude(s => s.Products)
                 .Where(b => b.BookingId == bookingId).ToListAsync();
 
                 return list;

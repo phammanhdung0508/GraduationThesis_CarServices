@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,10 +45,41 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
+        /// View detail of a specific Booking. [Staff]
+        /// </summary>
+        //[Authorize(Roles = "Staff")]
+        [Route("detail-booking-for-staff/{bookingId}")]
+        [AcceptVerbs("GET")]
+        public async Task<IActionResult> DetailBookingForStaff(int bookingId)
+        {
+            var booking = await bookingService.RunQRCode(bookingId);
+            return Ok(booking);
+        }
+
+        /// <summary>
+        /// Filter list booking by date for staff. [Staff]
+        /// </summary>
+        [Authorize(Roles = "Staff")]
+        [HttpGet("get-booking-by-date-for-staff")]
+        public async Task<IActionResult> FilterListBookingByGarageAndDate([FromQuery][Required] string date)
+        {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
+            var list = await bookingService.FilterListBookingByGarageAndDate(garageId, date);
+
+            return Ok(list);
+        }
+
+        /// <summary>
         /// View revenue of a specific Garage. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-revenue-by-garage/garageId={garageId}")]
+        [HttpGet("get-revenue-by-garage/{garageId}")]
         public async Task<IActionResult> CountRevune(int garageId)
         {
             var revenue = await bookingService.CountRevune(garageId);
@@ -66,7 +99,7 @@ namespace GraduationThesis_bookingServices.Controllers
             var token = handler.ReadJwtToken(encodedToken);
 
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
-            
+
             var list = await bookingService.FilterBookingByStatusCustomer(bookingStatus, userId);
             return Ok(list);
         }
@@ -167,19 +200,16 @@ namespace GraduationThesis_bookingServices.Controllers
         ///         "customerName": "name",
         ///         "customerPhone": "phone",
         ///         "customerEmail": "email",
-        ///         "dateSelected": "MM/dd/yyyy",
-        ///         "timeSelected": "hh:mm:ss",
+        ///         "dateSelected": "12/12/2023",
+        ///         "timeSelected": "08:00:00",
         ///         "serviceList": [
-        ///             {
-        ///                 "serviceDetailId": 1
-        ///             }
+        ///             1
         ///         ],
-        ///         "mechanicId": 1,
+        ///         "mechanicId": 0,
         ///         "carId": 1,
         ///         "garageId": 1,
-        ///         "couponId": 1,
+        ///         "couponId": 0,
         ///
-        ///         "versionNumber": "AAAAAAAAEBM=" /*version number get when call garage detail. Must have*/
         ///     }
         ///
         /// </remarks>
@@ -187,19 +217,8 @@ namespace GraduationThesis_bookingServices.Controllers
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBooking(BookingCreateRequestDto bookingCreateRequestDto)
         {
-            await bookingService.Create(bookingCreateRequestDto);
-            throw new MyException("Successfully.", 200);
-        }
-
-        /// <summary>
-        /// Generate new QR code for Customer when they check-in. [Customer]
-        /// </summary>
-        [Authorize(Roles = "Customer")]
-        [HttpGet("generate-qr-code/{bookingId}")]
-        public async Task<IActionResult> GenerateQRCode(int bookingId)
-        {
-            await bookingService.GenerateQRCode(bookingId);
-            throw new MyException("Successfully.", 200);
+            var response = await bookingService.Create(bookingCreateRequestDto);
+            return Ok(response);
         }
 
         /// <summary>
@@ -216,31 +235,18 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Run a specific function after a user scan QR code.
+        /// Count Bookings for every booking status. [Admin]
         /// </summary>
-        // [HttpGet]
-        [Authorize(Roles = "Staff")]
-        [Route("run-qr/{bookingId}")]
-        [AcceptVerbs("GET")]
-        public async Task<IActionResult> RunQR(int bookingId)
+        [HttpGet("count-booking-per-status")]
+        public async Task<IActionResult> CountBookingPerStatus(int? garageId)
         {
-            await bookingService.RunQRCode(bookingId);
-            throw new MyException("Successfully.", 200);
+            var count = await bookingService.CountBookingPerStatus(garageId);
+
+            return Ok(count);
         }
 
         /// <summary>
-        /// Count Bookings for every booking status. [Admin]
-        /// </summary>
-        [Authorize(Roles = "Admin")]
-        [HttpGet("count-booking-per-status")]
-        public async Task<IActionResult> CountBookingPerStatus()
-        {
-            var count = await bookingService.CountBookingPerStatus();
-            return Ok(count);
-        }
-    
-        /// <summary>
-        /// Count Bookings for every booking status. [Customer]
+        /// Get booking detail status by booking for customer. [Customer]
         /// </summary>
         [Authorize(Roles = "Customer")]
         [HttpGet("get-booking-detail-status-by-booking-customer/{bookingId}")]
@@ -249,6 +255,40 @@ namespace GraduationThesis_bookingServices.Controllers
             var list = await bookingService.GetBookingDetailStatusByBooking(bookingId);
 
             return Ok(list);
+        }
+
+        /// <summary>
+        /// Get booking detail status by booking for staff. [Staff]
+        /// </summary>
+        [Authorize(Roles = "Staff")]
+        [HttpGet("get-booking-detail-status-by-booking-staff/{bookingId}")]
+        public async Task<IActionResult> GetBookingServiceStatusByBooking(int bookingId)
+        {
+            var booking = await bookingService.GetBookingServiceStatusByBooking(bookingId);
+
+            return Ok(booking);
+        }
+
+        /// <summary>
+        /// Update a booking detail status. [Staff]
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Put status:
+        ///     {
+        ///         "NotStart": "0",
+        ///         "Done": "1",
+        ///         "Error": "2"
+        ///     }
+        ///
+        /// </remarks>
+        [Authorize(Roles = "Staff")]
+        [HttpPut("update-booking-detail-status/{bookingDetailId}&{status}")]
+        public async Task<IActionResult> UpdateBookingDetailStatus(int bookingDetailId, int status)
+        {
+            await bookingService.UpdateBookingDetailStatus(bookingDetailId, status);
+            throw new MyException("Successfully.", 200);
         }
     }
 }

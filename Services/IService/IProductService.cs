@@ -10,9 +10,8 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ProductListResponseDto>?> FilterAvailableProductForService(int serviceId);
         Task<ProductDetailResponseDto?> Detail(int id);
         Task Create(ProductCreateRequestDto requestDto);
-        Task UpdatePrice(ProductPriceRequestDto requestDto);
-        Task UpdateStatus(ProductStatusRequestDto requestDto);
-        Task UpdateQuantity(ProductQuantityRequestDto requestDto);
+        Task Update(ProductUpdateRequestDto requestDto);
+        Task UpdateStatus(int productId);
         Task<GenericObject<List<ProductListResponseDto>>> SearchByName(SearchByNameRequestDto requestDto);
     }
 }

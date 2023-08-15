@@ -75,7 +75,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var listGarage = new List<Garage>();
-                
+
                 foreach (var id in serviceList)
                 {
                     var list = await context.Garages.Include(g => g.Reviews)
@@ -83,7 +83,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                     listGarage.AddRange(list);
                 }
-                
+
                 return listGarage.Distinct().ToList();
             }
             catch (Exception)
@@ -199,5 +199,47 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<byte[]?> GetGarageVersionNumber(int garageId)
+        {
+            try
+            {
+                var versionNumber = await context.Garages.Where(g => g.GarageId == garageId)
+                .Select(g => g.VersionNumber).FirstOrDefaultAsync();
+
+                return versionNumber;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int?> GetManagerId(int? garageId)
+        {
+            try
+            {
+                var managerId = await context.Garages.Where(g => g.GarageId == garageId)
+                .Select(g => g.UserId).FirstOrDefaultAsync();
+
+                return managerId;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task CreateGarageMechanic(GarageMechanic garageMechanic)
+        {
+            try
+            {
+                context.GarageMechanics.Add(garageMechanic);
+                await context.SaveChangesAsync();
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
     }
 }

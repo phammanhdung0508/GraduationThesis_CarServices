@@ -6,6 +6,7 @@ namespace GraduationThesis_CarServices.Enum
         Canceled,
         CheckIn,
         Processing,
-        Completed
+        Completed,
+        CheckOut
     }
 }

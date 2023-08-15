@@ -13,12 +13,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             this.context = context;
         }
 
-        public async Task Create(Customer customer)
+        public async Task<int> Create(Customer customer)
         {
             try
             {
                 context.Customers.Add(customer);
                 await context.SaveChangesAsync();
+
+                return await context.Customers.OrderBy(c => c.CustomerId)
+                .Select(c => c.CustomerId).LastAsync();
             }
             catch (System.Exception)
             {

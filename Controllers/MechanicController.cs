@@ -106,5 +106,15 @@ namespace GraduationThesis_CarServices.Controllers
             await mechanicService.RemoveMechanicfromBooking(requestDto);
             throw new MyException("Successfully", 200);
         }
+
+        /// <summary>
+        /// View bookings having mechanic appplied[Admin]
+        /// </summary>
+        [HttpPost("get-booking-mechanic-applied")]
+        public async Task<IActionResult> GetBookingMechanicApplied(FilterBookingByMechanicRequestDto requestDto)
+        {
+            var list = await mechanicService.GetBookingMechanicApplied(requestDto);
+            return Ok(list);
+        }
     }
 }

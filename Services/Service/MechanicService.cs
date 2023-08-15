@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -304,7 +305,6 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
-                var isExist = await mechanicRepository.IsMechanicExist(requestDto.MechanicId);
 
                 switch (false)
                 {
@@ -312,13 +312,47 @@ namespace GraduationThesis_CarServices.Services.Service
                     (requestDto.MechanicId != 0 &&
                     requestDto.BookingId != 0):
                         throw new MyException("MechanicId and BookingId dont take 0 value.", 404);
-                    case var isFalse when isFalse == isExist:
-                        throw new MyException("The mechanic doesn't exist.", 404);
                 }
 
                 var bookingMechanic = await mechanicRepository.DetailBookingMechanic(requestDto.MechanicId, requestDto.BookingId);
                 bookingMechanic!.BookingMechanicStatus = Status.Deactivate;
                 await mechanicRepository.UpdateBookingMechanic(bookingMechanic);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> GetBookingMechanicApplied(FilterBookingByMechanicRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                (var listObj, var count) = await mechanicRepository.GetBookingMechanicApplied(requestDto.UserId, page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
             }
             catch (Exception e)
             {

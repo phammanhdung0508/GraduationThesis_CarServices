@@ -131,16 +131,16 @@ namespace GraduationThesis_CarServices.Services.Service
                 Random random = new Random();
                 string code = "CARME" + new string(Enumerable.Repeat(chars, 7).Select(s => s[random.Next(s.Length)]).ToArray());
 
-                startDate = DateTime.Parse(requestDto.CouponStartDate);
-                endDate = DateTime.Parse(requestDto.CouponEndDate);
+                var startDate = DateTime.Parse(requestDto.CouponStartDate);
+                var endDate = DateTime.Parse(requestDto.CouponEndDate);
 
                 switch(false){
                     case var isFalse when isFalse == (requestDto.CouponMinSpend <= requestDto.CouponMaxSpend):
-                        throw new MyException("Số tiền tối thiểu phải nhỏ hơn hoặc bằng số tiền tối đa của coupon.");
+                        throw new MyException("Số tiền tối thiểu phải nhỏ hơn hoặc bằng số tiền tối đa của coupon.", 14);
                     case var isFalse when isFalse == (requestDto.NumberOfTimesToUse > 0):
-                        throw new MyException("Số lần sử dụng coupon không được nhận số 0.");
+                        throw new MyException("Số lần sử dụng coupon không được nhận số 0.", 14);
                     case var isFalse when isFalse == (startDate < endDate):
-                        throw new MyException("Ngày kết thúc coupon không được lớn hơn ngày bắt đầu coupon.");
+                        throw new MyException("Ngày kết thúc coupon không được lớn hơn ngày bắt đầu coupon.", 14);
                 }
 
                 var coupon = mapper.Map<CouponCreateRequestDto, Coupon>(requestDto,

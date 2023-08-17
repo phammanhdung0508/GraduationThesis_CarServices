@@ -221,8 +221,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var bookingMechanic = await context.BookingMechanics
-                .Where(b => b.UserId == mechanicId &&
+                var bookingMechanic = await context.BookingMechanics.Include(m => m.Mechanic)
+                .Where(b => b.Mechanic.UserId == mechanicId &&
                 b.BookingId == bookingId).FirstOrDefaultAsync();
 
                 return bookingMechanic;
@@ -257,6 +257,29 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<(List<Booking>?, int count)> GetBookingMechanicApplied(int userId, PageDto page){
+            try
+            {
+                var query = context.Bookings
+                .Include(b => b.Car)
+                .ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(g => g.Garage)
+                .Include(m => m.BookingMechanics)
+                .ThenInclude(m => m.Mechanic)
+                .Where(b => b.BookingMechanics.Any(m => m.Mechanic.UserId == userId)).AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Booking>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                
                 throw;
             }
         }

@@ -13,7 +13,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Coupon
         public string CouponEndDate { get; set; }
         public float CouponMinSpend { get; set; }
         public float CouponMaxSpend { get; set; }
-        public int NumberOfTimesToTUse { get; set; }
+        public int NumberOfTimesToUse { get; set; }
         public int CouponType { get; set; }
 
         public int GarageId { get; set; }

@@ -63,7 +63,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ProductName": "Rửa xe Product",
         ///         "ProductImage": "Image",
         ///         "ProductDetailDescription": "Description",
-        ///         "ProductPrice": 100, /* 100 = 100k */
+        ///         "ProductPrice": 100.000 VND, /* 100.000 VND (string) */
         ///         "ProductQuantity": 10,
         ///         "ServiceId": 1,
         ///         "CategoryId": 1
@@ -75,7 +75,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
         {
             await productService.Create(product);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> Update(ProductUpdateRequestDto product)
         {
             await productService.Update(product);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateStatus(int productId)
         {
             await productService.UpdateStatus(productId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
 
         }
     }

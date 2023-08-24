@@ -17,6 +17,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task AddAvaliableMechanicToBooking(EditMechanicBookingRequestDto requestDto);
         Task RemoveMechanicfromBooking(EditMechanicBookingRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> GetBookingMechanicApplied(FilterBookingByMechanicRequestDto requestDto);
-
+        Task<List<MechanicWorkForGarageResponseDto>> GetMechanicAvaliableByGarage(int garageId);
     }
 }

@@ -6,6 +6,7 @@ using GraduationThesis_CarServices.Encrypting;
 using GraduationThesis_CarServices.Geocoder;
 using GraduationThesis_CarServices.Middleware;
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.PaymentGateway;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Repositories.Repository;
@@ -118,6 +119,7 @@ builder.Services.AddTransient<StorageMiddleware>();
 builder.Services.AddSingleton<TokenConfiguration>();
 builder.Services.AddSingleton<EncryptConfiguration>();
 builder.Services.AddSingleton<GeocoderConfiguration>();
+builder.Services.AddSingleton<FCMSendNotificationMobile>();
 
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IVNPayPaymentGateway, VNPayPaymentGateway>();

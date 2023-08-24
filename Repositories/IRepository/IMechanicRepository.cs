@@ -6,8 +6,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IMechanicRepository
     {
         Task<(List<Mechanic>, int, List<int>)> View(PageDto page);
-        Task<List<Mechanic>> FilterMechanicsByGarage(int garageId);
-        Task<List<Mechanic>> FilterMechanicsAvailableByGarage(int garageId);
+        Task<List<Mechanic>> FilterMechanicsAvailableByGarage(int garageId, bool isLv3);
         Task<List<Mechanic>> GetMechanicByBooking(int bookingId);
         Task<Mechanic?> Detail(int mechanicId);
         Task<bool> IsMechanicExist(int mechanicId);
@@ -22,5 +21,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<int> CountBookingMechanicApplied(int mechanicId);
 
         Task<(List<Booking>?, int count)> GetBookingMechanicApplied(int userId, PageDto page);
+        Task<List<Mechanic>> GetMechanicAvaliableByGarage(int garageId);
     }
 }

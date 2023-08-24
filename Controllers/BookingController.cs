@@ -4,6 +4,7 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
+using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Authorization;
@@ -47,12 +48,19 @@ namespace GraduationThesis_bookingServices.Controllers
         /// <summary>
         /// View detail of a specific Booking. [Staff]
         /// </summary>
-        //[Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff")]
         [Route("detail-booking-for-staff/{bookingId}")]
         [AcceptVerbs("GET")]
         public async Task<IActionResult> DetailBookingForStaff(int bookingId)
         {
-            var booking = await bookingService.RunQRCode(bookingId);
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
+            var booking = await bookingService.RunQRCode(bookingId, garageId);
             return Ok(booking);
         }
 
@@ -190,6 +198,41 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
+        /// Creates new a Booking for Manager. [Manager]
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Post create new booking.
+        ///     {
+        ///         "customerName": "name",
+        ///         "customerPhone": "phone",
+        ///         "customerEmail": "email",
+        ///         "dateSelected": "12/12/2023",
+        ///         "timeSelected": "08:00:00",
+        ///         "serviceList": [
+        ///             {
+        ///                 ServiceDetailId: 7,
+        ///                 ProductId: 1
+        ///             }
+        ///         ],
+        ///         "mechanicId": 0,
+        ///         "carId": 1,
+        ///         "garageId": 1,
+        ///         "couponId": 0,
+        ///
+        ///     }
+        ///
+        /// </remarks>
+        [Authorize(Roles = "Manager, Admin")]
+        [HttpPost("create-booking-for-manager")]
+        public async Task<IActionResult> CreateBookingForManager(BookingCreateForManagerRequestDto requestDto)
+        {
+            await bookingService.CreateForManager(requestDto);
+            throw new MyException("Thành công.", 200);
+        }
+
+        /// <summary>
         /// Creates new a Booking. [Customer]
         /// </summary>
         /// <remarks>
@@ -222,16 +265,30 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Update booking status.
+        /// Update booking status. [Staff]
         /// </summary>
-        //[Authorize(Roles = "Staff")]
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Booking status.
+        ///     {
+        ///         "Pending": 0,
+        ///         "Canceled": 1,
+        ///         "CheckIn": 2,
+        ///         "Processing": 3,
+        ///         "Completed": 4,
+        ///         "CheckOut": 5,
+        ///     }
+        ///
+        /// </remarks>
+        [Authorize(Roles = "Staff, Amdmin, Manager")]
         [HttpPut]
         [Route("update-status-booking/{bookingId}&{bookingStatus}")]
         // [AcceptVerbs("PUT")]
         public async Task<IActionResult> UpdateBookingStatus([FromRoute] int bookingId, [FromRoute] int bookingStatus)
         {
             await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -288,7 +345,15 @@ namespace GraduationThesis_bookingServices.Controllers
         public async Task<IActionResult> UpdateBookingDetailStatus(int bookingDetailId, int status)
         {
             await bookingService.UpdateBookingDetailStatus(bookingDetailId, status);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
+        }
+
+        [Authorize(Roles = "Manager, Admin")]
+        [HttpPut("confirm-booking-are-paid/{bookingId}")]
+        public async Task<IActionResult> ConfirmBookingArePaid(int bookingId)
+        {
+            await bookingService.ConfirmBookingArePaid(bookingId);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

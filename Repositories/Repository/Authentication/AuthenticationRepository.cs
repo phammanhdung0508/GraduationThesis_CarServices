@@ -61,7 +61,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     user = mapper.Map<UserLoginDto>(_user);
                 }
 
-                user.UserEmail = encryptConfiguration.Base64Decode(user.UserEmail!);
+                if (user.UserEmail is not null)
+                {
+                    user.UserEmail = encryptConfiguration.Base64Decode(user.UserEmail!);
+                }
 
                 return user;
             }
@@ -166,6 +169,17 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 if (_user.UserEmail is not null)
                 {
                     user.UserEmail = encryptConfiguration.Base64Decode(_user.UserEmail);
+                }
+
+                if (!string.IsNullOrEmpty(login.DeviceToken))
+                {
+                    var deviceToken = await context.Users.Where(u => u.UserId == _user.UserId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.DeviceToken, login.DeviceToken));
+                    user.DeviceToken = login.DeviceToken;
+                }
+                else
+                {
+                    user.DeviceToken = _user.DeviceToken ?? "";
                 }
 
                 return user;
@@ -315,15 +329,15 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                 TwilioClient.Init(accountSid, authToken);
 
                 //Company phone
-                var twilioPhone = "+19123725077";
+                var twilioPhone = configuration["Twilio:PhoneNumber"]!;
 
-                var validationRequest = ValidationRequestResource.Create(
-                    friendlyName: "My Phone Number",
-                    phoneNumber: new Twilio.Types.PhoneNumber(recipientPhone)
-                );
+                // var validationRequest = ValidationRequestResource.Create(
+                //     friendlyName: "Phone Number",
+                //     phoneNumber: new Twilio.Types.PhoneNumber(recipientPhone)
+                // );
 
                 var message = MessageResource.Create(
-                    body: $"Generic dependency state illustration Your OTP verification code is: {otp}.",
+                    body: $"Your OTP verification code is: {otp}.",
                     from: new Twilio.Types.PhoneNumber(twilioPhone),
                     to: new Twilio.Types.PhoneNumber(recipientPhone)
                 );

@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> PushNotification(string idToken)
         {
             await fCMSendNotificationMobile.SendMessagesToSpecificDevices(idToken);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

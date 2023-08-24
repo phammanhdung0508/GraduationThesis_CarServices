@@ -109,7 +109,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)
         {
             await serviceService.Create(service);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
 
         }
 
@@ -141,7 +141,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
         {
             await serviceService.Update(service);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateStatusService(int serviceId)
         {
             await serviceService.UpdateStatus(serviceId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
     }

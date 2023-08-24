@@ -19,11 +19,12 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICustomerRepository customerRepository;
         private readonly IGarageRepository garageRepository;
         private readonly IMechanicRepository mechanicRepository;
+        private readonly IAuthenticationRepository authenticationRepository;
         private readonly EncryptConfiguration encryptConfiguration;
 
         public UserService(IMapper mapper, IUserRepository userRepository, IGarageRepository garageRepository,
         EncryptConfiguration encryptConfiguration, ICarRepository carRepository, ICustomerRepository customerRepository,
-        IMechanicRepository mechanicRepository)
+        IMechanicRepository mechanicRepository, IAuthenticationRepository authenticationRepository)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
@@ -32,6 +33,7 @@ namespace GraduationThesis_CarServices.Services.Service
             this.customerRepository = customerRepository;
             this.garageRepository = garageRepository;
             this.mechanicRepository = mechanicRepository;
+            this.authenticationRepository = authenticationRepository;
         }
 
         public async Task<List<UserListResponseDto>?> View(PageDto page)
@@ -349,6 +351,7 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 var encryptEmail = string.Empty;
+                var formatPhone = string.Empty;
 
                 switch (false)
                 {
@@ -362,26 +365,34 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail!);
                 }
+
                 encryptConfiguration.CreatePasswordHash(requestDto.UserPassword, out byte[] password_hash, out byte[] password_salt);
 
-                var user = mapper.Map<User>(requestDto,
-                opt => opt.AfterMap((src, des) =>
+                if (requestDto.UserPhone is not null &&
+                requestDto.UserPhone.Length == 10)
                 {
-                    des.UserEmail = encryptEmail;
-                    des.PasswordHash = password_hash;
-                    des.PasswordSalt = password_salt;
-                    des.RoleId = 5;
-                }));
+                    formatPhone = "+84" + requestDto.UserPhone.Substring(1, 9);
+                }
 
                 switch (requestDto.RoleId)
                 {
                     case 1:
+                        var isUserPhoneExist = await userRepository.IsUserPhoneExist(formatPhone);
+                        var testy = string.IsNullOrEmpty(formatPhone);
+                        var asdasd = isUserPhoneExist && string.IsNullOrEmpty(formatPhone);
+                        var asdasdasd = isUserPhoneExist && !string.IsNullOrEmpty(formatPhone);
+                        var asdasd1 = !isUserPhoneExist && !string.IsNullOrEmpty(formatPhone);
+
                         switch (false)
                         {
                             case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
                                 throw new MyException("Số điện thoại không được để trống.", 404);
-                            case var isFalse when isFalse == requestDto.UserPhone.All(char.IsDigit):
+                            case var isFalse when isFalse == requestDto.UserPhone!.All(char.IsDigit):
                                 throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
+                            case var isFalse when isFalse == (requestDto.UserPhone!.Length == 10):
+                                throw new MyException("Số điện thoại phải được nhập đủ 10 số.", 404);
+                            case var isFalse when isFalse == !isUserPhoneExist:
+                                throw new MyException("Số điện thoại đã tồn tại.", 404);
                             case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarModel):
                                 throw new MyException("Mẫu xe không được để trống.", 404);
                             case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.CarBrand):
@@ -394,11 +405,21 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Số ghế xe không được để trống.", 404);
                         }
 
-                        await userRepository.Create(user);
+                        var customer = mapper.Map<User>(requestDto,
+                        opt => opt.AfterMap((src, des) =>
+                        {
+                            des.UserPhone = formatPhone;
+                            des.UserEmail = encryptEmail;
+                            des.PasswordHash = password_hash;
+                            des.PasswordSalt = password_salt;
+                            des.RoleId = requestDto.RoleId;
+                        }));
 
-                        var customer = new Customer() { User = user };
+                        await userRepository.Create(customer);
 
-                        var customerId = await customerRepository.Create(customer);
+                        var customer_ = new Customer() { User = customer };
+
+                        var customerId = await customerRepository.Create(customer_);
 
                         var car = mapper.Map<UserCreateRequestDto, Car>(requestDto,
                         obj => obj.AfterMap((src, des) =>
@@ -409,19 +430,66 @@ namespace GraduationThesis_CarServices.Services.Service
                         await carRepository.Create(car);
                         break;
                     case 2:
+                        if (await userRepository.IsEmailExist(encryptEmail))
+                        {
+                            throw new MyException("Tài khoản của bạn không tồn tại.", 404);
+                        }
+
+                        if (garageId is null)
+                        {
+                            throw new MyException("Chỉ có Admin là được tạo Manager.", 404);
+                        }
+
                         if (string.IsNullOrEmpty(requestDto.UserEmail))
                         {
                             throw new MyException("Email không được để trống.", 404);
                         }
 
-                        await userRepository.Create(user);
+                        var manager = mapper.Map<User>(requestDto,
+                        opt => opt.AfterMap((src, des) =>
+                        {
+                            des.UserEmail = encryptEmail;
+                            des.PasswordHash = password_hash;
+                            des.PasswordSalt = password_salt;
+                            des.RoleId = requestDto.RoleId;
+                        }));
+
+                        await userRepository.Create(manager);
                         break;
                     case 5:
+                        var isUserPhoneExist_ = await userRepository.IsUserPhoneExist(formatPhone);
+
+                        switch (false)
+                        {
+                            case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
+                                throw new MyException("Số điện thoại không được để trống.", 404);
+                            case var isFalse when isFalse == requestDto.UserPhone!.All(char.IsDigit):
+                                throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
+                            case var isFalse when isFalse == (requestDto.UserPhone!.Length == 10):
+                                throw new MyException("Số điện thoại phải được nhập đủ 10 số.", 404);
+                            case var isFalse when isFalse == isUserPhoneExist_:
+                                throw new MyException("Số điện thoại đã tồn tại.", 404);
+                        }
+
+                        var staff = mapper.Map<User>(requestDto,
+                        opt => opt.AfterMap((src, des) =>
+                        {
+                            des.UserPhone = formatPhone;
+                            des.UserEmail = encryptEmail;
+                            des.PasswordHash = password_hash;
+                            des.PasswordSalt = password_salt;
+                            des.RoleId = requestDto.RoleId;
+                        }));
+
                         if (garageId is not null)
                         {
                             var managerId = await garageRepository.GetManagerId(garageId);
-                            user.ManagerId = managerId;
-                            await userRepository.Create(user);
+                            staff.ManagerId = managerId;
+                            await userRepository.Create(staff);
+                        }
+                        else
+                        {
+                            throw new MyException("Chỉ có Manager là được tạo Staff.", 404);
                         }
                         break;
                 }
@@ -445,35 +513,40 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task CustomerFirstLoginUpdate(UserUpdateRequestDto requestDto, int userId)
+        public async Task<string> CustomerFirstLoginUpdate(UserUpdateRequestDto requestDto, int userId)
         {
             try
             {
                 var u = await userRepository.Detail(userId);
+                var refreshToken = string.Empty;
 
                 switch (false)
                 {
-                    case var isFalse when isFalse != (requestDto.UserFirstName.Equals("")):
-                        throw new MyException("The user first name can't be empty.", 404);
-                    case var isFalse when isFalse != (requestDto.UserEmail.Equals("")):
-                        throw new MyException("The user email number can't be empty.", 404);
-                    case var isExist when isExist == (u != null):
-                        throw new MyException("The user doesn't exist.", 404);
-                    case var isCustomer when isCustomer == (u!.RoleId == 1):
-                        throw new MyException("The user don't have permission.", 403);
-                    case var isFirstLogin when isFirstLogin == (u.UserFirstName == null):
-                        throw new MyException("The user already update information.", 404);
+                    case var isFalse when isFalse != requestDto.UserFirstName.Equals(""):
+                        throw new MyException("Tên đầu của người dùng không được để trống.", 404);
+                    case var isFalse when isFalse != requestDto.UserLastName!.Equals(""):
+                        throw new MyException("Tên cuối của người dùng không được để trống.", 404);
+                    case var isExist when isExist == (u is not null):
+                        throw new MyException("Người dùng không tồn tại.", 404);
+                    case var isCustomer when isCustomer == (u!.RoleId == 1 || u!.RoleId == 5):
+                        throw new MyException("Authorized.", 403);
+                    case var isFirstLogin when isFirstLogin != (u.UserFirstName is not null):
+                        var newRefreshToken = await authenticationRepository.RefreshToken(u.UserId);
+                        refreshToken = newRefreshToken!.Token;
+                        break;
                 }
-
-                var encodeEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail);
 
                 var user = mapper.Map<UserUpdateRequestDto, User>(requestDto, u!,
                 opt => opt.AfterMap((src, des) =>
                 {
-                    des.UserEmail = encodeEmail;
+                    if (requestDto.UserEmail is not null)
+                    {
+                        des.UserEmail = encryptConfiguration.Base64Encode(src.UserEmail!);
+                    }
                     des.UpdatedAt = DateTime.Now;
                 }));
                 await userRepository.Update(user);
+                return refreshToken;
             }
             catch (Exception e)
             {

@@ -100,7 +100,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateGarage(GarageCreateRequestDto garageCreateRequestDto)
         {
             await garageService.Create(garageCreateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateGarage(GarageUpdateRequestDto garageUpdateRequestDto)
         {
             await garageService.Update(garageUpdateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateStatus(GarageStatusRequestDto garageStatusRequestDto)
         {
             await garageService.UpdateStatus(garageStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateLocation(LocationUpdateRequestDto locationUpdateRequestDto)
         {
             await garageService.UpdateLocation(locationUpdateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

@@ -108,12 +108,22 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View bookings having mechanic appplied[Admin]
+        /// View bookings having mechanic appplied [Admin]
         /// </summary>
         [HttpPost("get-booking-mechanic-applied")]
         public async Task<IActionResult> GetBookingMechanicApplied(FilterBookingByMechanicRequestDto requestDto)
         {
             var list = await mechanicService.GetBookingMechanicApplied(requestDto);
+            return Ok(list);
+        }
+    
+        /// <summary>
+        /// View bookings having mechanic appplied [Manager]
+        /// </summary>
+        [HttpGet("get-mechanic-avaliable-by-garage/{garageId}")]
+        public async Task<IActionResult> GetMechanicAvaliableByGarage(int garageId)
+        {
+            var list = await mechanicService.GetMechanicAvaliableByGarage(garageId);
             return Ok(list);
         }
     }

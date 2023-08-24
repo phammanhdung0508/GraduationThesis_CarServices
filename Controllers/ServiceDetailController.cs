@@ -60,18 +60,27 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateServiceDetail(ServiceDetailCreateRequestDto serviceDetail)
         {
             await serviceDetailService.Create(serviceDetail);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
         /// Updates a specific service detail.
         /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     Note.
+        ///     {
+        ///         "ServicePrice": 100.000 VND, /* 100.000 VND (string) */
+        ///     }
+        ///
+        /// </remarks>
         //[Authorize(Roles = "Admin")]
         [HttpPut("update-service-detail")]
         public async Task<IActionResult> UpdateServiceDetail(ServiceDetailUpdateRequestDto serviceDetail)
         {
             await serviceDetailService.Update(serviceDetail);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

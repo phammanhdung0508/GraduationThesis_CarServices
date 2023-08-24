@@ -70,7 +70,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Filter Customer by role.
+        /// Filter Customer by role. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("filter-by-role/{roleId}")]
@@ -88,7 +88,7 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Creates new customer, manager, staff.
+        /// Creates new customer, manager, staff. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-user")]
@@ -107,11 +107,11 @@ namespace GraduationThesis_CarServices.Controllers
             }
 
             await userService.Create(requestDto, garageId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Creates new a mechanic.
+        /// Creates new a mechanic. [Manager]
         /// </summary>
         [Authorize(Roles = "Manager")]
         [HttpPost("create-mechanic")]
@@ -125,15 +125,15 @@ namespace GraduationThesis_CarServices.Controllers
             var garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
 
             await userService.CreateMechanic(requestDto, garageId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Updates a specific user when they first login.
+        /// Updates a specific user. [Customer, Staff]
         /// </summary>
-        [Authorize(Roles = "Admin, Customer")]
+        [Authorize(Roles = "Customer, Staff")]
         [HttpPut("update-user")]
-        public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
+        public async Task<IActionResult> UpdateUserFirstLogin(UserUpdateRequestDto userUpdateRequestDto)
         {
             string encodedToken = HttpContext.Items["Token"]!.ToString()!;
 
@@ -142,19 +142,25 @@ namespace GraduationThesis_CarServices.Controllers
 
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
 
-            await userService.CustomerFirstLoginUpdate(userUpdateRequestDto, userId);
-            throw new MyException("Successfully.", 200);
+            var refeshToken = await userService.CustomerFirstLoginUpdate(userUpdateRequestDto, userId);
+
+            if (refeshToken is not null)
+            {
+                return Ok(refeshToken);
+            }
+
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Updates a specific user status.
+        /// Updates a specific user status. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("update-status")]
         public async Task<IActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
         {
             await userService.UpdateStatus(userStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

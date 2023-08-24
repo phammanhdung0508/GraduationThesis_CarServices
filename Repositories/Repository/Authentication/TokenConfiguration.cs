@@ -30,7 +30,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
                     new Claim("garageId", user.GarageId.ToString()),
                     new Claim("firstname", user.UserFirstName! is not null ? user.UserFirstName : ""),
                     new Claim("lastname", user.UserLastName! is not null ? user.UserLastName : ""),
-                    new Claim("name", user.UserFirstName + user.UserLastName),
+                    new Claim("name", user.UserFullName),
                     new Claim("phone", user.UserPhone),
                     new Claim("image", user.UserImage! is not null ? user.UserImage : ""),
                     new Claim(ClaimTypes.Role, user.RoleDto!.RoleName)};

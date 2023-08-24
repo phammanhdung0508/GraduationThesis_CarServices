@@ -300,7 +300,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Bookings.AsQueryable();;
+                var query = context.Bookings.AsQueryable(); ;
 
                 if (garageId is not null)
                 {
@@ -317,7 +317,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
-                
+
                 throw;
             }
         }
@@ -378,6 +378,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 b.BookingStatus.Equals(BookingStatus.Completed))).ToListAsync();
 
                 return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task ConfirmBookingArePaid(int bookingId)
+        {
+            try
+            {
+                await context.Bookings.Where(b => b.BookingId == bookingId)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.PaymentStatus, PaymentStatus.Paid));
             }
             catch (System.Exception)
             {

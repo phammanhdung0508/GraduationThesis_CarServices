@@ -1,33 +1,33 @@
-#nullable disable
 namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
     public class BookingDetailForCustomerResponseDto
     {
         public int GarageId { get; set; }
-        public string GaragePhone { get; set; }
-        public string CarName { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerPhone { get; set; }
-        public string Duration { get; set; }
-        public string BookingDay { get; set; }
-        public string GarageAddress { get; set; }
-        public string BookingStatus { get; set; }
-        public string QrImage { get; set; }
-        public string DiscountPrice { get; set; }
-        public string TotalPrice { get; set; }
-        public string FinalPrice { get; set; }
-        public List<GroupServiceBookingDetailDto> GroupServiceBookingDetailDtos {get; set;}
+        public string GaragePhone { get; set; } = string.Empty;
+        public string CarName { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
+        public string DeviceToken { get; set; } = string.Empty;
+        public string Duration { get; set; } = string.Empty;
+        public string BookingDay { get; set; } = string.Empty;
+        public string GarageAddress { get; set; } = string.Empty;
+        public string BookingStatus { get; set; } = string.Empty;
+        public string QrImage { get; set; } = string.Empty;
+        public string DiscountPrice { get; set; } = string.Empty;
+        public string TotalPrice { get; set; } = string.Empty;
+        public string FinalPrice { get; set; } = string.Empty;
+        public List<GroupServiceBookingDetailDto>? GroupServiceBookingDetailDtos {get; set;}
     }
 
     public class GroupServiceBookingDetailDto
     {
-        public string ServiceGroup { get; set; }
-        public List<ServiceListBookingDetailDto> ServiceListBookingDetailDtos {get; set;}
+        public string ServiceGroup { get; set; } = string.Empty;
+        public List<ServiceListBookingDetailDto>? ServiceListBookingDetailDtos {get; set;}
     }
 
     public class ServiceListBookingDetailDto
     {
-        public string ServicePrice { get; set; }
-        public string ServiceName { get; set; }
+        public string ServicePrice { get; set; } = string.Empty;
+        public string ServiceName { get; set; } = string.Empty;
     }
 }

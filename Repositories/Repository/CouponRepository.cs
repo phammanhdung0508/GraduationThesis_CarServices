@@ -68,6 +68,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var coupon = await context.Coupons
+                .Include(c => c.Garage).ThenInclude(c => c.User)
                 .FirstOrDefaultAsync(c => c.CouponId == id);
 
                 return coupon;

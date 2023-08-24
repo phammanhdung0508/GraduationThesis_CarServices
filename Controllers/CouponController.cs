@@ -59,7 +59,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateCoupon(CouponCreateRequestDto couponCreateRequestDto)
         {
             await couponService.Create(couponCreateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateCoupon(CouponUpdateRequestDto couponUpdateRequestDto)
         {
             await couponService.Update(couponUpdateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateStatus(CouponStatusRequestDto couponStatusRequestDto)
         {
             await couponService.UpdateStatus(couponStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

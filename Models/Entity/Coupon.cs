@@ -16,10 +16,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string CouponDescription { get; set; }
         [Column(TypeName = "decimal(10,3)")]
         public decimal CouponValue { get; set; }
-        [Column(TypeName = "decimal(10,3)")]
-        public decimal CouponMinSpend { get; set; }
-        [Column(TypeName = "decimal(10,3)")]
-        public decimal CouponMaxSpend { get; set; }
+        // [Column(TypeName = "decimal(10,3)")]
+        // public decimal CouponMinSpend { get; set; }
+        // [Column(TypeName = "decimal(10,3)")]
+        // public decimal CouponMaxSpend { get; set; }
         public int NumberOfTimesToUse { get; set; }
         [Column(TypeName = "date")]
         public DateTime CouponStartDate { get; set; }

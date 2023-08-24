@@ -1,4 +1,3 @@
-using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.User;
 using GraduationThesis_CarServices.Models.DTO.Authentication;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+using GraduationThesis_CarServices.Models.DTO.Role;
 
 namespace GraduationThesis_CarServices.Controllers
 {
@@ -82,25 +82,53 @@ namespace GraduationThesis_CarServices.Controllers
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(encodedToken);
 
-            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+            int userId = int.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
 
             var user = userRepository.Detail(userId).Result;
 
-            if (_user is null)
+            switch (_user is null)
             {
-                throw new MyException("Please login again to get a new refresh token.", 401);
-            }
+                case true:
+                    if (user!.RefreshToken is null)
+                    {
+                        throw new MyException("refresh-token not exists.", 401);
+                    }
+                    else if (user.RefreshTokenExpires < DateTime.Now)
+                    {
+                        throw new MyException("Token expired.", 401);
+                    }
 
-            if (!_user!.RefreshToken.Equals(user!.RefreshToken))
-            {
-                throw new MyException("Invalid refresh-token.", 401);
-            }
-            else if (user.RefreshTokenExpires < DateTime.Now)
-            {
-                throw new MyException("Token expired.", 401);
-            }
+                    var loginDto = new UserLoginDto();
 
-            var _token = authenticationRepository.RecreateToken(_user);
+                    loginDto!.UserId = user.UserId;
+                    loginDto.GarageId = 0;
+                    loginDto.UserFirstName = user.UserFirstName;
+                    loginDto.UserLastName = user.UserLastName;
+                    loginDto.UserFullName = user.UserFirstName + " " + user.UserLastName;
+                    loginDto.UserImage = user.UserImage;
+                    loginDto.UserPhone = "1";
+                    loginDto.RefreshToken = user.RefreshToken;
+                    loginDto.RefreshTokenCreated = user.RefreshTokenCreated;
+                    loginDto.RefreshTokenExpires = user.RefreshTokenExpires;
+                    loginDto.RoleDto = new RoleDto(){RoleName = user.Role.RoleName};
+
+                    loginDto.UserToken = authenticationRepository.RecreateToken(loginDto);
+
+                    return Ok(loginDto);
+                case false:
+                    if (!_user!.RefreshToken.Equals(user!.RefreshToken))
+                    {
+                        throw new MyException("Invalid refresh-token.", 401);
+                    }
+                    else if (user.RefreshTokenExpires < DateTime.Now)
+                    {
+                        throw new MyException("Token expired.", 401);
+                    }
+
+                    _user.UserToken = authenticationRepository.RecreateToken(_user);
+
+                    return Ok(_user);
+            }
 
             // var newRefreshToken = authenticationRepository.RefreshToken(userId);
 
@@ -114,12 +142,9 @@ namespace GraduationThesis_CarServices.Controllers
 
             // userRepository.Update(user);
 
-            _user.UserToken = _token;
             // _user.RefreshToken = refreshToken;
             // _user.RefreshTokenCreated = refreshTokenCreated;
             // _user.RefreshTokenExpires = refreshTokenExpires;
-
-            return Ok(_user);
         }
 
         /// <summary>
@@ -185,7 +210,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> SendOTP(string recipientPhone)
         {
             await authenticationRepository.SendOTP(recipientPhone);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -196,19 +221,19 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> ValidateOTP(string otp, string recipientPhone)
         {
             await authenticationRepository.ValidateOTP(otp, recipientPhone);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
-        /// <summary>
-        /// Change the password if a user forgot.
-        /// </summary>
-        [AllowAnonymous]
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto requestDto)
-        {
-            await authenticationRepository.ChangePassword(requestDto);
-            throw new MyException("Successfully.", 200);
-        }
+        // /// <summary>
+        // /// Change the password if a user forgot.
+        // /// </summary>
+        // [AllowAnonymous]
+        // [HttpPost("change-password")]
+        // public async Task<IActionResult> ChangePassword(ChangePasswordDto requestDto)
+        // {
+        //     await authenticationRepository.ChangePassword(requestDto);
+        //     throw new MyException("Thành công.", 200);
+        // }
 
         /// <summary>
         /// Register new users.
@@ -218,19 +243,19 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<ActionResult> Register(UserRegisterRequestDto requestDto)
         {
             await authenticationRepository.UserRegister(requestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
-        /// <summary>
-        /// check if users are avaliable in data or not.
-        /// </summary>
-        [AllowAnonymous]
-        [HttpGet("check-email-exist/{recipientEmail}")]
-        public async Task<IActionResult> CheckEmailExist(string recipientEmail)
-        {
-            var email = await authenticationRepository.IsEmailExist(recipientEmail);
-            return Ok(email);
-        }
+        // /// <summary>
+        // /// check if users are avaliable in data or not.
+        // /// </summary>
+        // [AllowAnonymous]
+        // [HttpGet("check-email-exist/{recipientEmail}")]
+        // public async Task<IActionResult> CheckEmailExist(string recipientEmail)
+        // {
+        //     var email = await authenticationRepository.IsEmailExist(recipientEmail);
+        //     return Ok(email);
+        // }
 
         [AllowAnonymous]
         [HttpGet("count/{entity}")]

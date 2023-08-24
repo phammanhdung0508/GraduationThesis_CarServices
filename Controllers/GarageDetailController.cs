@@ -48,7 +48,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateGarageDetail(GarageDetailCreateRequestDto garageDetail)
         {
             await garageDetailService.Create(garageDetail);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateGarageDetail(GarageDetailUpdateRequestDto garageDetail)
         {
             await garageDetailService.Update(garageDetail);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
     }

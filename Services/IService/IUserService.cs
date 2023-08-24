@@ -8,7 +8,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<UserListResponseDto>?> View(PageDto page);
         Task<UserDetailResponseDto?> Detail(int id);
         Task Create(UserCreateRequestDto createUserDto, int? garageId);
-        Task CustomerFirstLoginUpdate(UserUpdateRequestDto updateUserDto, int userId);
+        Task<string> CustomerFirstLoginUpdate(UserUpdateRequestDto updateUserDto, int userId);
         Task UpdateStatus(UserStatusRequestDto requestDto);
         Task<CustomerDetailResponseDto> CustomerDetail(int userId);
         Task<List<CustomerListResponseDto>> SearchCustomer(string search);

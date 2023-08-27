@@ -62,7 +62,7 @@ namespace GraduationThesis_CarServices.Controllers
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
 
             await carService.Create(carCreateRequestDto, userId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateCar(CarUpdateRequestDto carUpdateRequestDto)
         {
             await carService.Update(carUpdateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
 
         }
 
@@ -86,7 +86,7 @@ namespace GraduationThesis_CarServices.Controllers
         {
 
             await carService.UpdateStatus(carStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

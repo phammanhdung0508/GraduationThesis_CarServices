@@ -30,19 +30,18 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string UserPhone { get; set; }
         [Column(TypeName = "tinyint")]
         public Gender UserGender { get; set; }
-        [Column(TypeName = "date")]
-        public DateTime? UserDateOfBirth { get; set; }
         [MaxLength(1024)]
         public string UserBio { get; set; }
         [Column(TypeName = "tinyint")]
         public Status UserStatus { get; set; }
         public string OTP { get; set; }
-        public DateTime ExpiredIn { get; set; }
+        public DateTime? ExpiredIn { get; set; }
         [Column(TypeName = "tinyint")]
         public int EmailConfirmed { get; set; }
         public int? ManagerId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string DeviceToken { get; set; }
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenCreated { get; set; }
         public DateTime RefreshTokenExpires { get; set; }

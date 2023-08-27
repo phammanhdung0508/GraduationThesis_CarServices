@@ -88,7 +88,7 @@ namespace GraduationThesis_CarServices.Controllers
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
 
             await reviewService.Create(reviewDto, userId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
 
@@ -97,18 +97,18 @@ namespace GraduationThesis_CarServices.Controllers
         // public async Task<IActionResult> UpdateReview(ReviewUpdateRequestDto reviewDto)
         // {
         //     await reviewService.Update(reviewDto);
-        //     throw new MyException("Successfully.", 200);
+        //     throw new MyException("Thành công.", 200);
         // }
 
         /// <summary>
         /// Updates a specific review status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {
             await reviewService.UpdateStatus(reviewDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

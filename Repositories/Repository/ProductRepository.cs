@@ -20,8 +20,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var product = context.ServiceDetails.Include(s => s.Service).ThenInclude(s => s.Products)
-                .Where(s => s.ServiceDetailId == serviceDetailId)
+                var product = context.ServiceDetails
+                .Include(s => s.Service).ThenInclude(s => s.Products)
+                .Where(s => s.ServiceDetailId == serviceDetailId &&
+                s.Service.Products.Any(p => p.ProductStatus.Equals(Status.Activate)))
                 .SelectMany(s => s.Service.Products).FirstOrDefault();
 
                 return product!;
@@ -104,9 +106,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.Products
-                .Where(p => p.ServiceId == serviceId && p.ProductQuantity > 0)
-                .Include(p => p.Category)
-                .Include(p => p.Service)
+                .Where(p => p.ServiceId == serviceId &&
+                p.ProductQuantity > 0 &&
+                p.ProductStatus.Equals(Status.Activate))
+                .Include(p => p.Category).Include(p => p.Service)
                 .ToListAsync();
 
                 return list;

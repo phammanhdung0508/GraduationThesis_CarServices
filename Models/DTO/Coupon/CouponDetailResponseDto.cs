@@ -1,18 +1,22 @@
-#nullable disable
-using GraduationThesis_CarServices.Enum;
-
 namespace GraduationThesis_CarServices.Models.DTO.Coupon
 {
     public class CouponDetailResponseDto
     {
-        public string CouponCode { get; set; }
-        public string CouponType { get; set; }
-        public float CouponValue { get; set; }
-        public string CouponStartDate { get; set; }
-        public string CouponEndDate { get; set; }
-        public float CouponMinSpend { get; set; }
-        public float CouponMaxSpend { get; set; }
+        public string CouponCode { get; set; } = string.Empty;
+        public string CouponType { get; set; } = string.Empty;
+        public string CouponValue { get; set; } = string.Empty;
+        public string CouponStartDate { get; set; } = string.Empty;
+        public string CouponEndDate { get; set; } = string.Empty;
         public int NumberOfTimesToTUse { get; set; }
-        public string CouponStatus { get; set; }
+        public string CouponStatus { get; set; } = string.Empty;
+        public CouponGarageInfoDto? CouponGarageInfoDto { get; set; }
+    }
+
+    public class CouponGarageInfoDto
+    {
+        public string GarageName { get; set; } = string.Empty;
+        public string Manager { get; set; } = string.Empty;
+        public string GaragePhoneNumber { get; set; } = string.Empty;
+        public string GarageAddress { get; set; } = string.Empty;
     }
 }

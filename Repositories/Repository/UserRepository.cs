@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -221,14 +222,46 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<User>> FilterByRole(PageDto page, int roleId)
+        public async Task<List<User>> FilterByRole(PageDto page, int roleId, int garageId)
         {
             try
             {
                 switch (roleId)
                 {
+                    case 35:
+                        if (garageId != 0)
+                        {
+                            var mechanicList = await context.Users.Include(u => u.Role)
+                            .Include(u => u.Mechanic).ThenInclude(u => u.GarageMechanics)
+                            .Where(u => u.RoleId != 1 &&
+                            u.RoleId != 2 &&
+                            u.RoleId != 4 &&
+                            u.RoleId != null &&
+                            u.UserStatus.Equals(Status.Activate) &&
+                            u.Mechanic.GarageMechanics.Any(g => g.GarageId == garageId)).ToListAsync();
+
+                            var managerId = await context.Users
+                            .Include(u => u.Garages).Where(u => u.RoleId == 2 &&
+                            u.Garages.Any(g => g.GarageId == garageId))
+                            .Select(u => u.UserId).FirstOrDefaultAsync();
+
+                            var staffList = await context.Users
+                            .Include(u => u.Role)
+                            .Where(u => u.RoleId == 5 &&
+                            u.ManagerId == managerId).ToListAsync();
+
+                            var newList = mechanicList.Concat(staffList);
+
+                            var list = await PagingConfiguration<User>.Get(newList.AsQueryable(), page);
+
+                            return list;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     case 245:
-                        return await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer)
+                        return await PagingConfiguration<User>.Get(context.Users
                         .Include(u => u.Role).Where(u => u.RoleId != 1 && u.RoleId != 3), page);
                     default:
                         return await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer)
@@ -254,6 +287,47 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 }
 
                 return totalBooking;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<User>, int)> GetStaffByGarage(PageDto page, int garageId)
+        {
+            try
+            {
+                var query = context.Users.Include(u => u.Garages).Include(u => u.Role)
+                .Where(u => u.Garages.Any(g => g.GarageId == garageId))
+                .AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<User>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<User>> GetManagerNotAssignByGarage()
+        {
+            try
+            {
+                var avaliablelist = await context.Users
+                .Where(u => u.RoleId == 2)
+                .Join(context.Garages, u => u.UserId, g => g.UserId, (u, g) => u).ToListAsync();
+
+                var Fulllist = await context.Users
+                .Where(u => u.RoleId == 2).ToListAsync();
+
+                var list = Fulllist.Except(avaliablelist).ToList();
+
+                return list;
             }
             catch (System.Exception)
             {

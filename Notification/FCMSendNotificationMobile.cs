@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using GraduationThesis_CarServices.Models.DTO.Exception;
@@ -19,10 +21,15 @@ namespace GraduationThesis_CarServices.Notification
             this.configuration = configuration;
         }
 
-        public async Task SendMessagesToSpecificDevices(string idToken)
+        public async Task SendMessagesToSpecificDevices(string deviceToken, string title, string body)
         {
             try
             {
+                if (deviceToken is null)
+                {
+                    throw new MyException("Device Token đang rỗng", 410);
+                }
+
                 var message = new FirebaseAdmin.Messaging.Message
                 {
                     Data = new Dictionary<string, string>
@@ -32,15 +39,16 @@ namespace GraduationThesis_CarServices.Notification
                     },
                     Notification = new FirebaseAdmin.Messaging.Notification()
                     {
-                        Title = "title",
-                        Body = "body"
+                        Title = title,
+                        Body = body
                     },
-                    Token = idToken,
+                    Token = deviceToken,
                 };
-    
+
+                var firebaseInstance = FirebaseMessaging.GetMessaging(FirebaseApp.DefaultInstance);
                 // Send a message to the device corresponding to the provided
                 // registration token.
-                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                string response = await firebaseInstance.SendAsync(message).ConfigureAwait(false);
                 // Response is a message ID string.
                 Console.WriteLine("Successfully sent message: " + response);
             }

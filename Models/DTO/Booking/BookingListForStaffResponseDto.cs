@@ -10,7 +10,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
     public class BookingListForStaffResponseDto
     {
         public int BookingId { get; set; }
-        public string CarName { get; set; }
+        public string CarLicensePlate { get; set; }
         public string CustomerName { get; set; }
         public string BookingDuration { get; set; }
         public string BookingStatus { get; set; }

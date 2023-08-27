@@ -74,7 +74,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Search service by name. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("search-services-by-name")]
         public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
@@ -104,12 +104,12 @@ namespace GraduationThesis_CarServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)
         {
             await serviceService.Create(service);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
 
         }
 
@@ -136,24 +136,31 @@ namespace GraduationThesis_CarServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-service")]
         public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
         {
             await serviceService.Update(service);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
         /// Updates a specific service status.
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status/{serviceId}")]
         public async Task<IActionResult> UpdateStatusService(int serviceId)
         {
             await serviceService.UpdateStatus(serviceId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-not-avaliable-in-garage/{garageId}")]
+        public async Task<IActionResult> GetNotSelectedServiceByGarage(int garageId)
+        {
+            var list = await serviceService.GetNotSelectedServiceByGarage(garageId);
+            return Ok(list);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -32,10 +33,10 @@ namespace GraduationThesis_CarServices.Controllers
         /// Filter Mechanics by specific garage. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("filter-mechanic-by-garage/{garageId}")]
-        public async Task<IActionResult> FilterMechanicsByGarage(int garageId)
+        [HttpPost("filter-mechanic-by-garage")]
+        public async Task<IActionResult> FilterMechanicsByGarage(PagingBookingPerGarageRequestDto requestDto)
         {
-            var list = await mechanicService.FilterMechanicsByGarage(garageId);
+            var list = await mechanicService.FilterMechanicsByGarage(requestDto);
             return Ok(list);
         }
 
@@ -108,12 +109,22 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View bookings having mechanic appplied[Admin]
+        /// View bookings having mechanic appplied [Admin]
         /// </summary>
         [HttpPost("get-booking-mechanic-applied")]
         public async Task<IActionResult> GetBookingMechanicApplied(FilterBookingByMechanicRequestDto requestDto)
         {
             var list = await mechanicService.GetBookingMechanicApplied(requestDto);
+            return Ok(list);
+        }
+    
+        /// <summary>
+        /// View bookings having mechanic appplied [Manager]
+        /// </summary>
+        [HttpGet("get-mechanic-avaliable-by-garage/{garageId}")]
+        public async Task<IActionResult> GetMechanicAvaliableByGarage(int garageId)
+        {
+            var list = await mechanicService.GetMechanicAvaliableByGarage(garageId);
             return Ok(list);
         }
     }

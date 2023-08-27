@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
@@ -70,25 +71,32 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// Filter Customer by role.
+        /// Filter Customer by role. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("filter-by-role/{roleId}")]
         public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
         {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
             switch (roleId)
             {
                 case 1:
                     var listCustomer = await userService.FilterCustomer(page);
                     return Ok(listCustomer);
                 default:
-                    var listUser = await userService.FilterUser(page, roleId);
+                    var listUser = await userService.FilterUser(page, roleId, garageId);
                     return Ok(listUser);
             }
         }
 
         /// <summary>
-        /// Creates new customer, manager, staff.
+        /// Creates new customer, manager, staff. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-user")]
@@ -107,11 +115,11 @@ namespace GraduationThesis_CarServices.Controllers
             }
 
             await userService.Create(requestDto, garageId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Creates new a mechanic.
+        /// Creates new a mechanic. [Manager]
         /// </summary>
         [Authorize(Roles = "Manager")]
         [HttpPost("create-mechanic")]
@@ -125,15 +133,15 @@ namespace GraduationThesis_CarServices.Controllers
             var garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
 
             await userService.CreateMechanic(requestDto, garageId);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Updates a specific user when they first login.
+        /// Updates a specific user. [Customer, Staff]
         /// </summary>
-        [Authorize(Roles = "Admin, Customer")]
+        [Authorize(Roles = "Customer, Staff")]
         [HttpPut("update-user")]
-        public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequestDto)
+        public async Task<IActionResult> UpdateUserFirstLogin(UserUpdateRequestDto userUpdateRequestDto)
         {
             string encodedToken = HttpContext.Items["Token"]!.ToString()!;
 
@@ -142,19 +150,44 @@ namespace GraduationThesis_CarServices.Controllers
 
             int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
 
-            await userService.CustomerFirstLoginUpdate(userUpdateRequestDto, userId);
-            throw new MyException("Successfully.", 200);
+            var refeshToken = await userService.CustomerFirstLoginUpdate(userUpdateRequestDto, userId);
+
+            if (refeshToken is not null)
+            {
+                return Ok(refeshToken);
+            }
+
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
-        /// Updates a specific user status.
+        /// Updates a specific user status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status")]
         public async Task<IActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
         {
             await userService.UpdateStatus(userStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
+        }
+
+        /// <summary>
+        /// View staff by specific Garage. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPost("get-staff-by-garage")]
+        public async Task<IActionResult> GetStaffByGarage(PagingBookingPerGarageRequestDto requestDto)
+        {
+            var list = await userService.GetStaffByGarage(requestDto)!;
+            return Ok(list);
+        }
+    
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-staff-by-garage")]
+        public async Task<IActionResult> GetManagerNotAssignByGarage()
+        {
+            var list = await userService.GetManagerNotAssignByGarage()!;
+            return Ok(list);
         }
     }
 }

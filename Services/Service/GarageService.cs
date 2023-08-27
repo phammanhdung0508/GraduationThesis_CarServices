@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
@@ -499,6 +498,32 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        // public async Task<List<Garage>>
+        public async Task<LotResponseDto> GetListLotByGarage(int garageId)
+        {
+            try
+            {
+                (var listObj, var countFree, var countBeingUsed) = await garageRepository.GetListLotByGarage(garageId);
+                var listDto = mapper.Map<List<LotList>>(listObj);
+                var lotResponse = new LotResponseDto { LotLists = listDto, FreeCount = countFree, BeingUsedCount = countBeingUsed};
+                return lotResponse;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
     }
 }

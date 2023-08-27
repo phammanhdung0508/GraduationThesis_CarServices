@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.PaymentGateway.Models;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +18,16 @@ namespace GraduationThesis_CarServices.PaymentGateway
         private readonly IConfiguration configuration;
         private readonly IMapper mapper;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly FCMSendNotificationMobile fCMSendNotificationMobile;
 
         public VNPayPaymentGateway(IConfiguration configuration, IMapper mapper,
-        DataContext context, IHttpContextAccessor httpContextAccessor)
+        DataContext context, IHttpContextAccessor httpContextAccessor, FCMSendNotificationMobile fCMSendNotificationMobile)
         {
             this.configuration = configuration;
             this.mapper = mapper;
             this.context = context;
             this.httpContextAccessor = httpContextAccessor;
+            this.fCMSendNotificationMobile = fCMSendNotificationMobile;
         }
 
         public async Task<PaymentLinkDto> Create(PaymentRequest request)
@@ -162,6 +165,13 @@ namespace GraduationThesis_CarServices.PaymentGateway
 
                         var updateBooking = await context.Bookings.Where(b => b.BookingId == payment.BookingId)
                         .ExecuteUpdateAsync(b => b.SetProperty(b => b.IsAccepted, true));
+
+                        var deviceToken = await context.Customers.Include(c => c.Cars)
+                        .Where(c => c.Cars.Any(c => c.CarId == payment.CarId))
+                        .Select(c => c.User.DeviceToken).FirstOrDefaultAsync();
+
+                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (deviceToken!, "Thông báo quan trọng:.", "Bạn đã hoàn thành đặt đơn hàng thành công.");
 
                         isSuccess = true;
                     }

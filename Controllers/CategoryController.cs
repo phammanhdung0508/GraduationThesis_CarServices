@@ -58,7 +58,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> CreateCategory(CategoryCreateRequestDto categoryCreateRequestDto)
         {
             await categoryService.Create(categoryCreateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateCategory(CategoryUpdateRequestDto categoryUpdateRequestDto)
         {
             await categoryService.Update(categoryUpdateRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> UpdateStatus(CategoryStatusRequestDto categoryStatusRequestDto)
         {
             await categoryService.UpdateStatus(categoryStatusRequestDto);
-            throw new MyException("Successfully.", 200);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

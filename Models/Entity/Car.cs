@@ -11,8 +11,6 @@ namespace GraduationThesis_CarServices.Models.Entity
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int CarId { get; set; }
         [MaxLength(20)]
-        public string CarModel { get; set; }
-        [MaxLength(20)]
         public string CarBrand { get; set; }
         [MaxLength(10)]
         public string CarLicensePlate { get; set; }

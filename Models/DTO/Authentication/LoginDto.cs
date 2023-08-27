@@ -7,6 +7,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Authentication
         public string? Email {get; set;}
         public string? Phone { get; set; }
         [DefaultValue("abc")]
-        public string Password { get; set; } = "";
+        public string Password { get; set; } = string.Empty;
+        public string? DeviceToken {get; set;} = string.Empty;
     }
 }

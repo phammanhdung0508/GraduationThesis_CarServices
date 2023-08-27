@@ -8,6 +8,7 @@ using GraduationThesis_CarServices.Models.DTO.Exception;
 using System.Diagnostics;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.Models.DTO.ServiceDetail;
+using GraduationThesis_CarServices.Mapping;
 
 namespace GraduationThesis_CarServices.Services.Service
 {
@@ -72,10 +73,19 @@ namespace GraduationThesis_CarServices.Services.Service
                     var serviceList = serviceListByGarage.Where(s => s.ServiceGroup.Equals(item) &&
                     s.ServiceDetails.Count >= 2).ToList();
 
-                    var serviceDtoList = mapper.Map<List<ServicListDto>>(serviceList);
-
                     if (serviceList.Count > 0)
                     {
+                        var serviceDtoList = mapper.Map<List<GraduationThesis_CarServices.Models.Entity.Service>, List<ServicListDto>>(serviceList,
+                        otp => otp.AfterMap((src, des) =>
+                        {
+                            for (int i = 0; i < src.Count; i++)
+                            {
+                                var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
+                                des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
+                                des[i].ServicePrice = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
+                            }
+                        }));
+
                         serviceSelectList.Add(new ServiceSelectResponseDto { ServiceGroup = item, ServicListDtos = serviceDtoList });
                     }
                     else
@@ -279,6 +289,14 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                switch (false)
+                {
+                    case var isFail when isFail == typeof(ServiceUnit).IsEnumDefined(requestDto.ServiceUnit!):
+                        throw new MyException("Dữ liệu truyền vào không đúng.", 404);
+                    case var isFail when isFail == (requestDto.ServiceGroup > 1 && requestDto.ServiceGroup <= 3):
+                        throw new MyException("Dữ liệu truyền vào không đúng.", 404);
+                }
+
                 if (await serviceRepository.IsServiceExist(requestDto.ServiceId))
                 {
                     var s = await serviceRepository.Detail(requestDto.ServiceId);
@@ -356,6 +374,33 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        //Temporary don't make delete function because there's no service status
+        public async Task<List<GetIdAndNameDto>> GetNotSelectedServiceByGarage(int garageId)
+        {
+            try
+            {
+                var listObj = await serviceRepository.GetNotSelectedServiceByGarage(garageId);
+
+                var listDto = mapper.Map<List<GetIdAndNameDto>>(listObj);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
     }
 }

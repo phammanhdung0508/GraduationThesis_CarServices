@@ -10,7 +10,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int GarageId { get; set; }
-        [MaxLength(20)]
+        [MaxLength(1024)]
         public string GarageName { get; set; }
         [MaxLength(500)]
         public string GarageAbout { get; set; }

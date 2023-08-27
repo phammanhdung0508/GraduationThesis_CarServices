@@ -31,5 +31,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<BookingCountResponseDto> CountBookingPerStatus(int? garageId);
         Task UpdateBookingDetailStatus(int bookingDetailId, int status);
         Task ConfirmBookingArePaid(int bookingId);
+        Task UpdateBookingDetailForManager(int bookingDetailId, int productId);
     }
 }

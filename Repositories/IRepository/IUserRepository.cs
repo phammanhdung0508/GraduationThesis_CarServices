@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<User?> Detail(int id);
         Task<int> Create(User user);
         Task Update(User user);
-        Task<List<User>> FilterByRole(PageDto page, int roleId);
+        Task<List<User>> FilterByRole(PageDto page, int roleId, int garageId);
         int TotalBooking(int customerId);
         Task<bool> IsUserPhoneExist(string userPhone);
         Task<bool> IsEmailExist(string userEmail);
@@ -19,5 +19,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<User?> CustomerDetail(int userId);
         Task<User?> GetUserByEmail(string userEmail);
         Task<List<User>?> SearchUser(string search, int roleId);
+        Task<(List<User>, int)> GetStaffByGarage(PageDto page, int garageId);
+        Task<List<User>> GetManagerNotAssignByGarage();
     }
 }

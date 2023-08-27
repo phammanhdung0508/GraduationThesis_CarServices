@@ -9,6 +9,7 @@ using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
+using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.Paging;
 using GraduationThesis_CarServices.PaymentGateway;
 using GraduationThesis_CarServices.Repositories.IRepository;
@@ -30,13 +31,14 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ILotRepository lotRepository;
         private readonly ICarRepository carRepository;
         private readonly IConfiguration configuration;
+        private readonly FCMSendNotificationMobile fCMSendNotificationMobile;
         //private readonly HttpClient httpClient;
         private readonly IMapper mapper;
         public BookingService(IBookingRepository bookingRepository, ILotRepository lotRepository,
         IMapper mapper, IBookingDetailRepository bookingDetailRepository, IProductRepository productRepository,
         IServiceRepository serviceRepository, IGarageRepository garageRepository, ICarRepository carRepository,
         ICouponRepository couponRepository, IMechanicRepository mechanicRepository, IConfiguration configuration,
-        IVNPayPaymentGateway iVNPayPaymentGateway)
+        IVNPayPaymentGateway iVNPayPaymentGateway, FCMSendNotificationMobile fCMSendNotificationMobile)
         {
             this.mapper = mapper;
             //httpClient = new HttpClient();
@@ -51,6 +53,7 @@ namespace GraduationThesis_CarServices.Services.Service
             this.mechanicRepository = mechanicRepository;
             this.configuration = configuration;
             this.iVNPayPaymentGateway = iVNPayPaymentGateway;
+            this.fCMSendNotificationMobile = fCMSendNotificationMobile;
         }
 
         public async Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId)
@@ -167,7 +170,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
 
-                (var listObj, var count) = await bookingRepository.FilterBookingByStatus(status, page);
+                (var listObj, var count) = await bookingRepository.FilterBookingByStatus(status, page, requestDto.GarageId);
 
                 var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
 
@@ -718,8 +721,21 @@ namespace GraduationThesis_CarServices.Services.Service
                 for (int i = 0; i < listService!.Count; i++)
                 {
                     //get default product id
+                    decimal productPrice = 0;
                     decimal servicePrice = serviceRepository.GetPrice(listService[i].ServiceDetailId);
-                    decimal productPrice = productRepository.GetPrice(listService[i].ProductId);
+
+                    var product = new Product();
+                    if (listService[i].ProductId > 0)
+                    {
+                        product = productRepository.GetDefaultProduct(listService[i].ProductId);
+                    }
+
+                    if (product is not null)
+                    {
+                        productPrice = product.ProductPrice;
+                        product.ProductQuantity--;
+                        await productRepository.Update(product);
+                    }
 
                     originalPrice += productPrice + servicePrice;
 
@@ -728,7 +744,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         ProductPrice = productPrice,
                         ServicePrice = servicePrice,
                         BookingServiceStatus = BookingServiceStatus.NotStart,
-                        ProductId = listService[i].ProductId,
+                        ProductId = product is null ? null : product.ProductId,
                         ServiceDetailId = listService[i].ServiceDetailId,
                         //MechanicId = mechanicId,
                         BookingId = bookingId
@@ -972,6 +988,12 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     if (isCreateNew == true)
                     {
+                        if (product is not null)
+                        {
+                            product.ProductQuantity--;
+                            await productRepository.Update(product);
+                        }
+
                         var bookingDetail = new BookingDetail()
                         {
                             ProductPrice = productPrice,
@@ -1057,6 +1079,67 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task UpdateBookingDetailForManager(int bookingDetailId, int productId)
+        {
+            try
+            {
+                var bookingDetailList = new List<BookingDetail>();
+
+                var bookingDetail = await bookingDetailRepository.Detail(bookingDetailId);
+
+                if (bookingDetail is not null)
+                {
+                    var productOld = bookingDetail.Product;
+
+                    var productNew = await productRepository.Detail(productId);
+
+                    bookingDetail.ProductId = productNew!.ProductId;
+                    bookingDetail.ProductPrice = productNew.ProductPrice;
+                    bookingDetail.UpdatedAt = DateTime.Now;
+                    bookingDetailList.Add(bookingDetail);
+
+                    await bookingDetailRepository.Update(bookingDetailList);
+
+                    var booking = await bookingRepository.Detail((int)bookingDetail.BookingId!);
+
+                    decimal originalPrice = 0;
+                    decimal totalPrice = 0;
+                    decimal finalPrice = 0;
+
+                    foreach (var bookingDetailItem in booking!.BookingDetails)
+                    {
+                        originalPrice += bookingDetailItem.ProductPrice + bookingDetailItem.ServicePrice;
+                    }
+
+                    totalPrice = originalPrice - booking.DiscountPrice;
+                    finalPrice = totalPrice - 100;
+
+                    booking.OriginalPrice = originalPrice;
+                    booking.TotalPrice = totalPrice;
+                    booking.FinalPrice = finalPrice;
+
+                    await bookingRepository.Update(booking);
+                }
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task ConfirmAcceptedBooking(bool isAccepted, int bookingId)
         {
             try
@@ -1106,13 +1189,24 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được hủy khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
+                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được hủy.");
+
                         break;
                     case BookingStatus.CheckIn:
+                        if (booking.BookingTime > DateTime.Now.AddMinutes(40))
+                        {
+                            throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
+                        }
+
                         switch (false)
                         {
                             case var isFalse when isFalse == (booking.BookingStatus == BookingStatus.Pending):
                                 throw new MyException("Đơn hàng chỉ có thể được check-in khi đang ở trạng thái chờ được xử lí.", 404);
                         }
+
+                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
 
                         await UpdateLotStatus(LotStatus.Assigned, booking!);
 
@@ -1122,15 +1216,15 @@ namespace GraduationThesis_CarServices.Services.Service
                     //     break;
                     case BookingStatus.Completed:
 
-                        // switch (false)
-                        // {
-                        //     case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
-                        //         throw new MyException("Tất cả dịch vụ cần phải được hoàn tất.", 404);
-                        //     case var isAccepted when isAccepted == (booking.IsAccepted is true):
-                        //         throw new MyException("Đơn hàng vẫn chưa được chấp nhận bởi người chủ xe.", 404);
-                        //     case var isFalse when isFalse == (booking.BookingStatus == BookingStatus.CheckIn):
-                        //         throw new MyException("Đơn hàng chỉ có thể được hoàn thành khi đang ở trạng thái đang được xử lí.", 404);
-                        // }
+                        switch (false)
+                        {
+                            case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
+                                throw new MyException("Tất cả dịch vụ cần phải được hoàn tất.", 404);
+                            case var isAccepted when isAccepted == (booking.IsAccepted is true):
+                                throw new MyException("Đơn hàng vẫn chưa được chấp nhận bởi người chủ xe.", 404);
+                            case var isFalse when isFalse == (booking.BookingStatus == BookingStatus.CheckIn):
+                                throw new MyException("Đơn hàng chỉ có thể được hoàn thành khi đang ở trạng thái đang được xử lí.", 404);
+                        }
 
                         var bookingDetails = await bookingDetailRepository.FilterBookingDetailByBookingId(bookingId);
 
@@ -1153,12 +1247,28 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         var mechanicList = await mechanicRepository.GetMechanicByBooking(bookingId);
 
-                        var mechanicUpdateStatusList = mechanicList.Select(m => { m.MechanicStatus = MechanicStatus.Available; return m; }).ToList();
+                        var mechanicUpdateStatusList = mechanicList
+                        .Select(m => { m.MechanicStatus = MechanicStatus.Available; return m; }).ToList();
 
                         foreach (var item in mechanicUpdateStatusList)
                         {
+                            var bookingMechanic = await mechanicRepository.DetailBookingMechanic(item.MechanicId, bookingId);
+
+                            if (bookingMechanic is not null)
+                            {
+                                bookingMechanic!.BookingMechanicStatus = Status.Deactivate;
+                                await mechanicRepository.UpdateBookingMechanic(bookingMechanic);
+                            }
+                            else
+                            {
+                                throw new MyException("Thợ không tồn tại", 404);
+                            }
+
                             await mechanicRepository.Update(item);
                         }
+
+                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã hoàn tất.");
 
                         break;
                     case BookingStatus.CheckOut:
@@ -1175,6 +1285,28 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking!.BookingStatus = bookingStatus;
 
                 await bookingRepository.Update(booking);
+
+                // if (bookingStatus.Equals(BookingStatus.Canceled))
+                // {
+                //     if (booking.BookingTime > DateTime.Now.AddHours(4))
+                //     {
+                //         throw new MyException("Đơn hàng của bạn sẽ được hoàn trả 100.000 VND hãy liên hệ với Garage để được hoàn tiền.", 404);
+                //     }
+
+                //     if (booking.BookingTime <= DateTime.Now.AddHours(4))
+                //     {
+                //         throw new MyException("Xin lỗi đơn hàng của bạn không được hoàn 100.000 VND đặt cọc trước đó vì đã quá thời hạn quy định.", 404);
+                //     }
+                // }
+
+                // if (booking.BookingTime > DateTime.Now.AddHours(4))
+                // {
+                //     throw new MyException("Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.", 404);
+                // }
+                // else
+                // {
+                //     throw new MyException("Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.", 404);
+                // }
 
                 watch.Stop();
                 Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -1469,7 +1601,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 (var amountEarned, var serviceEarned,
                 var productEarned, var sumPaid, var sumUnpaid,
-                var countPaid, var countUnpaid) = await bookingRepository.CountRevenue(garageId);
+                var countPaid, var countUnpaid, var checkInCount, var checkOutCount) = await bookingRepository.CountRevenue(garageId);
 
                 var revenue = new BookingRevenueResponseDto
                 {
@@ -1479,7 +1611,9 @@ namespace GraduationThesis_CarServices.Services.Service
                     SumPaid = FormatCurrency.FormatNumber(sumPaid) + " VND",
                     SumUnPaid = FormatCurrency.FormatNumber(sumUnpaid) + " VND",
                     CountPaid = countPaid,
-                    CountUnpaid = countUnpaid
+                    CountUnpaid = countUnpaid,
+                    CountCheckInt = checkInCount,
+                    CountCheckOut = checkOutCount
                 };
 
                 return revenue;
@@ -1715,6 +1849,13 @@ namespace GraduationThesis_CarServices.Services.Service
                     case var isFalse when isFalse != ((bookingDetail!.BookingServiceStatus != 0) && status == 0):
                         throw new MyException("Không thể chuyển trạng thái lỗi hoặc xong thành chưa bắt đầu!", 404);
                 }
+
+                var booking = await bookingRepository.Detail((int)bookingDetail.BookingId!)
+                ?? throw new MyException("Đơn hàng không tồn tại.", 404);
+
+                await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                        $"Đơn của bạn đã hoàn thành {bookingDetail.ServiceDetail.Service.ServiceName}.");
 
                 bookingDetail.BookingServiceStatus = (BookingServiceStatus)status;
                 bookingDetail.UpdatedAt = DateTime.Now;

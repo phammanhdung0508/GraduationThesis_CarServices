@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.User;
@@ -72,17 +73,24 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Filter Customer by role. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("filter-by-role/{roleId}")]
         public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
         {
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+
             switch (roleId)
             {
                 case 1:
                     var listCustomer = await userService.FilterCustomer(page);
                     return Ok(listCustomer);
                 default:
-                    var listUser = await userService.FilterUser(page, roleId);
+                    var listUser = await userService.FilterUser(page, roleId, garageId);
                     return Ok(listUser);
             }
         }
@@ -155,12 +163,31 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific user status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status")]
         public async Task<IActionResult> UpdateStatus(UserStatusRequestDto userStatusRequestDto)
         {
             await userService.UpdateStatus(userStatusRequestDto);
             throw new MyException("Thành công.", 200);
+        }
+
+        /// <summary>
+        /// View staff by specific Garage. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPost("get-staff-by-garage")]
+        public async Task<IActionResult> GetStaffByGarage(PagingBookingPerGarageRequestDto requestDto)
+        {
+            var list = await userService.GetStaffByGarage(requestDto)!;
+            return Ok(list);
+        }
+    
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-staff-by-garage")]
+        public async Task<IActionResult> GetManagerNotAssignByGarage()
+        {
+            var list = await userService.GetManagerNotAssignByGarage()!;
+            return Ok(list);
         }
     }
 }

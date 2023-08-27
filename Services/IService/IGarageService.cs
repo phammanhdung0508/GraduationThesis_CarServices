@@ -17,5 +17,6 @@ namespace GraduationThesis_CarServices.Services.IService
        Task<List<GarageListMobileMapResponseDto>> GetAllCoordinates();
        Task<List<GarageAdminListResponseDto>> ViewAllForAdmin(PageDto page);
        Task<List<GarageListResponseDto>?> FilterGaragesNearMe(LocationRequestDto requestDto);
+       Task<LotResponseDto> GetListLotByGarage(int garageId);
     }
 }

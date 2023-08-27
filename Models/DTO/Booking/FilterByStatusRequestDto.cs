@@ -10,5 +10,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         [DefaultValue(10)]
         public int PageSize { get; set; }
         public BookingStatus BookingStatus { get; set; }
+        public int? GarageId { get; set; }
     }
 }

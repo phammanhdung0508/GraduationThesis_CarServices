@@ -117,20 +117,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         //     }
         // }
 
-        public async Task<List<Mechanic>> FilterMechanicAvailableByGarageId(int garageId)
+        public async Task<(List<Mechanic>, int, List<int>)> FilterMechanicAvailableByGarageId(int garageId, PageDto page)
         {
             try
             {
-                var list = await context.Mechanics
+                var query = context.Mechanics.Include(m => m.User)
                 .Join(context.GarageMechanics.Where(w => w.GarageId == garageId),
                 m => m.MechanicId, w => w.MechanicId, (m, w) => new { Mechanic = m, WorkingSchedule = w }).Select(m => m.Mechanic)
-                /*.OrderBy(m => m.TotalBookingApplied*/.ToListAsync();
+                /*.OrderBy(m => m.TotalBookingApplied*/.AsQueryable();
 
-                return list;
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Mechanic>.Get(query, page);
+
+                var totalBookingList = new List<int>();
+
+                foreach (var item in list)
+                {
+                    var totalBooking = await query.Where(s => s.MechanicId == item.MechanicId)
+                    .SelectMany(s => s.BookingMechanics).GroupBy(s => s.BookingId).CountAsync();
+
+                    totalBookingList.Add(totalBooking);
+                }
+
+                return (list, count, totalBookingList);
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
@@ -285,6 +298,27 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 g.GarageMechanics.Any(g => g.GarageId == garageId)).ToListAsync();
 
                 return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Booking?> GetBookingMechanicCurrentWorkingOn(int mechanicId)
+        {
+            try
+            {
+                var booking = await context.BookingMechanics
+                .Include(b => b.Booking).ThenInclude(b => b.Car)
+                .Include(b => b.Booking).ThenInclude(b => b.Garage)
+                .Include(b => b.Mechanic)
+                .Where(b => b.Mechanic.MechanicId == mechanicId &&
+                b.BookingMechanicStatus.Equals(Status.Activate) &&
+                b.Mechanic.MechanicStatus.Equals(MechanicStatus.NotAvailable))
+                .Select(s => s.Booking).FirstOrDefaultAsync();
+
+                return booking;
             }
             catch (System.Exception)
             {

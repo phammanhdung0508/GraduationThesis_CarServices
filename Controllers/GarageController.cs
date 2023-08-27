@@ -125,7 +125,7 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Thành công.", 200);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Updates a specific garage location.
         /// </summary>
         [Authorize(Roles = "Admin")]
@@ -134,6 +134,17 @@ namespace GraduationThesis_CarServices.Controllers
         {
             await garageService.UpdateLocation(locationUpdateRequestDto);
             throw new MyException("Thành công.", 200);
+        }*/
+
+        /// <summary>
+        /// Get list lot in specific Garage. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("view-lots-by-garage/{garageId}")]
+        public async Task<IActionResult> GetListLotByGarage(int garageId)
+        {
+            var lot = await garageService.GetListLotByGarage(garageId);
+            return Ok(lot);
         }
     }
 }

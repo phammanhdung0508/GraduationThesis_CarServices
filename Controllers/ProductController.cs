@@ -19,7 +19,7 @@ namespace GraduationThesis_CarServices.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("get-available-products-for-service/{serviceId}")]
         public async Task<IActionResult> GetAvailableProductsForService(int serviceId)
         {
@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(productList);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("search-products-by-name")]
         public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
@@ -35,7 +35,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(productList);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-product/{id}")]
         public async Task<IActionResult> DetailProduct(int id)
         {
@@ -43,7 +43,7 @@ namespace GraduationThesis_CarServices.Controllers
             return Ok(product);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("view-all-product")]
         public async Task<IActionResult> ViewProduct(PageDto page)
         {
@@ -70,7 +70,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-product")]
         public async Task<IActionResult> CreateProduct(ProductCreateRequestDto product)
         {
@@ -98,7 +98,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///
         /// </remarks>
         
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-product")]
         public async Task<IActionResult> Update(ProductUpdateRequestDto product)
         {
@@ -109,7 +109,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific product status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status/{productId}")]
         public async Task<IActionResult> UpdateStatus(int productId)
         {

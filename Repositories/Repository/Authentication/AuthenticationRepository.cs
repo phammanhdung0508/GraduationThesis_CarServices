@@ -173,8 +173,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository.Authentication
 
                 if (!string.IsNullOrEmpty(login.DeviceToken))
                 {
-                    var deviceToken = await context.Users.Where(u => u.UserId == _user.UserId)
-                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.DeviceToken, login.DeviceToken));
+                    // var deviceToken = await context.Users.Where(u => u.UserId == _user.UserId)
+                    // .ExecuteUpdateAsync(s => s.SetProperty(u => u.DeviceToken, login.DeviceToken));
+                    _user.DeviceToken = login.DeviceToken;
+                    await userRepository.Update(_user);
                     user.DeviceToken = login.DeviceToken;
                 }
                 else

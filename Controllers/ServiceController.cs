@@ -74,7 +74,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Search service by name. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("search-services-by-name")]
         public async Task<IActionResult> SearchByName(SearchByNameRequestDto requestDto)
         {
@@ -104,7 +104,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto service)
         {
@@ -136,7 +136,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-service")]
         public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto service)
         {
@@ -147,7 +147,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific service status.
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status/{serviceId}")]
         public async Task<IActionResult> UpdateStatusService(int serviceId)
         {
@@ -155,5 +155,12 @@ namespace GraduationThesis_CarServices.Controllers
             throw new MyException("Thành công.", 200);
         }
 
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-not-avaliable-in-garage/{garageId}")]
+        public async Task<IActionResult> GetNotSelectedServiceByGarage(int garageId)
+        {
+            var list = await serviceService.GetNotSelectedServiceByGarage(garageId);
+            return Ok(list);
+        }
     }
 }

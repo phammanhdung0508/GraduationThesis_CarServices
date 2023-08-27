@@ -21,5 +21,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<byte[]?> GetGarageVersionNumber(int garageId);
         Task<int?> GetManagerId(int? garageId);
         Task CreateGarageMechanic(GarageMechanic garageMechanic);
+        Task<(List<Lot>, int, int)> GetListLotByGarage(int garageId);
     }
 }

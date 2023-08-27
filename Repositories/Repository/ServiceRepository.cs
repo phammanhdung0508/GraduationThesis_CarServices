@@ -203,8 +203,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var services = await context.GarageDetails.Where(g => g.GarageId == garageId)
-                .Include(g => g.Service).ThenInclude(s => s.ServiceDetails).Select(g => g.Service).ToListAsync();
+                var services = await context.GarageDetails
+                .Include(g => g.Service).ThenInclude(s => s.ServiceDetails)
+                .Where(g => g.GarageId == garageId &&
+                g.Service.ServiceStatus.Equals(Status.Activate))
+                .Select(g => g.Service).ToListAsync();
 
                 return services;
             }
@@ -221,6 +224,28 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await context.BookingDetails
                 .Include(b => b.ServiceDetail).ThenInclude(s => s.Service).ThenInclude(s => s.Products)
                 .Where(b => b.BookingId == bookingId).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Service>> GetNotSelectedServiceByGarage(int garageId)
+        {
+            try
+            {
+                var avaliablelist = await context.GarageDetails
+                .Where(g => g.GarageId == garageId)
+                .Join(context.Services, g => g.ServiceId, s => s.ServiceId, (g, s) => new {g, s})
+                .Where(gs => gs.g.ServiceId == gs.s.ServiceId)
+                .Select(gs => gs.s).ToListAsync();
+
+                var Fulllist = await context.Services.ToListAsync();
+
+                var list = Fulllist.Except(avaliablelist).ToList();
 
                 return list;
             }

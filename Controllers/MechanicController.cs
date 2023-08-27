@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Mechanic;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -32,10 +33,10 @@ namespace GraduationThesis_CarServices.Controllers
         /// Filter Mechanics by specific garage. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("filter-mechanic-by-garage/{garageId}")]
-        public async Task<IActionResult> FilterMechanicsByGarage(int garageId)
+        [HttpPost("filter-mechanic-by-garage")]
+        public async Task<IActionResult> FilterMechanicsByGarage(PagingBookingPerGarageRequestDto requestDto)
         {
-            var list = await mechanicService.FilterMechanicsByGarage(garageId);
+            var list = await mechanicService.FilterMechanicsByGarage(requestDto);
             return Ok(list);
         }
 

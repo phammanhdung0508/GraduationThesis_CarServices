@@ -158,6 +158,7 @@ namespace GraduationThesis_bookingServices.Controllers
         /// <summary>
         /// Filter Bookings by booking status. [Admin]
         /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("filter-booking-by-status")]
         public async Task<IActionResult> FilterBookingByStatus(FilterByStatusRequestDto requestDto)
         {
@@ -275,13 +276,11 @@ namespace GraduationThesis_bookingServices.Controllers
         ///         "Pending": 0,
         ///         "Canceled": 1,
         ///         "CheckIn": 2,
-        ///         "Processing": 3,
         ///         "Completed": 4,
-        ///         "CheckOut": 5,
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Staff, Amdmin, Manager")]
+        [Authorize(Roles = "Customer, Staff, Admin, Manager")]
         [HttpPut]
         [Route("update-status-booking/{bookingId}&{bookingStatus}")]
         // [AcceptVerbs("PUT")]
@@ -340,7 +339,7 @@ namespace GraduationThesis_bookingServices.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff, Admin, Manager")]
         [HttpPut("update-booking-detail-status/{bookingDetailId}&{status}")]
         public async Task<IActionResult> UpdateBookingDetailStatus(int bookingDetailId, int status)
         {
@@ -353,6 +352,18 @@ namespace GraduationThesis_bookingServices.Controllers
         public async Task<IActionResult> ConfirmBookingArePaid(int bookingId)
         {
             await bookingService.ConfirmBookingArePaid(bookingId);
+            throw new MyException("Thành công.", 200);
+        }
+
+
+        /// <summary>
+        /// Update a specific booking detail. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Manager, Admin")]
+        [HttpPut("update-booking-detail-for-manager/{bookingDetailId}&{productId}")]
+        public async Task<IActionResult> UpdateBookingDetailForManager(int bookingDetailId, int productId)
+        {
+            await bookingService.UpdateBookingDetailForManager(bookingDetailId, productId);
             throw new MyException("Thành công.", 200);
         }
     }

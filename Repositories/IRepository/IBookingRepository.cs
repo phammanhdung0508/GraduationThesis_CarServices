@@ -16,9 +16,9 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<(List<Booking>, int count)> FilterBookingByGarage(int garageId, PageDto page);
         Task<(List<Booking>?, int count)> FilterBookingByCustomer(int userId, PageDto page);
         Task<(List<Booking>?, int count)> SearchByBookingCode(int userId, string search, PageDto page);
-        Task<(List<Booking>?, int count)> FilterBookingByStatus(BookingStatus? status, PageDto page);
+        Task<(List<Booking>?, int count)> FilterBookingByStatus(BookingStatus? status, PageDto page, int? garageId);
         Task<(List<Booking>?, int count)> FilterBookingStatusAndDate(DateTime? dateFrom, DateTime? dateTo, BookingStatus? status, PageDto page);
-        Task<(decimal, decimal, decimal, decimal, decimal, int, int)> CountRevenue(int garageId);
+        Task<(decimal, decimal, decimal, decimal, decimal, int, int, int, int)> CountRevenue(int garageId);
         Task<List<Booking>> FilterBookingByStatusCustomer(int bookingStatus, int userId);
         Task<Booking> DetailBookingForCustomer(int bookingId);
         Task<List<Booking>> FilterBookingByGarage(int garageId);

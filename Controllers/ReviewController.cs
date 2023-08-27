@@ -103,7 +103,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// Updates a specific review status. [Admin]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPut("update-status-review")]
         public async Task<IActionResult> UpdateStatusReview(ReviewStatusRequestDto reviewDto)
         {

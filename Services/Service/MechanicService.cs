@@ -63,11 +63,11 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<MechanicListResponseDto>> FilterMechanicsByGarage(int garageId)
+        public async Task<GenericObject<List<MechanicListResponseDto>>> FilterMechanicsByGarage(PagingBookingPerGarageRequestDto requestDto)
         {
             try
             {
-                var isGarageExist = await garageRepository.IsGarageExist(garageId);
+                var isGarageExist = await garageRepository.IsGarageExist(requestDto.GarageId);
 
                 switch (false)
                 {
@@ -75,7 +75,20 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("The garage doesn't exist.", 404);
                 }
 
-                var list = mapper.Map<List<MechanicListResponseDto>>(await mechanicRepository.FilterMechanicAvailableByGarageId(garageId));
+                var page = new PageDto { PageIndex = requestDto.PageIndex, PageSize = requestDto.PageSize };
+
+                (var listObj, var count, var listTotal) = await mechanicRepository.FilterMechanicAvailableByGarageId(requestDto.GarageId, page);
+
+                var listDto = mapper.Map<List<MechanicListResponseDto>>(listObj,
+                obj => obj.AfterMap((src, des) =>
+                {
+                    for (int i = 0; i < des.Count; i++)
+                    {
+                        des[i].TotalOrders = listTotal[i];
+                    }
+                }));
+
+                var list = new GenericObject<List<MechanicListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -134,6 +147,10 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var countBookingMechanicApplied = await mechanicRepository.CountBookingMechanicApplied(mechanic!.MechanicId);
 
+                var bookingCurrent = await mechanicRepository.GetBookingMechanicCurrentWorkingOn(mechanic!.MechanicId);
+
+                var bookingDto = bookingCurrent is null ? null : mapper.Map<BookingMechanicCurrentWorkingOn>(bookingCurrent);
+
                 return false switch
                 {
                     var isExist when isExist == (mechanic is not null) => throw new MyException("The mechanic doesn't exist.", 404),
@@ -141,6 +158,7 @@ namespace GraduationThesis_CarServices.Services.Service
                                     obj => obj.AfterMap((src, des) =>
                                     {
                                         des.TotalBookingApplied = countBookingMechanicApplied;
+                                        des.BookingMechanicCurrentWorkingOn = bookingDto;
                                     })),
                 };
             }

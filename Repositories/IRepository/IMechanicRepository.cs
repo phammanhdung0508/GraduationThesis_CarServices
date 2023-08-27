@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<Mechanic?> Detail(int mechanicId);
         Task<bool> IsMechanicExist(int mechanicId);
         // Task<List<WorkingSchedule>> FilterWorkingSchedulesByMechanicId(int mechanicId);
-        Task<List<Mechanic>> FilterMechanicAvailableByGarageId(int garageId);
+        Task<(List<Mechanic>, int, List<int>)> FilterMechanicAvailableByGarageId(int garageId, PageDto page);
         Task<int> Create(Mechanic mechanic);
         Task Update(Mechanic mechanic);
         Task<BookingMechanic?> DetailBookingMechanic(int mechanicId, int bookingId);
@@ -22,5 +22,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
 
         Task<(List<Booking>?, int count)> GetBookingMechanicApplied(int userId, PageDto page);
         Task<List<Mechanic>> GetMechanicAvaliableByGarage(int garageId);
+        Task<Booking?> GetBookingMechanicCurrentWorkingOn(int mechanicId);
     }
 }

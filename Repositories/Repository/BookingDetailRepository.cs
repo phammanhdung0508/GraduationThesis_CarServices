@@ -64,7 +64,10 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var bookingDetail = await context.BookingDetails
-                .Where(b => b.BookingDetailId == bookingDetailId).FirstOrDefaultAsync();
+                .Where(b => b.BookingDetailId == bookingDetailId)
+                .Include(b => b.Product)
+                .Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                .FirstOrDefaultAsync();
 
                 return bookingDetail;
             }

@@ -1,3 +1,4 @@
+using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -235,6 +236,27 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 context.GarageMechanics.Add(garageMechanic);
                 await context.SaveChangesAsync();
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Lot>, int, int)> GetListLotByGarage(int garageId)
+        {
+            try
+            {
+                var query = context.Lots
+                .Where(l => l.GarageId == garageId).AsQueryable();
+
+                var list = await query.ToListAsync();
+
+                var countFree = await query.Where(l => l.LotStatus.Equals(LotStatus.Free)).CountAsync();
+
+                var countBeingUsed = await query.Where(l => l.LotStatus.Equals(LotStatus.BeingUsed)).CountAsync();
+
+                return (list, countFree, countBeingUsed);
             }
             catch (System.Exception)
             {

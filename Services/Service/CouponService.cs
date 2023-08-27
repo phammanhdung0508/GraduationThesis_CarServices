@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Coupon;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
@@ -135,12 +136,12 @@ namespace GraduationThesis_CarServices.Services.Service
                 var endDate = DateTime.Parse(requestDto.CouponEndDate);
 
                 switch(false){
-                    case var isFalse when isFalse == (requestDto.CouponMinSpend <= requestDto.CouponMaxSpend):
-                        throw new MyException("Số tiền tối thiểu phải nhỏ hơn hoặc bằng số tiền tối đa của coupon.", 14);
+                    case var isFalse when isFalse == (requestDto.CouponValue > 0):
+                        throw new MyException("Giá trị coupon không được nhận số 0.", 404);
                     case var isFalse when isFalse == (requestDto.NumberOfTimesToUse > 0):
-                        throw new MyException("Số lần sử dụng coupon không được nhận số 0.", 14);
+                        throw new MyException("Số lần sử dụng coupon không được nhận số 0.", 404);
                     case var isFalse when isFalse == (startDate < endDate):
-                        throw new MyException("Ngày kết thúc coupon không được lớn hơn ngày bắt đầu coupon.", 14);
+                        throw new MyException("Ngày kết thúc coupon không được lớn hơn ngày bắt đầu coupon.", 404);
                 }
 
                 var coupon = mapper.Map<CouponCreateRequestDto, Coupon>(requestDto,

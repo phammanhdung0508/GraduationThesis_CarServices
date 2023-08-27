@@ -8,7 +8,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IMechanicService
     {
         Task<GenericObject<List<MechanicListResponseDto>>> View(PageDto page);
-        Task<List<MechanicListResponseDto>> FilterMechanicsByGarage(int garageId);
+        Task<GenericObject<List<MechanicListResponseDto>>> FilterMechanicsByGarage(PagingBookingPerGarageRequestDto requestDto);
         Task<List<MechanicListResponseDto>> FilterMechanicsByBooking(int bookingId);
         Task<MechanicDetailResponseDto?> Detail(int mechanicId);
         Task<List<MechanicWorkForBookingResponseDto>> GetMechanicByBooking(int bookingId);

@@ -1,4 +1,3 @@
-using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
@@ -20,7 +19,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Coupons.AsQueryable();
+                var query = context.Coupons
+                .Include(c => c.Garage).AsQueryable();
 
                 var count = await query.CountAsync();
 
@@ -38,8 +38,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
+                var now = DateTime.Now;
+
                 var list = await context.Coupons
-                .Where(c => c.GarageId == garageId).ToListAsync();
+                .Where(c => c.GarageId == garageId //fix
+                // &&
+                // c.NumberOfTimesToUse > 0 &&
+                // c.CouponStartDate < now &&
+                // c.CouponEndDate > now
+                ).ToListAsync();
+
                 return list;
             }
             catch (Exception)

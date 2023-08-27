@@ -79,11 +79,11 @@ namespace GraduationThesis_CarServices.Services.Service
                         otp => otp.AfterMap((src, des) =>
                         {
                             for (int i = 0; i < src.Count; i++)
-                                {
-                                    var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
-                                    des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
-                                    des[i].ServicePrice = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
-                                }
+                            {
+                                var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
+                                des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
+                                des[i].ServicePrice = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
+                            }
                         }));
 
                         serviceSelectList.Add(new ServiceSelectResponseDto { ServiceGroup = item, ServicListDtos = serviceDtoList });
@@ -374,6 +374,33 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        //Temporary don't make delete function because there's no service status
+        public async Task<List<GetIdAndNameDto>> GetNotSelectedServiceByGarage(int garageId)
+        {
+            try
+            {
+                var listObj = await serviceRepository.GetNotSelectedServiceByGarage(garageId);
+
+                var listDto = mapper.Map<List<GetIdAndNameDto>>(listObj);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
     }
 }

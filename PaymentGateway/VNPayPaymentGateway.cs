@@ -166,6 +166,9 @@ namespace GraduationThesis_CarServices.PaymentGateway
                         var updateBooking = await context.Bookings.Where(b => b.BookingId == payment.BookingId)
                         .ExecuteUpdateAsync(b => b.SetProperty(b => b.IsAccepted, true));
 
+                        var updatebooking = await context.Bookings.Where(b => b.BookingId == payment.BookingId)
+                        .ExecuteUpdateAsync(b => b.SetProperty(b => b.BookingStatus, BookingStatus.Pending));
+
                         var deviceToken = await context.Customers.Include(c => c.Cars)
                         .Where(c => c.Cars.Any(c => c.CarId == payment.CarId))
                         .Select(c => c.User.DeviceToken).FirstOrDefaultAsync();

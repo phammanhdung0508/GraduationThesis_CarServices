@@ -19,5 +19,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<List<Service>> GetServiceByServiceGroup(int garageId);
         Task<List<BookingDetail>> GetServiceForBookingDetail(int bookingId);
         Task<List<Service>> GetNotSelectedServiceByGarage(int garageId);
+        Task<List<Service>> GetALLIdAndNameByGarage();
     }
 }

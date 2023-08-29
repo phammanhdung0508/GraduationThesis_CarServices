@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using AutoMapper;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Geocoder;
@@ -39,11 +40,11 @@ namespace GraduationThesis_CarServices.Services.Service
                     for (int i = 0; i < des.Count; i++)
                     {
                         (var totalServices, var totalOrders) = garageRepository.GetServicesAndBookingsPerGarage(src![i].GarageId);
+                        des[i].TotalOrders = totalOrders;
+                        des[i].TotalServices = totalServices;
                         if (list![i].Reviews.Count != 0)
                         {
                             des[i].Rating = list[i].Reviews.Sum(r => r.Rating) / list[i].Reviews.Count;
-                            des[i].TotalOrders = totalOrders;
-                            des[i].TotalServices = totalServices;
                         }
                         des[i].GarageStatus = src![i].GarageStatus.ToString();
                     }
@@ -211,6 +212,53 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                var formatPhone = string.Empty;
+
+                if (requestDto.GarageContactInformation is not null &&
+                requestDto.GarageContactInformation.Length == 10)
+                {
+                    formatPhone = "+84" + requestDto.GarageContactInformation.Substring(1, 9);
+                }
+
+                var isExist = await garageRepository.IsGaragePhoneExist(formatPhone);
+                var isAddressExist = await garageRepository.IsGarageAddressExist(requestDto.GarageAddress);
+                int openAt, closeAt;
+
+                if (string.IsNullOrEmpty(requestDto.OpenAt) &&
+                string.IsNullOrEmpty(requestDto.CloseAt))
+                {
+                    throw new MyException("Giờ mở cửa và giờ đóng cửa không được để trống.", 404);
+                }
+                else
+                {
+                    openAt = DateTime.ParseExact("0" + requestDto.OpenAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+                    closeAt = DateTime.ParseExact("0" + requestDto.CloseAt, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay.Hours;
+                }
+
+                switch (false)
+                {
+                    case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.GarageContactInformation):
+                        throw new MyException("Số điện thoại không được để trống.", 404);
+                    case var isFalse when isFalse == requestDto.GarageContactInformation!.All(char.IsDigit):
+                        throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
+                    case var isFalse when isFalse == (requestDto.GarageContactInformation!.Length == 10):
+                        throw new MyException("Số điện thoại phải được nhập đủ 10 số.", 404);
+                    case var isFalse when isFalse == (requestDto.GarageAddress!.Length <= 50):
+                        throw new MyException("Địa chỉ không quá 50 kí tự.", 404);
+                    case var isFalse when isFalse == (requestDto.GarageWard!.Length <= 50):
+                        throw new MyException("Phường không quá 50 kí tự.", 404);
+                    case var isFalse when isFalse == (requestDto.GarageDistrict!.Length <= 50):
+                        throw new MyException("Quận không quá 50 kí tự.", 404);
+                    case var isFalse when isFalse == (requestDto.GarageCity!.Length <= 50):
+                        throw new MyException("Thành phố không quá 50 kí tự.", 404);
+                    case var isFalse when isFalse != isExist:
+                        throw new MyException("Số điện thoại đã tồn tại.", 404);
+                    case var isFalse when isFalse != isAddressExist:
+                        throw new MyException("Địa chỉ Garage đã tồn tại.", 404);
+                    case var isFalse when isFalse == (openAt < closeAt):
+                        throw new MyException("Giờ mở cửa không được phép nhỏ hơn giờ đóng cửa.", 404);
+                }
+
                 (double Latitude, double Longitude) = await geocoderConfiguration
                 .GeocodeAsync(requestDto.GarageAddress, requestDto.GarageCity, requestDto.GarageDistrict, requestDto.GarageWard);
 
@@ -504,8 +552,37 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 (var listObj, var countFree, var countBeingUsed) = await garageRepository.GetListLotByGarage(garageId);
                 var listDto = mapper.Map<List<LotList>>(listObj);
-                var lotResponse = new LotResponseDto { LotLists = listDto, FreeCount = countFree, BeingUsedCount = countBeingUsed};
+                var lotResponse = new LotResponseDto { LotLists = listDto, FreeCount = countFree, BeingUsedCount = countBeingUsed };
                 return lotResponse;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<List<GetIdAndNameDto>> GetAllIdAndNameByGarage()
+        {
+            try
+            {
+                var list = await garageRepository.GetAll();
+
+                var listDto = mapper.Map<List<GetIdAndNameDto>>(list);
+
+                return listDto;
             }
             catch (Exception e)
             {

@@ -27,7 +27,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var list = await PagingConfiguration<Booking>.Get(query.Include(b => b.Car)
                 .ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(b => b.Garage), page);
 
-                return (list, count);
+                return (list.OrderByDescending(b => b.BookingId).ToList(), count);
             }
             catch (Exception)
             {
@@ -283,25 +283,33 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 b.BookingStatus.Equals(BookingStatus.Completed) &&
                 b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
 
-                var amountEarned = await query.SumAsync(b => b.FinalPrice);
+                var amountEarned = await query.SumAsync(b => b.FinalPrice + 100);
 
-                var serviceEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ServicePrice);
+                var serviceEarned = await query.SelectMany(b => b.BookingDetails)
+                .Where(s => s.BookingServiceStatus.Equals(BookingServiceStatus.Done))
+                .SumAsync(d => d.ServicePrice);
 
-                var productEarned = await query.SelectMany(b => b.BookingDetails).SumAsync(d => d.ProductPrice);
+                var productEarned = await query.SelectMany(b => b.BookingDetails)
+                .Where(s => s.BookingServiceStatus.Equals(BookingServiceStatus.Done))
+                .SumAsync(d => d.ProductPrice);
 
                 var paidQuery = context.Bookings.Where(b => b.GarageId == garageId &&
+                b.BookingStatus.Equals(BookingStatus.Completed) &&
                 b.PaymentStatus.Equals(PaymentStatus.Paid)).AsQueryable();
 
                 var countPaid = await paidQuery.CountAsync();
 
-                var sumPaid = await paidQuery.SumAsync(b => b.FinalPrice);
+                var sumPaid = await paidQuery.SumAsync(b => b.FinalPrice + 100);
 
                 var unpaidQuery = context.Bookings.Where(b => b.GarageId == garageId &&
-                b.PaymentStatus.Equals(PaymentStatus.Unpaid)).AsQueryable();
+                ((b.BookingStatus.Equals(BookingStatus.CheckIn) && b.PaymentStatus.Equals(PaymentStatus.Unpaid)) || 
+                (b.BookingStatus.Equals(BookingStatus.Pending) && b.PaymentStatus.Equals(PaymentStatus.Unpaid)) ||
+                (b.BookingStatus.Equals(BookingStatus.Completed) && b.PaymentStatus.Equals(PaymentStatus.Unpaid))
+                )).AsQueryable();
 
                 var countUnpaid = await unpaidQuery.CountAsync();
 
-                var sumUnpaid = await unpaidQuery.SumAsync(b => b.FinalPrice);
+                var sumUnpaid = await unpaidQuery.SumAsync(b => b.FinalPrice + 100);
 
                 var checkInCount = await context.Bookings.Where(b => b.GarageId == garageId &&
                 b.BookingStatus.Equals(BookingStatus.CheckIn) &&
@@ -317,7 +325,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<(int, int, int)> CountBookingPerStatus(int? garageId)
+        public async Task<(int, int, int, int)> CountBookingPerStatus(int? garageId)
         {
             try
             {
@@ -332,9 +340,11 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var canceled = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Canceled)).CountAsync();
 
-                var completed = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Completed)).CountAsync();
+                var completed = await query.Where(b => b.BookingStatus.Equals(BookingStatus.CheckIn)).CountAsync();
 
-                return (pending, canceled, completed);
+                var checkin = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Completed)).CountAsync();
+
+                return (pending, canceled, checkin, completed);
             }
             catch (System.Exception)
             {
@@ -413,6 +423,22 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 await context.Bookings.Where(b => b.BookingId == bookingId)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.PaymentStatus, PaymentStatus.Paid));
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+    
+        public async Task<int?> GetRole(int userId)
+        {
+            try
+            {
+                var roleId = await context.Users
+                .Where(u => u.UserId == userId)
+                .Select(u => u.RoleId).FirstOrDefaultAsync();
+
+                return roleId;
             }
             catch (System.Exception)
             {

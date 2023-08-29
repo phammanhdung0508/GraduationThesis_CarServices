@@ -146,5 +146,13 @@ namespace GraduationThesis_CarServices.Controllers
             var lot = await garageService.GetListLotByGarage(garageId);
             return Ok(lot);
         }
+
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-all-id-and-name-garage")]
+        public async Task<IActionResult> GetAllIdAndNameByGarage()
+        {
+            var lot = await garageService.GetAllIdAndNameByGarage();
+            return Ok(lot);
+        }
     }
 }

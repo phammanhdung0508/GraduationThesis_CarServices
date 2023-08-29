@@ -222,7 +222,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<User>> FilterByRole(PageDto page, int roleId, int garageId)
+        public async Task<(List<User>?, int)> FilterByRole(PageDto page, int roleId, int garageId)
         {
             try
             {
@@ -252,20 +252,63 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                             var newList = mechanicList.Concat(staffList);
 
-                            var list = await PagingConfiguration<User>.Get(newList.AsQueryable(), page);
+                            var count_ = newList.Count();
 
-                            return list;
+                            var list_ = await PagingConfiguration<User>.Get(newList.AsQueryable(), page);
+
+                            return (list_, count_);
                         }
                         else
                         {
-                            return null;
+                            return (null, 0);
                         }
+                    case 24:
+                        var __query = context.Users
+                        .Include(u => u.Role).Where(u => u.RoleId != 1 &&
+                        u.RoleId != 3 &&
+                        u.RoleId != 5).AsQueryable();
+
+                        var __count = await __query.CountAsync();
+
+                        var __list = await PagingConfiguration<User>.Get(__query, page);
+
+                        return (__list, __count);
                     case 245:
-                        return await PagingConfiguration<User>.Get(context.Users
-                        .Include(u => u.Role).Where(u => u.RoleId != 1 && u.RoleId != 3), page);
+                        var query = context.Users
+                        .Include(u => u.Role).Where(u => u.RoleId != 1 && u.RoleId != 3).AsQueryable();
+
+                        var count = await query.CountAsync();
+
+                        var list = await PagingConfiguration<User>.Get(query, page);
+
+                        return (list, count);
                     default:
-                        return await PagingConfiguration<User>.Get(context.Users.Include(u => u.Customer)
-                        .Include(u => u.Role).Where(u => u.RoleId == roleId), page);
+                        IQueryable<User> _query;
+
+                        if (roleId == 5 &&
+                        garageId != 0)
+                        {
+                            var managerId = await context.Users
+                            .Include(u => u.Garages).Where(u => u.RoleId == 2 &&
+                            u.Garages.Any(g => g.GarageId == garageId))
+                            .Select(u => u.UserId).FirstOrDefaultAsync();
+
+                            _query = context.Users.Include(u => u.Customer)
+                            .Include(u => u.Garages)
+                            .Include(u => u.Role).Where(u => u.RoleId == roleId &&
+                            u.ManagerId == managerId).AsQueryable();
+                        }
+                        else
+                        {
+                            _query = context.Users.Include(u => u.Customer)
+                            .Include(u => u.Role).Where(u => u.RoleId == roleId).AsQueryable();
+                        }
+
+                        var _count = await _query.CountAsync();
+
+                        var _list = await PagingConfiguration<User>.Get(_query, page);
+
+                        return (_list, _count);
                 }
             }
             catch (System.Exception)
@@ -334,5 +377,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
+
     }
 }

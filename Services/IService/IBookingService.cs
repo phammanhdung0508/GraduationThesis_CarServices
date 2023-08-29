@@ -13,7 +13,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<BookingDetailResponseDto?> Detail(int id);
         Task CreateForManager(BookingCreateForManagerRequestDto requestDto);
         Task<PaymentLinkDto> Create(BookingCreateRequestDto requestDto);
-        Task UpdateStatus(int bookingId, BookingStatus bookingStatus);
+        Task UpdateStatus(int bookingId, BookingStatus bookingStatus, int userId);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
         Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto);
         Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId, int garageId);

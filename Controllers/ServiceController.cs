@@ -162,5 +162,13 @@ namespace GraduationThesis_CarServices.Controllers
             var list = await serviceService.GetNotSelectedServiceByGarage(garageId);
             return Ok(list);
         }
+
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpGet("get-all-id-and-name-garage")]
+        public async Task<IActionResult> GetALLIdAndNameByGarage()
+        {
+            var list = await serviceService.GetALLIdAndNameByGarage();
+            return Ok(list);
+        }
     }
 }

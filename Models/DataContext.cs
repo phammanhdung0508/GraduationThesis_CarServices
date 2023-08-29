@@ -378,6 +378,18 @@ namespace GraduationThesis_CarServices.Models
                 new Product{ProductId = 8, ProductName="Radiator conditioner (Vệ sinh điều hòa tản nhiệt)",
                     ProductImage="https://www.pro-tec-baltija.com/md5docupload/222fae770c434bc6fc23647307f6aab2.jpg",
                     ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=1},
+
+                new Product{ProductId = 9, ProductName="Oil System Cleaner (Vệ sinh động cơ) 350ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=32, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+
+                new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=30, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+
+                new Product{ProductId = 1, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=34, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
             };
 
             modelBuilder.Entity<Product>().HasData(list);

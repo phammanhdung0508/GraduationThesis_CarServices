@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task CreateBookingMechanic(BookingMechanic bookingMechanic);
         Task UpdateBookingMechanic(BookingMechanic bookingMechanic);
         Task<BookingMechanic?> IsCustomerPickMainMechanic(DateTime date);
-        Task<int> CountBookingMechanicApplied(int mechanicId);
+        Task<int> CountBookingMechanicApplied(int userId);
 
         Task<(List<Booking>?, int count)> GetBookingMechanicApplied(int userId, PageDto page);
         Task<List<Mechanic>> GetMechanicAvaliableByGarage(int garageId);

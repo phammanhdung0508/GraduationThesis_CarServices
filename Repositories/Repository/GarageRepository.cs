@@ -1,6 +1,6 @@
+using System.Text.RegularExpressions;
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
-using GraduationThesis_CarServices.Models.DTO.Garage;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.DTO.Search;
 using GraduationThesis_CarServices.Models.Entity;
@@ -262,6 +262,27 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 throw;
             }
+        }
+
+        public async Task<bool> IsGaragePhoneExist(string formatPhone)
+        {
+            var isExist = await context.Garages
+            .Where(g => g.GarageContactInformation.Equals(formatPhone))
+            .AnyAsync();
+
+            return isExist;
+        }
+
+        public async Task<bool> IsGarageAddressExist(string address)
+        {
+            var _address = Regex.Replace(address, @"\s", "").ToLower();
+
+            var garages = await context.Garages.ToListAsync();
+
+            var isExist =  garages
+            .Any(g => Regex.Replace(g.GarageContactInformation, @"\s", "").ToLower() == _address);
+
+            return isExist;
         }
     }
 }

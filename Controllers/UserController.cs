@@ -74,15 +74,26 @@ namespace GraduationThesis_CarServices.Controllers
         /// Filter Customer by role. [Admin]
         /// </summary>
         [Authorize(Roles = "Admin, Manager")]
-        [HttpPost("filter-by-role/{roleId}")]
-        public async Task<IActionResult> FilterByRole(PageDto page, int roleId)
+        [HttpPost("filter-by-role/{roleId}&{garageId}")]
+        public async Task<IActionResult> FilterByRole(PageDto page, int roleId, int garageId)
         {
+            /*int? _garageId = 0;
+
             string encodedToken = HttpContext.Items["Token"]!.ToString()!;
 
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(encodedToken);
 
-            int garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+            var roleName = token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value;
+
+            if (roleName == "Admin")
+            {
+                _garageId = garageId;
+            }
+            else
+            {
+                _garageId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "garageId")!.Value);
+            }*/
 
             switch (roleId)
             {
@@ -181,9 +192,9 @@ namespace GraduationThesis_CarServices.Controllers
             var list = await userService.GetStaffByGarage(requestDto)!;
             return Ok(list);
         }
-    
+
         [Authorize(Roles = "Admin, Manager")]
-        [HttpGet("get-staff-by-garage")]
+        [HttpGet("get-manager-not-assign-by-garage")]
         public async Task<IActionResult> GetManagerNotAssignByGarage()
         {
             var list = await userService.GetManagerNotAssignByGarage()!;

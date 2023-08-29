@@ -145,7 +145,7 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 var mechanic = await mechanicRepository.Detail(mechanicId);
 
-                var countBookingMechanicApplied = await mechanicRepository.CountBookingMechanicApplied(mechanic!.MechanicId);
+                var countBookingMechanicApplied = await mechanicRepository.CountBookingMechanicApplied(mechanic!.UserId);
 
                 var bookingCurrent = await mechanicRepository.GetBookingMechanicCurrentWorkingOn(mechanic!.MechanicId);
 
@@ -332,7 +332,9 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("MechanicId and BookingId dont take 0 value.", 404);
                 }
 
-                var bookingMechanic = await mechanicRepository.DetailBookingMechanic(requestDto.MechanicId, requestDto.BookingId);
+                var mechanic = await mechanicRepository.Detail(requestDto.MechanicId);
+
+                var bookingMechanic = await mechanicRepository.DetailBookingMechanic(mechanic!.MechanicId, requestDto.BookingId);
                 if (bookingMechanic is not null)
                 {
                     bookingMechanic!.BookingMechanicStatus = Status.Deactivate;

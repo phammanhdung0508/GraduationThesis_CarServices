@@ -1171,7 +1171,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus)
+        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus, int userId)
         {
             try
             {
@@ -1189,15 +1189,41 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được hủy khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
-                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
-                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được hủy.");
+                        var _car = await carRepository.Detail(booking.Car.CarId);
+
+                        _car!.CarBookingStatus = CarStatus.Available;
+
+                        await carRepository.Update(_car);
+
+                        var roleId = await bookingRepository.GetRole(userId);
+
+                        if (roleId == 2 ||
+                        roleId == 4)
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Đơn hàng đã hủy bởi Garage hãy liên hệ Garage để biết chi tiết.");
+                        }
+
+                        if (booking.BookingTime > DateTime.Now.AddHours(4))
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.");
+                        }
+                        else
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.");
+                        }
 
                         break;
                     case BookingStatus.CheckIn:
-                        if (booking.BookingTime > DateTime.Now.AddMinutes(40))
-                        {
-                            throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
-                        }
+                        // if (booking.BookingTime > DateTime.Now.AddMinutes(40))
+                        // {
+                        //     throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
+                        // }
 
                         switch (false)
                         {
@@ -1205,10 +1231,10 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được check-in khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
+                        await UpdateLotStatus(LotStatus.Assigned, booking!);
+
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
-
-                        await UpdateLotStatus(LotStatus.Assigned, booking!);
 
                         break;
                     // case BookingStatus.Processing:
@@ -1283,30 +1309,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 booking!.BookingStatus = bookingStatus;
+                booking.UpdatedAt = DateTime.Now;
 
                 await bookingRepository.Update(booking);
-
-                // if (bookingStatus.Equals(BookingStatus.Canceled))
-                // {
-                //     if (booking.BookingTime > DateTime.Now.AddHours(4))
-                //     {
-                //         throw new MyException("Đơn hàng của bạn sẽ được hoàn trả 100.000 VND hãy liên hệ với Garage để được hoàn tiền.", 404);
-                //     }
-
-                //     if (booking.BookingTime <= DateTime.Now.AddHours(4))
-                //     {
-                //         throw new MyException("Xin lỗi đơn hàng của bạn không được hoàn 100.000 VND đặt cọc trước đó vì đã quá thời hạn quy định.", 404);
-                //     }
-                // }
-
-                // if (booking.BookingTime > DateTime.Now.AddHours(4))
-                // {
-                //     throw new MyException("Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.", 404);
-                // }
-                // else
-                // {
-                //     throw new MyException("Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.", 404);
-                // }
 
                 watch.Stop();
                 Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -1351,10 +1356,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     var lot = await lotRepository.GetLotByLicensePlate((int)booking.GarageId!, booking.Car.CarLicensePlate)
                     ?? throw new MyException("Xin lỗi hệ thống không tìm thấy xe của bạn.", 404);
 
-                    if (lot.LotStatus == LotStatus.Free)
-                    {
-                        lot.IsAssignedFor = null;
-                    }
+                    lot.LotStatus = LotStatus.Free;
+                    lot.IsAssignedFor = null;
 
                     await lotRepository.Update(lot);
                     break;
@@ -1809,7 +1812,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     Pending = count.Item1,
                     Canceled = count.Item2,
-                    Completed = count.Item3
+                    CheckIn = count.Item3,
+                    Completed = count.Item4
                 };
 
                 return countDto;
@@ -1853,9 +1857,18 @@ namespace GraduationThesis_CarServices.Services.Service
                 var booking = await bookingRepository.Detail((int)bookingDetail.BookingId!)
                 ?? throw new MyException("Đơn hàng không tồn tại.", 404);
 
-                await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                if (status == 2)
+                {
+                    await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                        $"Đơn của bạn đã xảy ra lỗi ở {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                }
+                else
+                {
+                    await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:",
                         $"Đơn của bạn đã hoàn thành {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                }
 
                 bookingDetail.BookingServiceStatus = (BookingServiceStatus)status;
                 bookingDetail.UpdatedAt = DateTime.Now;
@@ -1886,6 +1899,13 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                var booking = await bookingRepository.Detail(bookingId);
+
+                if (!booking!.BookingStatus.Equals(BookingStatus.Completed))
+                {
+                    throw new MyException("Đơn hàng phải được hoàn thành trước khi thanh toán.", 404);
+                }
+
                 await bookingRepository.ConfirmBookingArePaid(bookingId);
             }
             catch (Exception e)

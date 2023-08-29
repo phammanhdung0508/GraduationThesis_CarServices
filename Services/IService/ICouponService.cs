@@ -8,6 +8,7 @@ namespace GraduationThesis_CarServices.Services.IService
     {
         Task<GenericObject<List<CouponListResponseDto>>> View(PageDto page);
         Task<List<FilterCouponByGarageResponseDto>?> FilterGarageCoupon(int garageId);
+        Task<GenericObject<List<FilterCouponByGarageResponseDto>>> FilterGarageCouponForAdmin(int garageId);
         Task<CouponDetailResponseDto?> Detail(int id);
         Task Create(CouponCreateRequestDto requestDto);
         Task Update(CouponUpdateRequestDto requestDto);

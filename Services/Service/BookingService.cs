@@ -430,14 +430,14 @@ namespace GraduationThesis_CarServices.Services.Service
                     CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours, dateSelect);
                 });
 
-                var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
-                .Select(l => DateTime.Parse(l.Hour).TimeOfDay.Hours).Order().ToList();
-                var sequenceLength = 1;
+                // var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
+                // .Select(l => DateTime.Parse(l.Hour).TimeOfDay.Hours).Order().ToList();
+                // var sequenceLength = 1;
 
-                await Task.Run(() =>
-                {
-                    UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours, requestDto.TotalEstimatedTimeServicesTake);
-                });
+                // await Task.Run(() =>
+                // {
+                //     UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours, requestDto.TotalEstimatedTimeServicesTake);
+                // });
 
                 watch.Stop();
                 Debug.WriteLine($"\nTotal run time (Milliseconds): {watch.ElapsedMilliseconds}\n");
@@ -1205,7 +1205,14 @@ namespace GraduationThesis_CarServices.Services.Service
                             "Đơn hàng đã hủy bởi Garage hãy liên hệ Garage để biết chi tiết.");
                         }
 
-                        if (booking.BookingTime > DateTime.Now.AddHours(4))
+                        var _timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                        var _isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), _timeZone);
+
+                        var _bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, _timeZone);
+
+                        var _current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZone);
+
+                        if (!(DateTime.Now.Day == booking.BookingTime.Day))
                         {
                             await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                             (booking.Car.Customer.User.DeviceToken, "Thông báo:",
@@ -1220,10 +1227,17 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         break;
                     case BookingStatus.CheckIn:
-                        // if (booking.BookingTime > DateTime.Now.AddMinutes(40))
-                        // {
-                        //     throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
-                        // }
+                        // var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                        // var isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone);
+
+                        // var bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, timeZone);
+
+                        // var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+                        if (!(DateTime.Now.Day == booking.BookingTime.Day))
+                        {
+                            throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
+                        }
 
                         switch (false)
                         {

@@ -65,7 +65,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var isExist = await context.Users.Where(u => u.UserEmail.Equals(userEmail)).AnyAsync();
+                var list = await context.Users.Select(u => u.UserEmail).ToListAsync();
+
+                var isExist = list.Any(l => l.Equals(userEmail));
 
                 return isExist;
             }

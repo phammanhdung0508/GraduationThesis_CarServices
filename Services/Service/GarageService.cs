@@ -495,7 +495,7 @@ namespace GraduationThesis_CarServices.Services.Service
             try
             {
                 const double earthRadiusInKm = 6371.01;
-                var unfilteredGarages = await garageRepository.GetAll();
+                var unfilteredGarages = await garageRepository.GetAllGarage();
                 var filteredGarages = new List<Garage>();
                 foreach (var garage in unfilteredGarages!)
                 {

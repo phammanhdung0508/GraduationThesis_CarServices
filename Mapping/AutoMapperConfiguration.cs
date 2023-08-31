@@ -136,7 +136,7 @@ namespace GraduationThesis_CarServices.Mapping
                 // .ForMember(des => des.CouponGarageDto, obj => obj.MapFrom(src => src.Coupons))
                 // .ForMember(des => des.GarageDetailGarageDto, obj => obj.MapFrom(src => src.GarageDetails))
                 .ForMember(des => des.GarageFullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity))
-                .ForMember(des => des.HoursOfOperation, obj => obj.MapFrom(src => "From " + src!.OpenAt + " to " + src.CloseAt))
+                .ForMember(des => des.HoursOfOperation, obj => obj.MapFrom(src => "Từ " + src!.OpenAt + " đến " + src.CloseAt))
                 .ForMember(des => des.Rating, obj => obj.MapFrom((src, des) =>
                 {
                     return src.Reviews.Count != 0 ? src.Reviews.Sum(r => r.Rating) / src.Reviews.Count : 0;
@@ -151,7 +151,7 @@ namespace GraduationThesis_CarServices.Mapping
 
                     return presentTime switch
                     {
-                        var time when TimeSpan.Compare(presentTime, openAt).Equals(1) && TimeSpan.Compare(presentTime, closeAt).Equals(-1) => "Closed",
+                        var time when TimeSpan.Compare(presentTime, openAt).Equals(1) && TimeSpan.Compare(presentTime, closeAt).Equals(-1) => "Open",
                         var time when TimeSpan.Compare(presentTime, closeAt).Equals(1) || TimeSpan.Compare(presentTime, openAt).Equals(-1) => "Open",
                         _ => "N/A",
                     };

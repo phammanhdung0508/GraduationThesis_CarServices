@@ -384,7 +384,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("Mật khẩu xác nhận không khớp.", 404);
                 }
 
-                if (requestDto.UserEmail is not null)
+                if (!string.IsNullOrEmpty(requestDto.UserEmail))
                 {
                     encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail!);
                 }
@@ -453,9 +453,10 @@ namespace GraduationThesis_CarServices.Services.Service
                         await carRepository.Create(car);
                         break;
                     case 2:
-                        if (await userRepository.IsEmailExist(encryptEmail))
+                        var isEmailExist = await userRepository.IsEmailExist(encryptEmail);
+                        if (isEmailExist == true)
                         {
-                            throw new MyException("Tài khoản của bạn không tồn tại.", 404);
+                            throw new MyException("Tài khoản đã tồn tại.", 404);
                         }
 
                         if (garageId is null)

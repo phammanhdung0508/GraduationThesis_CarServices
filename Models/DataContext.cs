@@ -383,13 +383,21 @@ namespace GraduationThesis_CarServices.Models
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
                     ProductUnit=ProductUnit.Bottle, ProductPrice=32, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
 
-                new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 300ml",
+                new Product{ProductId = 10, ProductName="Oil System Cleaner (Vệ sinh động cơ) 300ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
                     ProductUnit=ProductUnit.Bottle, ProductPrice=30, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
 
-                new Product{ProductId = 1, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
+                new Product{ProductId = 11, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
                     ProductUnit=ProductUnit.Bottle, ProductPrice=34, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                
+                new Product{ProductId = 12, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+
+                new Product{ProductId = 13, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
             };
 
             modelBuilder.Entity<Product>().HasData(list);

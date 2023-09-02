@@ -101,7 +101,7 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.Id, obj => obj.MapFrom(src => src.GarageId))
                 .ForMember(des => des.Name, obj => obj.MapFrom(src => src.GarageName + ". " + src.GarageAddress));
             CreateMap<Lot, LotList>()
-                .ForMember(des => des.IsAssignedFor, obj => obj.MapFrom(src => string.IsNullOrEmpty(src.IsAssignedFor) ? "N/A" : src.IsAssignedFor))
+                .ForMember(des => des.IsAssignedFor, obj => obj.MapFrom(src => string.IsNullOrEmpty(src.IsAssignedFor) ? "Không có" : src.IsAssignedFor))
                 .ForMember(des => des.LotStatus, obj => obj.MapFrom((src, des) => {
                     switch (src.LotStatus)
                     {

@@ -239,7 +239,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var avaliablelist = await context.GarageDetails
                 .Where(g => g.GarageId == garageId)
-                .Join(context.Services, g => g.ServiceId, s => s.ServiceId, (g, s) => new {g, s})
+                .Join(context.Services, g => g.ServiceId, s => s.ServiceId, (g, s) => new { g, s })
                 .Where(gs => gs.g.ServiceId == gs.s.ServiceId)
                 .Select(gs => gs.s).ToListAsync();
 
@@ -251,6 +251,21 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<List<Service>> GetALLIdAndNameByGarage()
+        {
+            try
+            {
+                var list = await context.Services.ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                
                 throw;
             }
         }

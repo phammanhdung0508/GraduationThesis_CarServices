@@ -349,35 +349,55 @@ namespace GraduationThesis_CarServices.Models
             var list = new List<Product>{
                 new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
 
                 new Product{ProductId = 2, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
                     ProductImage="https://down-vn.img.susercontent.com/file/0c60eba492310c8f98ef3b73011c659b",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
 
                 new Product{ProductId = 3, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 350ml ",
                     ProductImage="https://salt.tikicdn.com/cache/w400/ts/product/eb/f5/9d/8357d880b50985b5d5bcef7715e02a27.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
 
                 new Product{ProductId = 4, ProductName="Nano Engine Super Protection (Nano bảo vệ động cơ) 250ml",
                     ProductImage="https://pronanotex.com/wp-content/uploads/2016/11/NanoEngineSuperProtection-1.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=16, CategoryId=2},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductStatus=Status.Activate, ServiceId=16, CategoryId=2},
 
                 new Product{ProductId = 5, ProductName="Oxicat Oxygen Sensor & Catalytic (Vệ sinh cảm biến oxy và catalytic) 300ml",
                     ProductImage="https://m.media-amazon.com/images/I/61m+XWXThFL.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
 
                 new Product{ProductId = 6, ProductName="Throttle Body Cleaner (Vệ sinh họng ga) 280ml",
                     ProductImage="https://crcindustries.com.au/media/catalog/product/cache/628e20d88205b96f2e2f6bc42ae35fbb/6/e/6e33c61b31cd1e9013976610ca82741895d12a73db6d67342cf7b023e578aaa9.jpeg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
 
                 new Product{ProductId = 7, ProductName="Radiator Flush (Vệ sinh hệ thống làm mát) 300ml",
                     ProductImage="https://abro.com/wp-content/uploads/2020/07/RF-505-RADIATOR-FLUSH.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
 
                 new Product{ProductId = 8, ProductName="Radiator conditioner (Vệ sinh điều hòa tản nhiệt)",
                     ProductImage="https://www.pro-tec-baltija.com/md5docupload/222fae770c434bc6fc23647307f6aab2.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductQuantity=100, ProductStatus=Status.Activate, ServiceId=15, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductStatus=Status.Activate, ServiceId=15, CategoryId=1},
+
+                new Product{ProductId = 9, ProductName="Oil System Cleaner (Vệ sinh động cơ) 350ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=32, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+
+                new Product{ProductId = 10, ProductName="Oil System Cleaner (Vệ sinh động cơ) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=30, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+
+                new Product{ProductId = 11, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=34, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                
+                new Product{ProductId = 12, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+
+                new Product{ProductId = 13, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 300ml",
+                    ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
             };
 
             modelBuilder.Entity<Product>().HasData(list);
@@ -690,7 +710,6 @@ namespace GraduationThesis_CarServices.Models
                 bookingFaker.RuleFor(b => b.BookingId, i)
                     .RuleFor(b => b.BookingCode, f => f.Random.Replace("##?#???#?"))
                     .RuleFor(b => b.BookingTime, f => f.Date.Soon())
-                    .RuleFor(b => b.PaymentMethod, f => "Cash")
                     .RuleFor(b => b.OriginalPrice, f => f.Random.Int(100, 1000))
                     .RuleFor(b => b.DiscountPrice, f => f.Random.Int(00, 30))
                     .RuleFor(b => b.TotalPrice, (f, g) => g.OriginalPrice - g.DiscountPrice)

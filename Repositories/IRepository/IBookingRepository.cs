@@ -23,7 +23,8 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<Booking> DetailBookingForCustomer(int bookingId);
         Task<List<Booking>> FilterBookingByGarage(int garageId);
         Task<List<Booking>> FilterListBookingByGarageAndDate(int garageId, DateTime date);
-        Task<(int, int, int)> CountBookingPerStatus(int? garageId);
+        Task<(int, int, int, int)> CountBookingPerStatus(int? garageId);
         Task ConfirmBookingArePaid(int bookingId);
+        Task<int?> GetRole(int userId);
     }
 }

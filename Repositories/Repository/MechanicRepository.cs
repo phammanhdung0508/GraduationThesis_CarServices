@@ -56,12 +56,14 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                             .Include(m => m.User).Include(m => m.BookingMechanics).Include(m => m.GarageMechanics)
                             .Where(w => w.Level.Equals(MechanicLevel.Level3.ToString()) &&
                             w.MechanicStatus == MechanicStatus.Available &&
+                            w.User.UserStatus == Status.Activate &&
                             w.GarageMechanics.Any(g => g.GarageId == garageId)).ToListAsync();
                     case false:
                         return await context.Mechanics
                             .Include(m => m.User).Include(m => m.BookingMechanics).Include(m => m.GarageMechanics)
                             .Where(w => !w.Level.Equals(MechanicLevel.Level3.ToString()) &&
                             w.MechanicStatus == MechanicStatus.Available &&
+                            w.User.UserStatus == Status.Activate &&
                             w.GarageMechanics.Any(g => g.GarageId == garageId)).ToListAsync();
                 }
             }
@@ -224,7 +226,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var bookingMechanic = await context.BookingMechanics.Include(m => m.Mechanic)
-                .Where(b => b.Mechanic.UserId == mechanicId &&
+                .Where(b => b.Mechanic.MechanicId == mechanicId &&
                 b.BookingMechanicStatus.Equals(Status.Activate) &&
                 b.BookingId == bookingId).FirstOrDefaultAsync();
 
@@ -251,11 +253,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<int> CountBookingMechanicApplied(int mechanicId)
+        public async Task<int> CountBookingMechanicApplied(int userId)
         {
             try
             {
-                var count = await context.BookingMechanics.Where(b => b.MechanicId == mechanicId).CountAsync();
+                var count = await context.BookingMechanics
+                .Include(b => b.Mechanic).Where(b => b.Mechanic.UserId == userId).CountAsync();
 
                 return count;
             }
@@ -269,12 +272,12 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Bookings
-                .Include(b => b.Car)
-                .ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(g => g.Garage)
-                .Include(m => m.BookingMechanics)
-                .ThenInclude(m => m.Mechanic)
-                .Where(b => b.BookingMechanics.Any(m => m.Mechanic.UserId == userId)).AsQueryable();
+                var query = context.BookingMechanics
+                .Include(b => b.Booking).ThenInclude(b => b.Car)
+                .ThenInclude(c => c.Customer).ThenInclude(c => c.User)
+                .Include(b => b.Booking).ThenInclude(g => g.Garage)
+                .Include(b => b.Mechanic)
+                .Where(b => b.Mechanic.UserId == userId).Select(b => b.Booking).AsQueryable();
 
                 var count = await query.CountAsync();
 
@@ -284,7 +287,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
@@ -295,6 +297,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Mechanics.Include(m => m.GarageMechanics).Include(m => m.User)
                 .Where(g => g.MechanicStatus.Equals(MechanicStatus.Available) &&
+                g.User.UserStatus.Equals(Status.Activate) &&
                 g.GarageMechanics.Any(g => g.GarageId == garageId)).ToListAsync();
 
                 return list;

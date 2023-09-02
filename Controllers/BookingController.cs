@@ -286,7 +286,14 @@ namespace GraduationThesis_bookingServices.Controllers
         // [AcceptVerbs("PUT")]
         public async Task<IActionResult> UpdateBookingStatus([FromRoute] int bookingId, [FromRoute] int bookingStatus)
         {
-            await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus);
+            string encodedToken = HttpContext.Items["Token"]!.ToString()!;
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(encodedToken);
+
+            int userId = Int32.Parse(token.Claims.FirstOrDefault(c => c.Type == "userId")!.Value);
+
+            await bookingService.UpdateStatus(bookingId, (BookingStatus)bookingStatus, userId);
             throw new MyException("Thành công.", 200);
         }
 

@@ -94,7 +94,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> AddAvaliableMechanicToBooking(EditMechanicBookingRequestDto requestDto)
         {
             await mechanicService.AddAvaliableMechanicToBooking(requestDto);
-            throw new MyException("Successfully", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace GraduationThesis_CarServices.Controllers
         public async Task<IActionResult> RemoveMechanicfromBooking(EditMechanicBookingRequestDto requestDto)
         {
             await mechanicService.RemoveMechanicfromBooking(requestDto);
-            throw new MyException("Successfully", 200);
+            throw new MyException("Thành công.", 200);
         }
 
         /// <summary>

@@ -107,7 +107,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.Products
                 .Where(p => p.ServiceId == serviceId &&
-                p.ProductQuantity > 0 &&
                 p.ProductStatus.Equals(Status.Activate))
                 .Include(p => p.Category).Include(p => p.Service)
                 .ToListAsync();

@@ -42,8 +42,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var list = await context.Coupons
                 .Where(c => c.GarageId == garageId //fix
-                // &&
-                // c.NumberOfTimesToUse > 0 &&
+                &&
+                c.NumberOfTimesToUse > 0
                 // c.CouponStartDate < now &&
                 // c.CouponEndDate > now
                 ).ToListAsync();

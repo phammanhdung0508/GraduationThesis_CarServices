@@ -14,9 +14,9 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateStatus(UserStatusRequestDto requestDto);
         Task<CustomerDetailResponseDto> CustomerDetail(int userId);
         Task<List<CustomerListResponseDto>> SearchCustomer(string search);
-        Task<List<CustomerListResponseDto>> FilterCustomer(PageDto page);
+        Task<GenericObject<List<CustomerListResponseDto>>> FilterCustomer(PageDto page);
         Task<List<UserListResponseDto>?> SearchUser(string search, int roleId);
-        Task<List<UserListResponseDto>> FilterUser(PageDto page, int roleId, int garageId);
+        Task<GenericObject<List<UserListResponseDto>>> FilterUser(PageDto page, int roleId, int garageId);
         Task CreateMechanic(MechanicCreateRequestDto requestDto, int? garageId);
         Task<GenericObject<List<UserListResponseDto>>> GetStaffByGarage(PagingBookingPerGarageRequestDto requestDto);
         Task<List<GetIdAndNameDto>> GetManagerNotAssignByGarage();

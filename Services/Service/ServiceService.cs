@@ -402,5 +402,34 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
+
+        public async Task<List<GetIdAndNameDto>> GetALLIdAndNameByGarage()
+        {
+            try
+            {
+                var listObj = await serviceRepository.GetALLIdAndNameByGarage();
+
+                var listDto = mapper.Map<List<GetIdAndNameDto>>(listObj);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
     }
 }

@@ -733,8 +733,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     if (product is not null)
                     {
                         productPrice = product.ProductPrice;
-                        product.ProductQuantity--;
-                        await productRepository.Update(product);
+                        /*product.ProductQuantity--;
+                        await productRepository.Update(product);*/
                     }
 
                     originalPrice += productPrice + servicePrice;
@@ -766,7 +766,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
 
-                await GenerateQRCode(booking);
+                //await GenerateQRCode(booking);
             }
             catch (Exception)
             {
@@ -930,7 +930,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
 
-                await GenerateQRCode(booking);
+                //await GenerateQRCode(booking);
 
                 var payment = new PaymentRequest()
                 {
@@ -988,11 +988,11 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     if (isCreateNew == true)
                     {
-                        if (product is not null)
+                        /*if (product is not null)
                         {
                             product.ProductQuantity--;
                             await productRepository.Update(product);
-                        }
+                        }*/
 
                         var bookingDetail = new BookingDetail()
                         {
@@ -1171,7 +1171,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus)
+        public async Task UpdateStatus(int bookingId, BookingStatus bookingStatus, int userId)
         {
             try
             {
@@ -1189,12 +1189,52 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được hủy khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
-                        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
-                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được hủy.");
+                        var _car = await carRepository.Detail(booking.Car.CarId);
+
+                        _car!.CarBookingStatus = CarStatus.Available;
+
+                        await carRepository.Update(_car);
+
+                        var roleId = await bookingRepository.GetRole(userId);
+
+                        if (roleId == 2 ||
+                        roleId == 4)
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Đơn hàng đã hủy bởi Garage hãy liên hệ Garage để biết chi tiết.");
+                        }
+
+                        var _timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                        var _isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), _timeZone);
+
+                        var _bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, _timeZone);
+
+                        var _current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZone);
+
+                        if (!(DateTime.Now.Day == booking.BookingTime.Day))
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.");
+                        }
+                        else
+                        {
+                            await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                            (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                            "Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.");
+                        }
 
                         break;
                     case BookingStatus.CheckIn:
-                        if (booking.BookingTime > DateTime.Now.AddMinutes(40))
+                        // var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                        // var isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone);
+
+                        // var bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, timeZone);
+
+                        // var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+                        if (!(DateTime.Now.Day == booking.BookingTime.Day))
                         {
                             throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
                         }
@@ -1205,15 +1245,12 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được check-in khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
+                        await UpdateLotStatus(LotStatus.Assigned, booking!);
+
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
 
-                        await UpdateLotStatus(LotStatus.Assigned, booking!);
-
                         break;
-                    // case BookingStatus.Processing:
-                    //     await UpdateLotStatus(LotStatus.BeingUsed, booking!);
-                    //     break;
                     case BookingStatus.Completed:
 
                         switch (false)
@@ -1283,30 +1320,9 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 booking!.BookingStatus = bookingStatus;
+                booking.UpdatedAt = DateTime.Now;
 
                 await bookingRepository.Update(booking);
-
-                // if (bookingStatus.Equals(BookingStatus.Canceled))
-                // {
-                //     if (booking.BookingTime > DateTime.Now.AddHours(4))
-                //     {
-                //         throw new MyException("Đơn hàng của bạn sẽ được hoàn trả 100.000 VND hãy liên hệ với Garage để được hoàn tiền.", 404);
-                //     }
-
-                //     if (booking.BookingTime <= DateTime.Now.AddHours(4))
-                //     {
-                //         throw new MyException("Xin lỗi đơn hàng của bạn không được hoàn 100.000 VND đặt cọc trước đó vì đã quá thời hạn quy định.", 404);
-                //     }
-                // }
-
-                // if (booking.BookingTime > DateTime.Now.AddHours(4))
-                // {
-                //     throw new MyException("Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.", 404);
-                // }
-                // else
-                // {
-                //     throw new MyException("Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.", 404);
-                // }
 
                 watch.Stop();
                 Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -1351,10 +1367,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     var lot = await lotRepository.GetLotByLicensePlate((int)booking.GarageId!, booking.Car.CarLicensePlate)
                     ?? throw new MyException("Xin lỗi hệ thống không tìm thấy xe của bạn.", 404);
 
-                    if (lot.LotStatus == LotStatus.Free)
-                    {
-                        lot.IsAssignedFor = null;
-                    }
+                    lot.LotStatus = LotStatus.Free;
+                    lot.IsAssignedFor = null;
 
                     await lotRepository.Update(lot);
                     break;
@@ -1416,28 +1430,29 @@ namespace GraduationThesis_CarServices.Services.Service
                 throw new MyException("Garage hiện tại không còn thợ rảnh.", 404);
             }
 
-            // var bookingDetailList = await bookingDetailRepository.FilterBookingDetailByBookingId(booking.BookingId);
-            // var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
+            /*var bookingDetailList = await bookingDetailRepository.FilterBookingDetailByBookingId(booking.BookingId);
+            var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
 
-            // switch (false)
-            // {
-            //     case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
-            //         throw new MyException("There are not enough mechanic for booking.", 404);
-            // }
+            switch (false)
+            {
+                case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
+                    throw new MyException("There are not enough mechanic for booking.", 404);
+            }
 
-            // var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
+            var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
 
-            // //Index out of range bug
-            // for (int i = 0; i < bookingDetailList.Count; i++)
-            // {
-            //     //bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
-            //     var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
-            //     //minWorkingHour[i].TotalBookingApplied += estimatedTime;
-            // }
+            //Index out of range bug
+            for (int i = 0; i < bookingDetailList.Count; i++)
+            {
+                //bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
+                var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
+                //minWorkingHour[i].TotalBookingApplied += estimatedTime;
+            }
 
-            // await bookingDetailRepository.Update(bookingDetailList);
+            await bookingDetailRepository.Update(bookingDetailList);*/
         }
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         private async Task GenerateQRCode(Booking booking)
         {
             try
@@ -1507,21 +1522,21 @@ namespace GraduationThesis_CarServices.Services.Service
 
         public async Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId, int garageId)
         {
-            // var url = $"https://carserviceappservice.azurewebsites.net/api/booking/update-status-booking/{bookingId}&2";
-            // var data = "{\"status\": \"updated status\"}";
+            /*var url = $"https://carserviceappservice.azurewebsites.net/api/booking/update-status-booking/{bookingId}&2";
+            var data = "{\"status\": \"updated status\"}";
 
-            // using (var httpClient = new HttpClient())
-            // {
-            //     var request = new HttpRequestMessage(HttpMethod.Put, url)
-            //     {
-            //         Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
-            //     };
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
+                };
 
-            //     var response = await httpClient.SendAsync(request);
-            //     var statusCode = response.StatusCode;
+                var response = await httpClient.SendAsync(request);
+                var statusCode = response.StatusCode;
 
-            //     Console.WriteLine($"Response Status Code: {statusCode}");
-            // }
+                Console.WriteLine($"Response Status Code: {statusCode}");
+            }*/
 
             var serviceSelectList = new List<GroupServiceBookingDetailDto>();
 
@@ -1809,7 +1824,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     Pending = count.Item1,
                     Canceled = count.Item2,
-                    Completed = count.Item3
+                    CheckIn = count.Item3,
+                    Completed = count.Item4
                 };
 
                 return countDto;
@@ -1853,9 +1869,18 @@ namespace GraduationThesis_CarServices.Services.Service
                 var booking = await bookingRepository.Detail((int)bookingDetail.BookingId!)
                 ?? throw new MyException("Đơn hàng không tồn tại.", 404);
 
-                await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                if (status == 2)
+                {
+                    await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:",
+                        $"Đơn của bạn đã xảy ra lỗi ở {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                }
+                else
+                {
+                    await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:",
                         $"Đơn của bạn đã hoàn thành {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                }
 
                 bookingDetail.BookingServiceStatus = (BookingServiceStatus)status;
                 bookingDetail.UpdatedAt = DateTime.Now;
@@ -1886,6 +1911,13 @@ namespace GraduationThesis_CarServices.Services.Service
         {
             try
             {
+                var booking = await bookingRepository.Detail(bookingId);
+
+                if (!booking!.BookingStatus.Equals(BookingStatus.Completed))
+                {
+                    throw new MyException("Đơn hàng phải được hoàn thành trước khi thanh toán.", 404);
+                }
+
                 await bookingRepository.ConfirmBookingArePaid(bookingId);
             }
             catch (Exception e)

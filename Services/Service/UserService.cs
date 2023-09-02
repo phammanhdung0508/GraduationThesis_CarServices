@@ -99,11 +99,13 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<CustomerListResponseDto>> FilterCustomer(PageDto page)
+        public async Task<GenericObject<List<CustomerListResponseDto>>> FilterCustomer(PageDto page)
         {
             try
             {
-                var list = mapper.Map<List<User>, List<CustomerListResponseDto>>(await userRepository.FilterByRole(page, 1, 0),
+                (var listObj, var count) = await userRepository.FilterByRole(page, 1, 0);
+
+                var listDto = mapper.Map<List<User>, List<CustomerListResponseDto>>(listObj!,
                 otp => otp.AfterMap((src, des) =>
                 {
                     for (int i = 0; i < src.Count; i++)
@@ -111,6 +113,8 @@ namespace GraduationThesis_CarServices.Services.Service
                         des[i].TotalBooking = userRepository.TotalBooking(src[i].Customer.CustomerId);
                     }
                 }));
+
+                var list = new GenericObject<List<CustomerListResponseDto>>(listDto, count);
 
                 return list;
             }
@@ -165,7 +169,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<UserListResponseDto>> FilterUser(PageDto page, int roleId, int garageId)
+        public async Task<GenericObject<List<UserListResponseDto>>> FilterUser(PageDto page, int roleId, int garageId)
         {
             try
             {
@@ -175,9 +179,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("Can't accept value 0.", 404);
                 }
 
-                var list = new List<UserListResponseDto>();
+                (var listObj, var count) = await userRepository.FilterByRole(page, roleId, garageId);
 
-                return list = mapper.Map<List<User>, List<UserListResponseDto>>(await userRepository.FilterByRole(page, roleId, garageId));
+                var listDto = mapper.Map<List<User>, List<UserListResponseDto>>(listObj!);
+
+                var list = new GenericObject<List<UserListResponseDto>>(listDto, count);
+
+                return list;
             }
             catch (Exception e)
             {
@@ -376,7 +384,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("Mật khẩu xác nhận không khớp.", 404);
                 }
 
-                if (requestDto.UserEmail is not null)
+                if (!string.IsNullOrEmpty(requestDto.UserEmail))
                 {
                     encryptEmail = encryptConfiguration.Base64Encode(requestDto.UserEmail!);
                 }
@@ -445,9 +453,10 @@ namespace GraduationThesis_CarServices.Services.Service
                         await carRepository.Create(car);
                         break;
                     case 2:
-                        if (await userRepository.IsEmailExist(encryptEmail))
+                        var isEmailExist = await userRepository.IsEmailExist(encryptEmail);
+                        if (isEmailExist == true)
                         {
-                            throw new MyException("Tài khoản của bạn không tồn tại.", 404);
+                            throw new MyException("Tài khoản đã tồn tại.", 404);
                         }
 
                         if (garageId is null)
@@ -474,6 +483,11 @@ namespace GraduationThesis_CarServices.Services.Service
                     case 5:
                         var isUserPhoneExist_ = await userRepository.IsUserPhoneExist(formatPhone);
 
+                        if (isUserPhoneExist_)
+                        {
+                            throw new MyException("Số điện thoại đã tồn tại.", 404);
+                        }
+
                         switch (false)
                         {
                             case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.UserPhone):
@@ -482,8 +496,6 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Số điện thoại không được nhập kí tự khác ngoài chữ số.", 404);
                             case var isFalse when isFalse == (requestDto.UserPhone!.Length == 10):
                                 throw new MyException("Số điện thoại phải được nhập đủ 10 số.", 404);
-                            case var isFalse when isFalse == isUserPhoneExist_:
-                                throw new MyException("Số điện thoại đã tồn tại.", 404);
                         }
 
                         var staff = mapper.Map<User>(requestDto,

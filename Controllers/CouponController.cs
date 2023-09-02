@@ -20,13 +20,24 @@ namespace GraduationThesis_CarServices.Controllers
         }
 
         /// <summary>
-        /// View coupon of a specific Garage. [Customer]
+        /// View coupon of a specific Garage. [Customer, Admin, Manager]
         /// </summary>
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer, Admin, Manager")]
         [HttpGet("get-garage-coupon-for-customer/{garageId}")]
         public async Task<IActionResult> GetGarageCoupon(int garageId)
         {
             var list = await couponService.FilterGarageCoupon(garageId)!;
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// View coupon of a specific Garage. [Customer, Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Customer, Admin, Manager")]
+        [HttpGet("get-garage-coupon-for-admin/{garageId}")]
+        public async Task<IActionResult> FilterGarageCouponForAdmin(int garageId)
+        {
+            var list = await couponService.FilterGarageCouponForAdmin(garageId)!;
             return Ok(list);
         }
 
@@ -46,7 +57,8 @@ namespace GraduationThesis_CarServices.Controllers
         /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("view-all-coupon")]
-        public async Task<IActionResult> View(PageDto page){
+        public async Task<IActionResult> View(PageDto page)
+        {
             var list = await couponService.View(page);
             return Ok(list);
         }

@@ -18,7 +18,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private readonly ICouponRepository couponRepository;
         private readonly IGarageRepository garageRepository;
         private readonly IMapper mapper;
-        
+
         public CouponService(ICouponRepository couponRepository, IGarageRepository garageRepository, IMapper mapper)
         {
             this.mapper = mapper;
@@ -35,6 +35,37 @@ namespace GraduationThesis_CarServices.Services.Service
                 var listDto = mapper.Map<List<CouponListResponseDto>>(listObj);
 
                 var list = new GenericObject<List<CouponListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<FilterCouponByGarageResponseDto>>> FilterGarageCouponForAdmin(int garageId)
+        {
+            try
+            {
+                var listObj = await couponRepository.FilterGarageCoupon(garageId);
+
+                var listDto = mapper.Map<List<FilterCouponByGarageResponseDto>>(listObj);
+
+                var list = new GenericObject<List<FilterCouponByGarageResponseDto>>(listDto, listDto.Count);
 
                 return list;
             }
@@ -135,7 +166,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 var startDate = DateTime.Parse(requestDto.CouponStartDate);
                 var endDate = DateTime.Parse(requestDto.CouponEndDate);
 
-                switch(false){
+                switch (false)
+                {
                     case var isFalse when isFalse == (requestDto.CouponValue > 0):
                         throw new MyException("Giá trị coupon không được nhận số 0.", 404);
                     case var isFalse when isFalse == (requestDto.NumberOfTimesToUse > 0):

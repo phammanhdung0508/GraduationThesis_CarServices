@@ -18,9 +18,12 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<List<Garage>?> GetAllCoordinates();
         (int totalServices, int totalOrders) GetServicesAndBookingsPerGarage(int garageId);
         Task<List<Garage>?> GetAll();
+        Task<List<Garage>?> GetAllGarage();
         Task<byte[]?> GetGarageVersionNumber(int garageId);
         Task<int?> GetManagerId(int? garageId);
         Task CreateGarageMechanic(GarageMechanic garageMechanic);
         Task<(List<Lot>, int, int)> GetListLotByGarage(int garageId);
+        Task<bool> IsGaragePhoneExist(string formatPhone);
+        Task<bool> IsGarageAddressExist(string address);
     }
 }

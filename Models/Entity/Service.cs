@@ -19,6 +19,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public int ServiceDuration { get; set; }
         [MaxLength(1024)]
         public string ServiceGroup { get; set; }
+        public int? ServiceWarrantyPeriod { get; set; }
         [Column(TypeName = "tinyint")]
         public ServiceUnit ServiceUnit { get; set; }
         [Column(TypeName = "tinyint")]

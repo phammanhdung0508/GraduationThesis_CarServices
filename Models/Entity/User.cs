@@ -43,8 +43,8 @@ namespace GraduationThesis_CarServices.Models.Entity
         public DateTime? UpdatedAt { get; set; }
         public string DeviceToken { get; set; }
         public string RefreshToken { get; set; }
-        public DateTime RefreshTokenCreated { get; set; }
-        public DateTime RefreshTokenExpires { get; set; }
+        public DateTime? RefreshTokenCreated { get; set; }
+        public DateTime? RefreshTokenExpires { get; set; }
 
         /*-------------------------------------------------*/
         public virtual Customer Customer { get; set; }

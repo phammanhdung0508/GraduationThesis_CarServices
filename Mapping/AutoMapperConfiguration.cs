@@ -58,8 +58,9 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.GarageName, obj => obj.MapFrom(src => src.Garage.GarageName))
                 .ForMember(des => des.CreatedAt, obj => obj.MapFrom(src => src.CreatedAt!.Value.ToString("dd/MM/yyyy")));
             CreateMap<Coupon, FilterCouponByGarageResponseDto>()
+                .ForMember(des => des.CouponStartDate, obj => obj.MapFrom(src => src.CouponStartDate.ToString("dd/MM/yyyy")))
                 .ForMember(des => des.CouponEndDate, obj => obj.MapFrom(src => src.CouponEndDate.ToString("dd/MM/yyyy")))
-                .ForMember(des => des.CouponMinSpend, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.CouponValue) + " VND"))
+                //.ForMember(des => des.CouponMinSpend, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.CouponValue) + " VND"))
                 .ForMember(des => des.CouponType, obj => obj.MapFrom((src, des) =>
                 {
                     switch (src.CouponType)
@@ -78,7 +79,7 @@ namespace GraduationThesis_CarServices.Mapping
                         case CouponType.Percent:
                             return "Giảm " + String.Format(CultureInfo.InvariantCulture, "{0:0}%", src.CouponValue);
                         case CouponType.FixedAmount:
-                            return "Giảm " + String.Format(CultureInfo.InvariantCulture, "{0:0.000}", src.CouponValue);
+                            return "Giảm " + FormatCurrency.FormatNumber(src.CouponValue) + " VND";
                     }
                     return "N/A";
                 }));
@@ -96,6 +97,9 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //Garage
+            CreateMap<Garage, GetIdAndNameDto>()
+                .ForMember(des => des.Id, obj => obj.MapFrom(src => src.GarageId))
+                .ForMember(des => des.Name, obj => obj.MapFrom(src => src.GarageName + ". " + src.GarageAddress));
             CreateMap<Lot, LotList>()
                 .ForMember(des => des.IsAssignedFor, obj => obj.MapFrom(src => string.IsNullOrEmpty(src.IsAssignedFor) ? "N/A" : src.IsAssignedFor))
                 .ForMember(des => des.LotStatus, obj => obj.MapFrom((src, des) => {
@@ -132,7 +136,7 @@ namespace GraduationThesis_CarServices.Mapping
                 // .ForMember(des => des.CouponGarageDto, obj => obj.MapFrom(src => src.Coupons))
                 // .ForMember(des => des.GarageDetailGarageDto, obj => obj.MapFrom(src => src.GarageDetails))
                 .ForMember(des => des.GarageFullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity))
-                .ForMember(des => des.HoursOfOperation, obj => obj.MapFrom(src => "From " + src!.OpenAt + " to " + src.CloseAt))
+                .ForMember(des => des.HoursOfOperation, obj => obj.MapFrom(src => "Từ " + src!.OpenAt + " đến " + src.CloseAt))
                 .ForMember(des => des.Rating, obj => obj.MapFrom((src, des) =>
                 {
                     return src.Reviews.Count != 0 ? src.Reviews.Sum(r => r.Rating) / src.Reviews.Count : 0;
@@ -147,7 +151,7 @@ namespace GraduationThesis_CarServices.Mapping
 
                     return presentTime switch
                     {
-                        var time when TimeSpan.Compare(presentTime, openAt).Equals(1) && TimeSpan.Compare(presentTime, closeAt).Equals(-1) => "Closed",
+                        var time when TimeSpan.Compare(presentTime, openAt).Equals(1) && TimeSpan.Compare(presentTime, closeAt).Equals(-1) => "Open",
                         var time when TimeSpan.Compare(presentTime, closeAt).Equals(1) || TimeSpan.Compare(presentTime, openAt).Equals(-1) => "Open",
                         _ => "N/A",
                     };
@@ -536,7 +540,8 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.TotalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.TotalPrice) + " VND"))
                 .ForMember(des => des.BookingTime, obj => obj.MapFrom(src => src.BookingTime.ToString("dd/MM/yyyy h:mm tt")));
             CreateMap<Booking, BookingListResponseDto>()
-                .ForMember(des => des.TotalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.FinalPrice) + " VND"))
+                .ForMember(des => des.TotalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.FinalPrice + 100) + " VND"))
+                .ForMember(des => des.UpdatedAt, obj => obj.MapFrom(src => src.UpdatedAt!.Value.ToString("dd/MM/yyyy")))
                 .ForMember(des => des.UserBookingDto, obj => obj.MapFrom(src => src.Car.Customer.User))
                 .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage));
             CreateMap<Booking, BookingDetailResponseDto>()
@@ -545,20 +550,19 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.OriginalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.OriginalPrice) + " VND"))
                 .ForMember(des => des.DiscountPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.DiscountPrice) + " VND"))
                 .ForMember(des => des.TotalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.TotalPrice) + " VND"))
+                .ForMember(des => des.FinalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.FinalPrice) + " VND"))
                 .ForMember(des => des.CustomerBookingDto, obj => obj.MapFrom(src => src.Car.Customer.User))
                 .ForPath(des => des.CustomerBookingDto!.FullName, obj => obj.MapFrom(src => src.Car.Customer.User.UserFirstName + " " + src.Car.Customer.User.UserLastName))
                 .ForMember(des => des.GarageBookingDto, obj => obj.MapFrom(src => src.Garage))
                 .ForMember(des => des.BookingDetailDtos, obj => obj.MapFrom(src => src.BookingDetails));
             CreateMap<BookingCreateRequestDto, Booking>()
                 .ForMember(des => des.BookingCode, obj => obj.MapFrom(src => DateTime.Now.Ticks.ToString()))
-                .ForMember(des => des.PaymentMethod, obj => obj.MapFrom(src => "Cash"))
                 .ForMember(des => des.PaymentStatus, obj => obj.MapFrom(src => PaymentStatus.Unpaid))
-                .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Pending))
+                .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Canceled))
                 .ForMember(des => des.IsAccepted, obj => obj.MapFrom(src => false))
                 .ForMember(des => des.CreatedAt, obj => obj.MapFrom(src => DateTime.Now));
             CreateMap<BookingCreateForManagerRequestDto, Booking>()
                 .ForMember(des => des.BookingCode, obj => obj.MapFrom(src => DateTime.Now.Ticks.ToString()))
-                .ForMember(des => des.PaymentMethod, obj => obj.MapFrom(src => "Cash"))
                 .ForMember(des => des.PaymentStatus, obj => obj.MapFrom(src => PaymentStatus.Unpaid))
                 .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Pending))
                 .ForMember(des => des.IsAccepted, obj => obj.MapFrom(src => false))

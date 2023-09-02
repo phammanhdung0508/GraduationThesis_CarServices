@@ -514,9 +514,13 @@ namespace GraduationThesis_CarServices.Services.Service
 
         private static void UpdateEstimatedTimeCanBeBook(int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
             for (int i = 0; i <= isAvailableList.Count - 1; i++)
             {
-                if (isAvailableList[i + 1] - isAvailableList[i] == 1)
+                if (current.Hour != 13 &&
+                isAvailableList[i + 1] - isAvailableList[i] == 1)
                 {
                     sequenceLength++;
                 }
@@ -535,12 +539,14 @@ namespace GraduationThesis_CarServices.Services.Service
                     sequenceLength = 1;
                 }
 
-                if (isAvailableList[i + 1].Equals(isAvailableList.Last()))
+                if (current.Hour != 13 &&
+                isAvailableList[i + 1].Equals(isAvailableList.Last()))
                 {
                     EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours, totalEstimatedTimeServicesTake);
                     break;
                 }
             }
+
         }
 
         private static void CheckIfGarageAvailablePerHour(int openAt, int closeAt, List<Booking> listBooking, int lotCount, List<BookingPerHour> listHours, DateTime dateSelect)
@@ -1189,11 +1195,11 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được hủy khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
-                        var _car = await carRepository.Detail(booking.Car.CarId);
+                        /*var _car = await carRepository.Detail(booking.Car.CarId);
 
                         _car!.CarBookingStatus = CarStatus.Available;
 
-                        await carRepository.Update(_car);
+                        await carRepository.Update(_car);*/
 
                         var roleId = await bookingRepository.GetRole(userId);
 
@@ -1227,12 +1233,12 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         break;
                     case BookingStatus.CheckIn:
-                        // var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-                        // var isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone);
+                        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                        var isEditAble = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone);
 
-                        // var bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, timeZone);
+                        var bookingTime = TimeZoneInfo.ConvertTimeFromUtc(booking.BookingTime, timeZone);
 
-                        // var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+                        var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
                         if (!(DateTime.Now.Day == booking.BookingTime.Day))
                         {
@@ -1245,7 +1251,7 @@ namespace GraduationThesis_CarServices.Services.Service
                                 throw new MyException("Đơn hàng chỉ có thể được check-in khi đang ở trạng thái chờ được xử lí.", 404);
                         }
 
-                        await UpdateLotStatus(LotStatus.Assigned, booking!);
+                        //await UpdateLotStatus(LotStatus.Assigned, booking!);
 
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
@@ -1274,7 +1280,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             }
                         }
 
-                        var car = await carRepository.Detail(booking.Car.CarId);
+                        /*var car = await carRepository.Detail(booking.Car.CarId);
 
                         car!.CarBookingStatus = CarStatus.Available;
 
@@ -1302,7 +1308,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             }
 
                             await mechanicRepository.Update(item);
-                        }
+                        }*/
 
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã hoàn tất.");
@@ -1319,10 +1325,10 @@ namespace GraduationThesis_CarServices.Services.Service
                         break;
                 }
 
-                booking!.BookingStatus = bookingStatus;
+                /*booking!.BookingStatus = bookingStatus;
                 booking.UpdatedAt = DateTime.Now;
 
-                await bookingRepository.Update(booking);
+                await bookingRepository.Update(booking);*/
 
                 watch.Stop();
                 Debug.WriteLine($"Total run time (Milliseconds) Run(): {watch.ElapsedMilliseconds}");
@@ -1938,5 +1944,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
+    
+        //public async Task<>
     }
 }

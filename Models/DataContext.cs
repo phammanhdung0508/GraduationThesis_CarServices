@@ -30,6 +30,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<ServiceDetail> ServiceDetails { get; set; }
         public DbSet<BookingMechanic> BookingMechanics { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Warranty> Warranties { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -220,104 +221,104 @@ namespace GraduationThesis_CarServices.Models
                 new Service{ServiceId=16, ServiceName="Phủ Nano",
                     ServiceImage="https://thanhphongauto.com/wp-content/uploads/2019/09/2-4.jpg",
                     ServiceDetailDescription="phủ bóng Nano là việc phủ lên bề mặt lớp sơn xe một lớp dung dịch có thành phần chính là các tinh thể có gốc hữu cơ với kích thước siêu nhỏ dạng Nano.", ServiceDuration=4,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=17, ServiceName="Phủ Ceramic 9H",
                     ServiceImage="https://brodetailing.vn/wp-content/uploads/2017/12/9h.jpg",
                     ServiceDetailDescription="Ceramic Pro 9H là lớp sơn phủ Nano- ceramic có độ bóng cao, hiệu ứng siêu kỵ nước, chống trầy xước, kháng hóa chất, chống tia cực tím, kháng nhiệt và chống Grafitti.", ServiceDuration=4,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 8,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=18, ServiceName="Phủ gầm gói tiêu chuẩn",
                     ServiceImage="https://danchoioto.vn/wp-content/uploads/2019/01/son-phu-gam-o-to-giup-han-che-hap-thu-nhiet-tu-mat-duong.jpg",
                     ServiceDetailDescription="Lớp phủ chống ăn mòn được áp dụng dưới phần dưới của xe, bao gồm cả khung gầm và các bộ phận khác như động cơ, hệ thống treo và ống xả.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 8,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=19, ServiceName="Phủ gầm gói cao cấp",
                     ServiceImage="https://danchoioto.vn/wp-content/uploads/2019/01/son-phu-gam-o-to-giup-han-che-hap-thu-nhiet-tu-mat-duong.jpg",
                     ServiceDetailDescription="Lớp phủ chống ăn mòn được áp dụng dưới phần dưới của xe, bao gồm cả khung gầm và các bộ phận khác như động cơ, hệ thống treo và ống xả.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=20, ServiceName="Dán phim Nano gói tiêu chuẩn",
                     ServiceImage="https://phoenixauto.vn/Uploads/origin/20200120/thumbnail_dan-phim-cach-nhiet-cho-porsche.jpg",
                     ServiceDetailDescription="Dán phim Nano chuyển sáng và chống chói lóa, đặc biệt, cơ chế dẫn điện chuyển đổi kim loại bằng oxy nitride tăng khả năng loại bỏ nhiệt nhiều hơn và bền hơn so với các loại phim cách nhiệt thông thường khác.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=21, ServiceName="Dán phim Nano gói cao cấp",
                     ServiceImage="https://phoenixauto.vn/Uploads/origin/20200120/thumbnail_dan-phim-cach-nhiet-cho-porsche.jpg",
                     ServiceDetailDescription="Dán phim Nano chuyển sáng và chống chói lóa, đặc biệt, cơ chế dẫn điện chuyển đổi kim loại bằng oxy nitride tăng khả năng loại bỏ nhiệt nhiều hơn và bền hơn so với các loại phim cách nhiệt thông thường khác.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=22, ServiceName="Phim 3M- Llumar gói tiêu chuẩn",
                     ServiceImage="https://llumar.com.vn/wp-content/uploads/2022/08/phim-cach-nhiet-LLumar-USA-scaled.jpg",
                     ServiceDetailDescription="Phim 3M- Llumar phim cách nhiệt mang đến thẩm mỹ và khả năng duy trì các kết nối trên xe ổn định, không gây cản trở như sóng điện thoại, radio, GPS,… .", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=23, ServiceName="Phim 3M- Llumar gói cao cấp",
                     ServiceImage="https://llumar.com.vn/wp-content/uploads/2022/08/phim-cach-nhiet-LLumar-USA-scaled.jpg",
                     ServiceDetailDescription="Phim 3M- Llumar phim cách nhiệt mang đến thẩm mỹ và khả năng duy trì các kết nối trên xe ổn định, không gây cản trở như sóng điện thoại, radio, GPS,… .", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=24, ServiceName="Thay dầu, bộ lọc",
                     ServiceImage="https://storage.googleapis.com/f1-cms/2020/02/00cd4ca8-20200228_024616.jpg",
                     ServiceDetailDescription="Thay dầu, bộ lọc có vai trò lọc sạch các cặn bẩn và giữ lại mạt sắt đảm bảo dầu được lọc sạch giúp bảo vệ hệ thống bôi trơn, hạn chế hao mòn của các chi tiết trong động cơ.", ServiceDuration=1,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=25, ServiceName="Kiểm tra hệ thống điện, phanh, treo",
                     ServiceImage="https://thanhphongauto.com/wp-content/uploads/2020/03/hu-hong-cua-he-thong-treo.jpg",
                     ServiceDetailDescription="Kiểm tra hệ thống điện, phanh, treo là quá trình kiểm tra các bộ phận quan trọng trên ôtô để đảm bảo sự an toàn và hoạt động hiệu quả của xe.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=26, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai",
                     ServiceImage="https://danchoioto.vn/wp-content/uploads/2021/05/neu-dien-ap-binh-ac-quy-do-duoc-bang-hoac-lon-hon-12v-nghia-la-ac-quy-dang-binh-thuong.jpeg",
                     ServiceDetailDescription="Kiểm tra và thay bình ắc quy là quá trình kiểm tra tình trạng hoạt động của bình ắc quy và thay thế nếu cần.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //GÓI DỊCH VỤ NỘI THẤT
                 new Service{ServiceId=27, ServiceName="Áo ghế simili",
                     ServiceImage="https://thanhphongauto.com/wp-content/uploads/2019/09/5-dieu-can-biet-khi-boc-ao-ghe-simili-cho-xe-oto-02.jpg",
                     ServiceDetailDescription="Áo ghế Simili là một dạng vải tổng hợp bằng cách kết hợp chất liệu nhựa và sợi polyester. Được sản xuất để có độ bền cao, áo ghế simili thường có khả năng chống chịu mài mòn, chống thấm nước và dễ vệ sinh.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=28, ServiceName="Thảm lót sàn",
                     ServiceImage="https://static.carmudi.vn/wp-content/uploads/2020-01/BCYttvBL1N.jpg",
                     ServiceDetailDescription="Thảm lót sàn được sử dụng để bảo vệ sàn ô tô khỏi bụi bẩn, nước, và các tác động bên ngoài khác.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=29, ServiceName="Mặt cốp + lưng ghế",
                     ServiceImage="https://katavina.com/uploaded/tin-tuc/tham-lot-cop-bang-da-pu.jpg",
                     ServiceDetailDescription="Thay thế Mặt cốp và lưng ghế ô tô là quá trình thay thế các bộ phận của cốp sau và lưng ghế trong xe ô tô.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=30, ServiceName="La phông trần - bọc ni long",
                     ServiceImage="https://thanhphongauto.com/wp-content/uploads/2019/09/3-dieu-can-biet-ve-la-phong-tran-va-boc-ni-long-xe-%C3%B4t-02.png",
                     ServiceDetailDescription="La phông trần - bọc ni long là quá trình thêm một lớp ni da nhân tạo hoặc ni vinyl lên bề mặt của chiếc xe để bảo vệ nó khỏi các tác động từ môi trường như mưa, nắng, bụi bẩn, trầy xước.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=31, ServiceName="Bọc da bò",
                     ServiceImage="https://hoangkims5.blob.core.windows.net/otohoangkimzag152hg18/boc-tran-da-kia-cerato.jpg",
                     ServiceDetailDescription="Bọc da bò là quá trình thêm một lớp da bò nhân tạo lên bề mặt của chiếc xe để bảo vệ nó khỏi các tác động từ môi trường như mưa, nắng, bụi bẩn, trầy xước và tăng thẩm mỹ cho xe.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=32, ServiceName="Camera hành trình",
                     ServiceImage="https://danchoioto.vn/wp-content/uploads/2021/03/camera-hanh-trinh-oto.jpeg",
                     ServiceDetailDescription="Camera hành trình ô tô là một thiết bị ghi hình được gắn trên xe ô tô để ghi lại các sự kiện xảy ra trong quá trình lái xe.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack,
+                    ServiceGroup = ServiceGroup.PackageInterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 6,
                     ServiceStatus=Status.Activate, CreatedAt=now},
             };
 
@@ -349,55 +350,81 @@ namespace GraduationThesis_CarServices.Models
             var list = new List<Product>{
                 new Product{ProductId = 1, ProductName="Oil System Cleaner (Vệ sinh động cơ) 250ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=28, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 5,
+                    ServiceId=4, CategoryId=1},
 
                 new Product{ProductId = 2, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
                     ProductImage="https://down-vn.img.susercontent.com/file/0c60eba492310c8f98ef3b73011c659b",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=7, CategoryId=1},
 
                 new Product{ProductId = 3, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 350ml ",
                     ProductImage="https://salt.tikicdn.com/cache/w400/ts/product/eb/f5/9d/8357d880b50985b5d5bcef7715e02a27.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=35, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 3,
+                    ServiceId=8, CategoryId=1},
 
                 new Product{ProductId = 4, ProductName="Nano Engine Super Protection (Nano bảo vệ động cơ) 250ml",
                     ProductImage="https://pronanotex.com/wp-content/uploads/2016/11/NanoEngineSuperProtection-1.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductStatus=Status.Activate, ServiceId=16, CategoryId=2},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)37.5, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 3,
+                    ServiceId=16, CategoryId=2},
 
                 new Product{ProductId = 5, ProductName="Oxicat Oxygen Sensor & Catalytic (Vệ sinh cảm biến oxy và catalytic) 300ml",
                     ProductImage="https://m.media-amazon.com/images/I/61m+XWXThFL.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=(decimal)29.5, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=11, CategoryId=1},
 
                 new Product{ProductId = 6, ProductName="Throttle Body Cleaner (Vệ sinh họng ga) 280ml",
                     ProductImage="https://crcindustries.com.au/media/catalog/product/cache/628e20d88205b96f2e2f6bc42ae35fbb/6/e/6e33c61b31cd1e9013976610ca82741895d12a73db6d67342cf7b023e578aaa9.jpeg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductStatus=Status.Activate, ServiceId=12, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=20, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=12, CategoryId=1},
 
                 new Product{ProductId = 7, ProductName="Radiator Flush (Vệ sinh hệ thống làm mát) 300ml",
                     ProductImage="https://abro.com/wp-content/uploads/2020/07/RF-505-RADIATOR-FLUSH.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductStatus=Status.Activate, ServiceId=11, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=15, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=11, CategoryId=1},
 
                 new Product{ProductId = 8, ProductName="Radiator conditioner (Vệ sinh điều hòa tản nhiệt)",
                     ProductImage="https://www.pro-tec-baltija.com/md5docupload/222fae770c434bc6fc23647307f6aab2.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductStatus=Status.Activate, ServiceId=15, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=21, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=15, CategoryId=1},
 
                 new Product{ProductId = 9, ProductName="Oil System Cleaner (Vệ sinh động cơ) 350ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=32, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=32, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=4, CategoryId=1},
 
                 new Product{ProductId = 10, ProductName="Oil System Cleaner (Vệ sinh động cơ) 300ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=30, ProductStatus=Status.Activate, ServiceId=4, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=30, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=4, CategoryId=1},
 
                 new Product{ProductId = 11, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 250ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=34, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=34, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=7, CategoryId=1},
                 
                 new Product{ProductId = 12, ProductName="Fuel System Cleaner (Vệ sinh hệ thống xăng) 300ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, ServiceId=7, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=7, CategoryId=1},
 
                 new Product{ProductId = 13, ProductName="Diesel System Cleaner (Vệ sinh hệ thống dầu) 300ml",
                     ProductImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROCCRqRZboIkPIiOOqYnyqRohBap1idqh_UQ&usqp=CAU",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, ServiceId=8, CategoryId=1},
+                    ProductUnit=ProductUnit.Bottle, ProductPrice=38, ProductStatus=Status.Activate, 
+                    ProductWarrantyPeriod = 4,
+                    ServiceId=8, CategoryId=1},
             };
 
             modelBuilder.Entity<Product>().HasData(list);

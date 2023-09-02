@@ -557,14 +557,12 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.BookingDetailDtos, obj => obj.MapFrom(src => src.BookingDetails));
             CreateMap<BookingCreateRequestDto, Booking>()
                 .ForMember(des => des.BookingCode, obj => obj.MapFrom(src => DateTime.Now.Ticks.ToString()))
-                .ForMember(des => des.PaymentMethod, obj => obj.MapFrom(src => "Cash"))
                 .ForMember(des => des.PaymentStatus, obj => obj.MapFrom(src => PaymentStatus.Unpaid))
                 .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Canceled))
                 .ForMember(des => des.IsAccepted, obj => obj.MapFrom(src => false))
                 .ForMember(des => des.CreatedAt, obj => obj.MapFrom(src => DateTime.Now));
             CreateMap<BookingCreateForManagerRequestDto, Booking>()
                 .ForMember(des => des.BookingCode, obj => obj.MapFrom(src => DateTime.Now.Ticks.ToString()))
-                .ForMember(des => des.PaymentMethod, obj => obj.MapFrom(src => "Cash"))
                 .ForMember(des => des.PaymentStatus, obj => obj.MapFrom(src => PaymentStatus.Unpaid))
                 .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Pending))
                 .ForMember(des => des.IsAccepted, obj => obj.MapFrom(src => false))

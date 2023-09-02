@@ -15,15 +15,17 @@ namespace GraduationThesis_CarServices.Models.Entity
         [MaxLength(1024)]
         public string ProductImage { get; set; }
         public string ProductDetailDescription { get; set; }
-        public ProductUnit ProductUnit { get; set; }
+        public int? ProductWarrantyPeriod { get; set; }
         [Column(TypeName = "decimal(10,3)")]
         public decimal ProductPrice { get; set; }
-        [Range(0, 1000, ErrorMessage = "Out of range!")]
-        public int ProductQuantity { get; set; }
-        // [Range(0, int.MaxValue, ErrorMessage = "")]
-        // public int ProductSold { get; set; }
+        [Column(TypeName = "tinyint")]
+        public ProductUnit ProductUnit { get; set; }
         [Column(TypeName = "tinyint")]
         public Status ProductStatus { get; set; }
+        // [Range(0, 1000, ErrorMessage = "Out of range!")]
+        // public int ProductQuantity { get; set; }
+        // [Range(0, int.MaxValue, ErrorMessage = "")]
+        // public int ProductSold { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

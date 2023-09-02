@@ -430,14 +430,14 @@ namespace GraduationThesis_CarServices.Services.Service
                     CheckIfGarageAvailablePerHour(openAt, closeAt, listBooking!, lotCount, listHours, dateSelect);
                 });
 
-                // var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
-                // .Select(l => DateTime.Parse(l.Hour).TimeOfDay.Hours).Order().ToList();
-                // var sequenceLength = 1;
+                var isAvailableList = listHours.Where(l => l.IsAvailable.Equals(true)).AsParallel()
+                .Select(l => DateTime.Parse(l.Hour).TimeOfDay.Hours).Order().ToList();
+                var sequenceLength = 1;
 
-                // await Task.Run(() =>
-                // {
-                //     UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours, requestDto.TotalEstimatedTimeServicesTake);
-                // });
+                await Task.Run(() =>
+                {
+                    UpdateEstimatedTimeCanBeBook(sequenceLength, isAvailableList, listHours, requestDto.TotalEstimatedTimeServicesTake);
+                });
 
                 watch.Stop();
                 Debug.WriteLine($"\nTotal run time (Milliseconds): {watch.ElapsedMilliseconds}\n");
@@ -733,8 +733,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     if (product is not null)
                     {
                         productPrice = product.ProductPrice;
-                        product.ProductQuantity--;
-                        await productRepository.Update(product);
+                        /*product.ProductQuantity--;
+                        await productRepository.Update(product);*/
                     }
 
                     originalPrice += productPrice + servicePrice;
@@ -766,7 +766,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
 
-                await GenerateQRCode(booking);
+                //await GenerateQRCode(booking);
             }
             catch (Exception)
             {
@@ -930,7 +930,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.TotalEstimatedCompletionTime = totalEstimated;
                 booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
 
-                await GenerateQRCode(booking);
+                //await GenerateQRCode(booking);
 
                 var payment = new PaymentRequest()
                 {
@@ -988,11 +988,11 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     if (isCreateNew == true)
                     {
-                        if (product is not null)
+                        /*if (product is not null)
                         {
                             product.ProductQuantity--;
                             await productRepository.Update(product);
-                        }
+                        }*/
 
                         var bookingDetail = new BookingDetail()
                         {
@@ -1251,9 +1251,6 @@ namespace GraduationThesis_CarServices.Services.Service
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
 
                         break;
-                    // case BookingStatus.Processing:
-                    //     await UpdateLotStatus(LotStatus.BeingUsed, booking!);
-                    //     break;
                     case BookingStatus.Completed:
 
                         switch (false)
@@ -1433,28 +1430,29 @@ namespace GraduationThesis_CarServices.Services.Service
                 throw new MyException("Garage hiện tại không còn thợ rảnh.", 404);
             }
 
-            // var bookingDetailList = await bookingDetailRepository.FilterBookingDetailByBookingId(booking.BookingId);
-            // var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
+            /*var bookingDetailList = await bookingDetailRepository.FilterBookingDetailByBookingId(booking.BookingId);
+            var mechanicAvailableList = await mechanicRepository.FilterMechanicAvailableByGarageId((int)booking.GarageId!);
 
-            // switch (false)
-            // {
-            //     case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
-            //         throw new MyException("There are not enough mechanic for booking.", 404);
-            // }
+            switch (false)
+            {
+                case var isFalse when isFalse == (bookingDetailList.Count <= mechanicAvailableList.Count):
+                    throw new MyException("There are not enough mechanic for booking.", 404);
+            }
 
-            // var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
+            var minWorkingHour = mechanicAvailableList.Take(bookingDetailList.Count).ToList();
 
-            // //Index out of range bug
-            // for (int i = 0; i < bookingDetailList.Count; i++)
-            // {
-            //     //bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
-            //     var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
-            //     //minWorkingHour[i].TotalBookingApplied += estimatedTime;
-            // }
+            //Index out of range bug
+            for (int i = 0; i < bookingDetailList.Count; i++)
+            {
+                //bookingDetailList[i].MechanicId = minWorkingHour[i].MechanicId;
+                var estimatedTime = await serviceRepository.GetDuration((int)bookingDetailList[i].ServiceDetail.ServiceId!);
+                //minWorkingHour[i].TotalBookingApplied += estimatedTime;
+            }
 
-            // await bookingDetailRepository.Update(bookingDetailList);
+            await bookingDetailRepository.Update(bookingDetailList);*/
         }
 
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         private async Task GenerateQRCode(Booking booking)
         {
             try
@@ -1524,21 +1522,21 @@ namespace GraduationThesis_CarServices.Services.Service
 
         public async Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId, int garageId)
         {
-            // var url = $"https://carserviceappservice.azurewebsites.net/api/booking/update-status-booking/{bookingId}&2";
-            // var data = "{\"status\": \"updated status\"}";
+            /*var url = $"https://carserviceappservice.azurewebsites.net/api/booking/update-status-booking/{bookingId}&2";
+            var data = "{\"status\": \"updated status\"}";
 
-            // using (var httpClient = new HttpClient())
-            // {
-            //     var request = new HttpRequestMessage(HttpMethod.Put, url)
-            //     {
-            //         Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
-            //     };
+            using (var httpClient = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Put, url)
+                {
+                    Content = new StringContent(data, System.Text.Encoding.UTF8, "application/json")
+                };
 
-            //     var response = await httpClient.SendAsync(request);
-            //     var statusCode = response.StatusCode;
+                var response = await httpClient.SendAsync(request);
+                var statusCode = response.StatusCode;
 
-            //     Console.WriteLine($"Response Status Code: {statusCode}");
-            // }
+                Console.WriteLine($"Response Status Code: {statusCode}");
+            }*/
 
             var serviceSelectList = new List<GroupServiceBookingDetailDto>();
 

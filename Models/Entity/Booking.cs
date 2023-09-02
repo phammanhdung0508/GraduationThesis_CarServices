@@ -13,9 +13,7 @@ namespace GraduationThesis_CarServices.Models.Entity
         public string BookingCode { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
-        public string CustomerEmail { get; set; }
         public DateTime BookingTime { get; set; }
-        public string PaymentMethod { get; set; }
         [Column(TypeName = "decimal(10,3)")]
         public decimal OriginalPrice { get; set; } = 0;
         [Column(TypeName = "decimal(10,3)")]

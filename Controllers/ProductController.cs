@@ -63,6 +63,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ProductName": "Rửa xe Product",
         ///         "ProductImage": "Image",
         ///         "ProductDetailDescription": "Description",
+        ///         "productWarrantyPeriod": 10,
         ///         "ProductPrice": 100.000 VND, /* 100.000 VND (string) */
         ///         "ProductQuantity": 10,
         ///         "ServiceId": 1,
@@ -90,6 +91,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ProductName": "Rửa xe Product New",
         ///         "ProductImage": "Image New",
         ///         "ProductDetailDescription": "Description New",
+        ///         "productWarrantyPeriod": 10,
         ///         "ProductPrice": 100, /* 100 = 100k */
         ///         "ProductQuantity": 10,
         ///         "ServiceId": 1,

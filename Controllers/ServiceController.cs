@@ -96,6 +96,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///             1 : GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
         ///             2 : GÓI DỊCH VỤ NGOẠI THẤT
         ///             3 : GÓI DỊCH VỤ NỘI THẤT
+        ///         "serviceWarrantyPeriod": 2
         ///         "serviceUnit": 1,
         ///             1 : Lần
         ///             2 : Gói
@@ -128,6 +129,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///             1 : GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
         ///             2 : GÓI DỊCH VỤ NGOẠI THẤT
         ///             3 : GÓI DỊCH VỤ NỘI THẤT
+        ///         "serviceWarrantyPeriod": 2
         ///         "serviceUnit": 2,
         ///             1 : Lần
         ///             2 : Gói

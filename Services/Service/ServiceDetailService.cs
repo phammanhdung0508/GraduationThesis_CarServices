@@ -138,6 +138,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     case var isFalse when isFalse == s is not null:
                         throw new MyException("Chi tiết dịch vụ không tồn tại.", 404);
+                    case var isFalse when isFalse == requestDto.ServicePrice!.Contains("VND"):
+                        throw new MyException("Vui lòng nhập đơn vị tiền tệ là VND", 404);
                     case var isFalse when isFalse == !string.IsNullOrEmpty(requestDto.ServicePrice):
                         throw new MyException("Chi tiết dịch vụ không để rỗng.", 404);
                     case var isFalse when isFalse == (requestDto.MaxNumberOfCarLot > requestDto.MinNumberOfCarLot):

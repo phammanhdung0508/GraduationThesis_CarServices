@@ -9,7 +9,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
         public string ProductDetailDescription { get; set; } = string.Empty;
         public int ProductWarrantyPeriod { get; set; }
         public string ProductPrice { get; set; } = string.Empty;
-        public int ProductQuantity { get; set; }
         public string ProductStatus { get; set; } = string.Empty;
         public CategoryProductDto? CategoryProductDto { get; set; }
     }

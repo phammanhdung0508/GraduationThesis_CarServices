@@ -187,6 +187,12 @@ namespace GraduationThesis_CarServices.Services.Service
             {
                 if (await productRepository.IsProductExist(requestDto.ProductId))
                 {
+                    switch (false)
+                    {
+                        case var isFail when isFail == requestDto.ProductPrice!.Contains("VND"):
+                            throw new MyException("Vui lòng nhập đơn vị tiền tệ là VND", 404);
+                    }
+                    
                     var p = await productRepository.Detail(requestDto.ProductId);
 
                     var product = mapper.Map<ProductUpdateRequestDto, Product>(requestDto, p!);

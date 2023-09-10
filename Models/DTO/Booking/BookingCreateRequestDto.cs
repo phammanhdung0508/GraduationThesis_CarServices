@@ -4,9 +4,9 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
 {
     public class BookingCreateRequestDto
     {
-        public string CustomerName { get; set; } = "N/A";
-        public string CustomerPhone { get; set; } = "N/A";
-        public string CustomerEmail { get; set; } = "N/A";
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerPhone { get; set; } = string.Empty;
+        public string CustomerEmail { get; set; } = string.Empty;
 
         [DefaultValue("MM/dd/yyyy")]
         public string DateSelected { get; set; } = string.Empty;

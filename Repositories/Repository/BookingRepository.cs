@@ -182,7 +182,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.Bookings
-                .Where(b => b.BookingTime.Date.Equals(dateSelect) && b.GarageId.Equals(garageId))
+                .Where(b => b.BookingTime.Date.Equals(dateSelect) &&
+                b.GarageId.Equals(garageId) &&
+                b.IsAccepted == true &&
+                (b.BookingStatus.Equals(BookingStatus.Pending) ||
+                b.BookingStatus.Equals(BookingStatus.CheckIn) ||
+                b.BookingStatus.Equals(BookingStatus.Processing) ||
+                b.BookingStatus.Equals(BookingStatus.Completed)))
                 .ToListAsync();
 
                 return list;
@@ -302,7 +308,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 var sumPaid = await paidQuery.SumAsync(b => b.FinalPrice + 100);
 
                 var unpaidQuery = context.Bookings.Where(b => b.GarageId == garageId &&
-                ((b.BookingStatus.Equals(BookingStatus.CheckIn) && b.PaymentStatus.Equals(PaymentStatus.Unpaid)) || 
+                ((b.BookingStatus.Equals(BookingStatus.CheckIn) && b.PaymentStatus.Equals(PaymentStatus.Unpaid)) ||
                 (b.BookingStatus.Equals(BookingStatus.Pending) && b.PaymentStatus.Equals(PaymentStatus.Unpaid)) ||
                 (b.BookingStatus.Equals(BookingStatus.Completed) && b.PaymentStatus.Equals(PaymentStatus.Unpaid))
                 )).AsQueryable();
@@ -429,7 +435,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 throw;
             }
         }
-    
+
         public async Task<int?> GetRole(int userId)
         {
             try
@@ -439,6 +445,26 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .Select(u => u.RoleId).FirstOrDefaultAsync();
 
                 return roleId;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Booking>> GetBookingByGarageCalendar(int garageId)
+        {
+            try
+            {
+                var list = await context.Bookings.Include(b => b.Car).Where(b =>
+                b.Garage.GarageId == garageId &&
+                b.IsAccepted == true &&
+                (b.BookingStatus.Equals(BookingStatus.Pending) ||
+                b.BookingStatus.Equals(BookingStatus.CheckIn) ||
+                b.BookingStatus.Equals(BookingStatus.Processing) ||
+                b.BookingStatus.Equals(BookingStatus.Completed))).ToListAsync();
+
+                return list;
             }
             catch (System.Exception)
             {

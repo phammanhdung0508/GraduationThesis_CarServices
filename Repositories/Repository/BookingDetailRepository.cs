@@ -17,6 +17,37 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var list = await context.BookingDetails.Include(b => b.ServiceDetail)
+                .ThenInclude(s => s.Service).Where(s => s.BookingId == bookingId &&
+                s.IsAccepted == true).ToListAsync();
+
+                return list;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> IsBookingWaitForAccept(int bookingId)
+        {
+            try
+            {
+                var isWait = await context.BookingDetails.Where(b => b.BookingId == bookingId)
+                .AnyAsync(b => b.IsAccepted == false);
+
+                return isWait;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<BookingDetail>> FilterAllBookingDetailByBooking(int bookingId)
+        {
+            try
+            {
+                var list = await context.BookingDetails.Include(b => b.ServiceDetail)
                 .ThenInclude(s => s.Service).Where(s => s.BookingId == bookingId).ToListAsync();
 
                 return list;
@@ -51,6 +82,19 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 {
                     context.BookingDetails.Update(serviceBookings[i]);
                 }
+                await context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task Delete(BookingDetail bookingDetail)
+        {
+            try
+            {
+                context.BookingDetails.Remove(bookingDetail);
                 await context.SaveChangesAsync();
             }
             catch (Exception)

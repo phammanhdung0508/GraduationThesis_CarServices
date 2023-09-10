@@ -198,7 +198,7 @@ namespace GraduationThesis_bookingServices.Controllers
             return Ok(list);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Creates new a Booking for Manager. [Manager]
         /// </summary>
         /// <remarks>
@@ -231,7 +231,7 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             await bookingService.CreateForManager(requestDto);
             throw new MyException("Thành công.", 200);
-        }
+        }*/
 
         /// <summary>
         /// Creates new a Booking. [Customer]
@@ -362,6 +362,14 @@ namespace GraduationThesis_bookingServices.Controllers
             throw new MyException("Thành công.", 200);
         }
 
+        [Authorize(Roles = "Customer")]
+        [HttpPut("confirm-change-in-booking-detail/{bookingId}")]
+        public async Task<IActionResult> ConfirmChangeInBookingDetail(int bookingId, bool isAccepted)
+        {
+            await bookingService.ConfirmChangeInBookingDetail(bookingId, isAccepted);
+            throw new MyException("Thành công.", 200);
+        }
+
 
         /// <summary>
         /// Update a specific booking detail. [Admin, Manager]
@@ -372,6 +380,17 @@ namespace GraduationThesis_bookingServices.Controllers
         {
             await bookingService.UpdateBookingDetailForManager(bookingDetailId, productId);
             throw new MyException("Thành công.", 200);
+        }
+
+        /// <summary>
+        /// Get booking list for calendar. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Manager, Admin")]
+        [HttpGet("get-booking-by-garage-calendar/{garageId}")]
+        public async Task<IActionResult> GetBookingByGarageCalendar(int garageId)
+        {
+            var list = await bookingService.GetBookingByGarageCalendar(garageId);
+            return Ok(list);
         }
     }
 }

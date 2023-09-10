@@ -64,8 +64,7 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ProductImage": "Image",
         ///         "ProductDetailDescription": "Description",
         ///         "productWarrantyPeriod": 10,
-        ///         "ProductPrice": 100.000 VND, /* 100.000 VND (string) */
-        ///         "ProductQuantity": 10,
+        ///         "ProductPrice": 100, /* 100 = 100k */
         ///         "ServiceId": 1,
         ///         "CategoryId": 1
         ///     }
@@ -92,10 +91,8 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ProductImage": "Image New",
         ///         "ProductDetailDescription": "Description New",
         ///         "productWarrantyPeriod": 10,
-        ///         "ProductPrice": 100, /* 100 = 100k */
-        ///         "ProductQuantity": 10,
-        ///         "ServiceId": 1,
-        ///         "CategoryId": 1
+        ///         "ProductPrice": "100.000 VND", /* 100.000 VND (string)
+        ///         "ServiceId": 1
         ///     }
         ///
         /// </remarks>

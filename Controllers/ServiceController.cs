@@ -125,10 +125,6 @@ namespace GraduationThesis_CarServices.Controllers
         ///         "ServiceId": 1,
         ///         "serviceName": "Rửa xe New",
         ///         "serviceImage": "Image New",
-        ///         "serviceGroup": 2,
-        ///             1 : GÓI DỊCH VỤ VỆ SINH + BẢO DƯỠNG
-        ///             2 : GÓI DỊCH VỤ NGOẠI THẤT
-        ///             3 : GÓI DỊCH VỤ NỘI THẤT
         ///         "serviceWarrantyPeriod": 2
         ///         "serviceUnit": 2,
         ///             1 : Lần

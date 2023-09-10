@@ -347,18 +347,6 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.ServiceStatus, obj => obj.MapFrom(src => src.ServiceStatus.ToString()));
             CreateMap<Service, ServiceCreateRequestDto>().ReverseMap();
             CreateMap<ServiceUpdateRequestDto, Service>()
-                .ForMember(des => des.ServiceGroup, obj => obj.MapFrom((src, des) => {
-                    switch (src.ServiceGroup)
-                    {
-                        case 1:
-                            return des.ServiceGroup = ServiceGroup.PackageCleaningMaintenance.ToString();
-                        case 2:
-                            return des.ServiceGroup = ServiceGroup.PackageExterior.ToString();
-                        case 3:
-                            return des.ServiceGroup = ServiceGroup.PackageInterior.ToString();
-                        default: return "N/A";
-                    }
-                }))
                 .ForMember(des => des.ServiceUnit, obj => obj.MapFrom(src => src.ServiceUnit))
                 .ForMember(des => des.UpdatedAt, des => des.MapFrom(src => DateTime.Now))
                 .ForMember(des => des.ServiceId, obj => obj.Ignore());

@@ -293,8 +293,6 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     case var isFail when isFail == typeof(ServiceUnit).IsEnumDefined(requestDto.ServiceUnit!):
                         throw new MyException("Dữ liệu truyền vào không đúng.", 404);
-                    case var isFail when isFail == (requestDto.ServiceGroup > 1 && requestDto.ServiceGroup <= 3):
-                        throw new MyException("Dữ liệu truyền vào không đúng.", 404);
                 }
 
                 if (await serviceRepository.IsServiceExist(requestDto.ServiceId))

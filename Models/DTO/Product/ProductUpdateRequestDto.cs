@@ -8,7 +8,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Product
         public string? ProductDetailDescription { get; set; } = string.Empty;
         public int ProductWarrantyPeriod { get; set; }
         public string? ProductPrice { get; set; } = string.Empty;
-        public int? ProductQuantity { get; set; }
-        public int? CategoryId { get; set; }
+        public int? ServiceId { get; set; }
     }
 }

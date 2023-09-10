@@ -101,7 +101,6 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-
         public async Task<Service?> Detail(int id)
         {
             try
@@ -165,15 +164,16 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public decimal GetPrice(int serviceDetailId)
+        public (decimal, int?) GetPriceAndWarranty(int serviceDetailId)
         {
             try
             {
-                var servicePrice = context.ServiceDetails
+                var service = context.ServiceDetails
+                .Include(p => p.Service)
                 .Where(p => p.ServiceDetailId.Equals(serviceDetailId))
-                .Select(p => p.ServicePrice).FirstOrDefault();
+                .Select(p => new {p.ServicePrice, p.Service.ServiceWarrantyPeriod}).FirstOrDefault();
 
-                return servicePrice;
+                return (service!.ServicePrice, service.ServiceWarrantyPeriod);
             }
             catch (Exception)
             {
@@ -223,7 +223,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.BookingDetails
                 .Include(b => b.ServiceDetail).ThenInclude(s => s.Service).ThenInclude(s => s.Products)
-                .Where(b => b.BookingId == bookingId).ToListAsync();
+                .Where(b => b.BookingId == bookingId && b.IsAccepted == true).ToListAsync();
 
                 return list;
             }

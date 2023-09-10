@@ -12,22 +12,25 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string BookingDay { get; set; } = string.Empty;
         public string GarageAddress { get; set; } = string.Empty;
         public string BookingStatus { get; set; } = string.Empty;
-        public string QrImage { get; set; } = string.Empty;
+        public bool WaitForAccept { get; set; }
         public string DiscountPrice { get; set; } = string.Empty;
         public string TotalPrice { get; set; } = string.Empty;
         public string FinalPrice { get; set; } = string.Empty;
-        public List<GroupServiceBookingDetailDto>? GroupServiceBookingDetailDtos {get; set;}
+        public List<GroupServiceBookingDetailDto>? GroupServiceBookingDetailDtos { get; set; }
     }
 
     public class GroupServiceBookingDetailDto
     {
         public string ServiceGroup { get; set; } = string.Empty;
-        public List<ServiceListBookingDetailDto>? ServiceListBookingDetailDtos {get; set;}
+        public List<ServiceListBookingDetailDto>? ServiceListBookingDetailDtos { get; set; }
     }
 
     public class ServiceListBookingDetailDto
     {
+        public bool IsNew { get; set; }
         public string ServicePrice { get; set; } = string.Empty;
+        public string ServiceWarranty {get; set;} = string.Empty;
+        public string ProductWarranty {get; set;} = string.Empty;
         public string ServiceName { get; set; } = string.Empty;
     }
 }

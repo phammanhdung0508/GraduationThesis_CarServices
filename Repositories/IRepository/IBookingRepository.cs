@@ -26,5 +26,6 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<(int, int, int, int)> CountBookingPerStatus(int? garageId);
         Task ConfirmBookingArePaid(int bookingId);
         Task<int?> GetRole(int userId);
+        Task<List<Booking>> GetBookingByGarageCalendar(int garageId);
     }
 }

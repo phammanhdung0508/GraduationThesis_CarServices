@@ -11,7 +11,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<GenericObject<List<BookingListResponseDto>>> View(PageDto page);
         Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto);
         Task<BookingDetailResponseDto?> Detail(int id);
-        Task CreateForManager(BookingCreateForManagerRequestDto requestDto);
+        /*Task CreateForManager(BookingCreateForManagerRequestDto requestDto);*/
         Task<PaymentLinkDto> Create(BookingCreateRequestDto requestDto);
         Task UpdateStatus(int bookingId, BookingStatus bookingStatus, int userId);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
@@ -25,12 +25,13 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<FilterByBookingStatusResponseDto>> FilterBookingByStatusCustomer(int bookingStatus, int userId);
         Task<BookingDetailForCustomerResponseDto> DetailBookingForCustomer(int bookingId);
         Task<List<BookingDetailStatusForBookingResponseDto>> GetBookingDetailStatusByBooking(int bookingId);
-        Task ConfirmAcceptedBooking(bool isAccepted, int bookingId);
         Task<List<HourDto>> FilterListBookingByGarageAndDate(int bookingId, string date);
         Task<BookingServiceStatusForStaffResponseDto> GetBookingServiceStatusByBooking(int bookingId);
         Task<BookingCountResponseDto> CountBookingPerStatus(int? garageId);
         Task UpdateBookingDetailStatus(int bookingDetailId, int status);
         Task ConfirmBookingArePaid(int bookingId);
         Task UpdateBookingDetailForManager(int bookingDetailId, int productId);
+        Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int garageId);
+        Task ConfirmChangeInBookingDetail(int bookingId, bool isAccepted);
     }
 }

@@ -14,6 +14,10 @@ namespace GraduationThesis_CarServices.Models.Entity
         public decimal ProductPrice { get; set; }
         [Column(TypeName = "decimal(10,3)")]
         public decimal ServicePrice { get; set; }
+        public DateTime? ServiceWarrantyEndDate { get; set; }
+        public DateTime? ProductWarrantyEndDate { get; set; }
+        public bool? IsNew {get; set;}
+        public bool? IsAccepted {get; set;}
         [Column(TypeName = "tinyint")]
         public BookingServiceStatus BookingServiceStatus {get; set;}
         public DateTime? CreatedAt { get; set; }

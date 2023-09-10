@@ -7,6 +7,6 @@ namespace GraduationThesis_CarServices.Enum
         CheckIn,
         Processing,
         Completed,
-        CheckOut
+        Warranty
     }
 }

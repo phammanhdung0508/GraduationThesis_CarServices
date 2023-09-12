@@ -31,7 +31,8 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateBookingDetailStatus(int bookingDetailId, int status);
         Task ConfirmBookingArePaid(int bookingId);
         Task UpdateBookingDetailForManager(int bookingDetailId, int productId);
-        Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int garageId);
+        Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int? garageId);
         Task ConfirmChangeInBookingDetail(int bookingId, bool isAccepted);
+        Task CreateWarrantyForBooking(BookingCreateWarrantyRequestDto requestDto);
     }
 }

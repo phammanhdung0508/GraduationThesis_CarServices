@@ -4,8 +4,6 @@ using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Exception;
 using GraduationThesis_CarServices.Models.DTO.Page;
-using GraduationThesis_CarServices.Models.Entity;
-using GraduationThesis_CarServices.Notification;
 using GraduationThesis_CarServices.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -386,11 +384,19 @@ namespace GraduationThesis_bookingServices.Controllers
         /// Get booking list for calendar. [Admin, Manager]
         /// </summary>
         [Authorize(Roles = "Manager, Admin")]
-        [HttpGet("get-booking-by-garage-calendar/{garageId}")]
-        public async Task<IActionResult> GetBookingByGarageCalendar(int garageId)
+        [HttpGet("get-booking-by-garage-calendar")]
+        public async Task<IActionResult> GetBookingByGarageCalendar(int? garageId)
         {
             var list = await bookingService.GetBookingByGarageCalendar(garageId);
             return Ok(list);
+        }
+
+        [Authorize(Roles = "Manager, Admin")]
+        [HttpPost("create-warranty-by-booking")]
+        public async Task<IActionResult> CreateWarrantyForBooking(BookingCreateWarrantyRequestDto requestDto)
+        {
+            await bookingService.CreateWarrantyForBooking(requestDto);
+            throw new MyException("Thành công.", 200);
         }
     }
 }

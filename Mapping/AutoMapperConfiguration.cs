@@ -40,6 +40,12 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.CreatedAt, obj => obj.MapFrom(src => DateTime.Now));
             CreateMap<Booking, Booking>()
                 .ForMember(des => des.BookingId, obj => obj.Ignore())
+                .ForMember(des => des.BookingDetails, obj => obj.Ignore())
+                .ForMember(des => des.BookingMechanics, obj => obj.Ignore())
+                .ForMember(des => des.OriginalPrice, obj => obj.Ignore())
+                .ForMember(des => des.DiscountPrice, obj => obj.Ignore())
+                .ForMember(des => des.TotalPrice, obj => obj.Ignore())
+                .ForMember(des => des.FinalPrice, obj => obj.Ignore())
                 .ForMember(des => des.BookingStatus, obj => obj.MapFrom(src => BookingStatus.Warranty))
                 .ForMember(des => des.CreatedAt, obj => obj.MapFrom(src => DateTime.Now));
 

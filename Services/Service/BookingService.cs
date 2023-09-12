@@ -400,7 +400,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
 
                 var bookingDto = mapper.Map<Booking?, BookingDetailResponseDto>(booking,
-                otp => otp.AfterMap((src, des) => {
+                otp => otp.AfterMap((src, des) =>
+                {
                     des.WaitForAccept = isWait;
                 }));
 
@@ -1165,7 +1166,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                     await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                     (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                    "Đơn hàng của bạn vừa được thay đổi, hãy liên hệ Garage để biết thêm thông tin. Xin cảm ơn.");
+                    "Đơn hàng của bạn vừa được thay đổi, hãy liên hệ Garage để biết thêm thông tin. Xin cảm ơn.", booking.BookingId);
                 }
             }
             catch (Exception e)
@@ -1218,7 +1219,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                             (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                            "Đơn hàng đã hủy bởi Garage hãy liên hệ Garage để biết chi tiết.");
+                            "Đơn hàng đã hủy bởi Garage hãy liên hệ Garage để biết chi tiết.", 0);
                         }
 
                         var _timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -1228,13 +1229,13 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                             (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                            "Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.");
+                            "Đơn hàng của bạn sẽ được hoàn tiền, hãy liên hệ với Garage để được hoàn tiền đặt trước.", 0);
                         }
                         else
                         {
                             await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                             (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                            "Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.");
+                            "Xin lỗi đơn hàng của bạn sẽ không được hoàn tiền vì đã quá 4 tiếng trước lúc Check-in.", 0);
                         }
 
                         break;
@@ -1256,7 +1257,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         await UpdateLotStatus(LotStatus.Assigned, booking!);
 
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
-                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.");
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã được Check-in.", 0);
 
                         break;
                     case BookingStatus.Completed:
@@ -1313,7 +1314,7 @@ namespace GraduationThesis_CarServices.Services.Service
                         }
 
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
-                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã hoàn tất.");
+                        (booking.Car.Customer.User.DeviceToken, "Thông báo:", "Đơn của bạn đã hoàn tất.", 0);
 
                         break;
                 }
@@ -1668,7 +1669,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 var list = await bookingRepository.FilterBookingByStatusCustomer(bookingStatus, userId);
 
                 var listDto = mapper.Map<List<Booking>, List<FilterByBookingStatusResponseDto>>(list,
-                otp => otp.AfterMap((src, des) => {
+                otp => otp.AfterMap((src, des) =>
+                {
                     for (int i = 0; i < src.Count; i++)
                     {
                         des[i].WaitForAccept = bookingDetailRepository.IsBookingWaitForAccept(src[i].BookingId).Result;
@@ -1891,13 +1893,13 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                        $"Đơn của bạn đã xảy ra lỗi ở {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                        $"Đơn của bạn đã xảy ra lỗi ở {bookingDetail.ServiceDetail.Service.ServiceName}.", 0);
                 }
                 else
                 {
                     await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:",
-                        $"Đơn của bạn đã hoàn thành {bookingDetail.ServiceDetail.Service.ServiceName}.");
+                        $"Đơn của bạn đã hoàn thành {bookingDetail.ServiceDetail.Service.ServiceName}.", 0);
                 }
 
                 bookingDetail.BookingServiceStatus = (BookingServiceStatus)status;
@@ -1957,7 +1959,7 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int garageId)
+        public async Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int? garageId)
         {
             try
             {
@@ -2031,14 +2033,28 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
-        public async Task CreateWarrantyForBooking(int bookingId, DateTime warrantyTime, List<int> serviceIdList, string reason)
+        public async Task CreateWarrantyForBooking(BookingCreateWarrantyRequestDto requestDto)
         {
             try
             {
-                var initialBooking = await bookingRepository.Detail(bookingId);
+                var warrantyTime = DateOnly.Parse(requestDto.WarrantyDay)
+                .ToDateTime(TimeOnly.Parse(requestDto.WarrantyTime));
+
+                var initialBooking = await bookingRepository.Detail(requestDto.BookingId);
+
+                switch (false)
+                {
+                    case var isFalse when isFalse == (initialBooking!.BookingStatus != BookingStatus.Completed):
+                        throw new MyException("Đơn hàng gốc của khách hàng phải hoàn thành trước khi bảo hành.", 404);
+                    case var isFalse when isFalse == (initialBooking!.PaymentStatus != PaymentStatus.Paid):
+                        throw new MyException("Đơn hàng gốc của khách hàng chưa được thanh toán.", 404);
+                }
 
                 var bookingDetailList = initialBooking!.BookingDetails
-                .Where(i => serviceIdList.Any(j => j.Equals(i.ServiceDetail.ServiceId)))
+                .Where(i => requestDto.ServiceList!
+                .Any(j => j.Equals(i.ServiceDetail.ServiceDetailId) &&
+                i.IsAccepted == true &&
+                i.IsNew == true))
                 .ToList();
 
                 var duplicateBooking = mapper.Map<Booking>(initialBooking,
@@ -2058,8 +2074,25 @@ namespace GraduationThesis_CarServices.Services.Service
                 }));
 
                 var duplicateBookingId = await bookingRepository.Create(duplicateBooking);
-                bookingDetailList.ForEach(b => b.BookingId = duplicateBookingId);
-                await bookingDetailRepository.Create(bookingDetailList);
+
+                var bookingDetailNew = mapper.Map<List<BookingDetail>>(bookingDetailList,
+                otp => otp.AfterMap((src, des) =>
+                {
+                    foreach (var item in des)
+                    {
+                        item.BookingId = duplicateBookingId;
+                        item.IsAccepted = true;
+                    }
+                }));
+
+                var car = await carRepository.Detail((int)initialBooking.CarId!);
+
+                car!.CarBookingStatus = CarStatus.NotAvailable;
+
+                await carRepository.Update(car);
+
+                /*bookingDetailList.ForEach(b => b.BookingId = duplicateBookingId);*/
+                await bookingDetailRepository.Create(bookingDetailNew);
             }
             catch (System.Exception)
             {

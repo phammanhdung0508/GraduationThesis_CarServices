@@ -21,7 +21,7 @@ namespace GraduationThesis_CarServices.Notification
             this.configuration = configuration;
         }
 
-        public async Task SendMessagesToSpecificDevices(string deviceToken, string title, string body)
+        public async Task SendMessagesToSpecificDevices(string deviceToken, string title, string body, int bookingId)
         {
             try
             {
@@ -34,8 +34,7 @@ namespace GraduationThesis_CarServices.Notification
                 {
                     Data = new Dictionary<string, string>
                     {
-                        {"random_data", "not string"},
-                        {"hot_data", "also_not_string"}
+                        {"BookingId", bookingId.ToString()}
                     },
                     Notification = new FirebaseAdmin.Messaging.Notification()
                     {

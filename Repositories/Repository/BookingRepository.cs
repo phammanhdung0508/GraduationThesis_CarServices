@@ -339,7 +339,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 if (garageId is not null)
                 {
-                    query = context.Bookings.Where(g => g.GarageId == garageId).AsQueryable();
+                    query = context.Bookings.Where(g => g.GarageId == garageId);
                 }
 
                 var pending = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Pending)).CountAsync();
@@ -452,12 +452,17 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
-        public async Task<List<Booking>> GetBookingByGarageCalendar(int garageId)
+        public async Task<List<Booking>> GetBookingByGarageCalendar(int? garageId)
         {
             try
             {
-                var list = await context.Bookings.Include(b => b.Car).Where(b =>
-                b.Garage.GarageId == garageId &&
+                var query = context.Bookings.Include(b => b.Car).AsQueryable();
+
+                if(garageId is not null){
+                    query = query.Where(b => b.Garage.GarageId == garageId);
+                }
+
+                var list = await query.Where(b =>
                 b.IsAccepted == true &&
                 (b.BookingStatus.Equals(BookingStatus.Pending) ||
                 b.BookingStatus.Equals(BookingStatus.CheckIn) ||

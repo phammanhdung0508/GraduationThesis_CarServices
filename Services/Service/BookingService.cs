@@ -391,18 +391,23 @@ namespace GraduationThesis_CarServices.Services.Service
                 var isWait = await bookingDetailRepository.IsBookingWaitForAccept(id);
                 var booking = await bookingRepository.Detail(id);
 
-                foreach (var item in booking!.BookingDetails)
-                {
-                    if (item.IsAccepted == false)
-                    {
-                        booking.BookingDetails.Remove(item);
-                    }
-                }
+                // foreach (var item in booking!.BookingDetails)
+                // {
+                //     if (item.IsAccepted == false)
+                //     {
+                //         booking.BookingDetails.Remove(item);
+                //     }
+                // }
 
                 var bookingDto = mapper.Map<Booking?, BookingDetailResponseDto>(booking,
                 otp => otp.AfterMap((src, des) =>
                 {
                     des.WaitForAccept = isWait;
+                    if (des.BookingDetailDtos!.Any(b => b.ProductBookingDetailDto!.ProductId == 0))
+                    {
+                        des!.BookingDetailDtos!.Where(b => b.ProductBookingDetailDto!.ProductId == 0)
+                        .Select(b => {b.ProductBookingDetailDto = null; return b;}).ToList();
+                    }
                 }));
 
                 return bookingDto;
@@ -453,7 +458,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     CreateListHourPerDay(openAt, closeAt, listHours, dateSelect);
                 });
 
-                var listBooking = await bookingRepository.FilterBookingByDate(dateSelect, requestDto.GarageId);
+                var listBooking = await bookingRepository.FilterBookingByDateCheck(dateSelect, requestDto.GarageId);
                 var lotCount = garage.Lots.Count;
 
                 await Task.Run(() =>
@@ -1052,6 +1057,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     }
                 }
 
+                //decimal vat = originalPrice * 8 / 100;
+
                 if (isCreateNew == true)
                 {
                     await bookingDetailRepository.Create(listBookingDetail);
@@ -1065,11 +1072,11 @@ namespace GraduationThesis_CarServices.Services.Service
                     {
                         case CouponType.Percent:
                             discountedPrice = originalPrice * (coupon.CouponValue / 100);
-                            totalPrice = originalPrice - discountedPrice;
+                            totalPrice = originalPrice - discountedPrice /*+ vat*/;
                             break;
                         case CouponType.FixedAmount:
                             discountedPrice = coupon.CouponValue;
-                            totalPrice = originalPrice - discountedPrice;
+                            totalPrice = originalPrice - discountedPrice /*+ vat*/;
                             break;
                     }
 
@@ -1078,7 +1085,7 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
                 else
                 {
-                    totalPrice = originalPrice;
+                    totalPrice = originalPrice /*+ vat*/;
                 }
 
                 return (originalPrice, discountedPrice, totalPrice);
@@ -1146,16 +1153,23 @@ namespace GraduationThesis_CarServices.Services.Service
                     bookingDetailList.Add(bookingDetailNew);
                     await bookingDetailRepository.Create(bookingDetailList);
 
+                    bookingDetailList.Clear();
+
+                    bookingDetailOld.IsNew = false;
+                    bookingDetailList.Add(bookingDetailOld);
+                    await bookingDetailRepository.Update(bookingDetailList);
+
                     decimal originalPrice = 0, totalPrice = 0, finalPrice = 0;
 
+                    var bookingDetail_ = await bookingDetailRepository.FilterAllBookingDetailByBooking((int)bookingDetailOld.BookingId!);
+
                     foreach (var item in
-                    booking!.BookingDetails.Where(b => b.IsNew == true &&
-                    b.IsAccepted == true))
+                    bookingDetail_!.Where(b => b.IsNew == true))
                     {
                         originalPrice += item.ProductPrice + item.ServicePrice;
                     }
 
-                    totalPrice = originalPrice - booking.DiscountPrice;
+                    totalPrice = originalPrice - booking!.DiscountPrice;
                     finalPrice = totalPrice - 100;
 
                     booking.OriginalPrice = originalPrice;
@@ -1242,11 +1256,11 @@ namespace GraduationThesis_CarServices.Services.Service
                     case BookingStatus.CheckIn:
                         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
-                        if (TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone) <=
-                        booking.BookingTime)
-                        {
-                            throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
-                        }
+                        // if (TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddMinutes(40), timeZone) <=
+                        // booking.BookingTime)
+                        // {
+                        //     throw new MyException("Xin lỗi đơn hàng của bạn chưa thể Check-in vào lúc này.", 404);
+                        // }
 
                         switch (false)
                         {
@@ -1264,11 +1278,13 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         switch (false)
                         {
-                            case var isAll when isAll == (!booking!.BookingDetails.All(b => b.BookingServiceStatus == BookingServiceStatus.NotStart)):
+                            case var isAll when isAll == (!booking!.BookingDetails.All(b =>
+                            b.BookingServiceStatus == BookingServiceStatus.NotStart)):
                                 throw new MyException("Tất cả dịch vụ cần phải được hoàn tất.", 404);
                             case var isAccepted when isAccepted == (booking.IsAccepted is true):
                                 throw new MyException("Đơn hàng vẫn chưa được chấp nhận bởi người chủ xe.", 404);
-                            case var isFalse when isFalse == (booking.BookingStatus == BookingStatus.CheckIn):
+                            case var isFalse when isFalse == (booking.BookingStatus == BookingStatus.CheckIn ||
+                                booking.BookingStatus == BookingStatus.Warranty):
                                 throw new MyException("Đơn hàng chỉ có thể được hoàn thành khi đang ở trạng thái đang được xử lí.", 404);
                         }
 
@@ -1598,10 +1614,13 @@ namespace GraduationThesis_CarServices.Services.Service
 
             }
 
+            var isWait = await bookingDetailRepository.IsBookingWaitForAccept(bookingId);
+
             var bookingDto = mapper.Map<BookingDetailForStaffResponseDto>(booking,
                 obj => obj.AfterMap((src, des) =>
                 {
                     des.groupServiceBookingDetailDtos = serviceSelectList;
+                    des.WaitForAccept = isWait;
                 }));
 
             return bookingDto;
@@ -1805,7 +1824,14 @@ namespace GraduationThesis_CarServices.Services.Service
                     {
                         var bookingPerHour = list.Where(b => b.BookingTime.Equals(booking.BookingTime)).ToList();
 
-                        var listDto = mapper.Map<List<BookingListForStaffResponseDto>>(bookingPerHour);
+                        var listDto = mapper.Map<List<Booking>, List<BookingListForStaffResponseDto>>(bookingPerHour,
+                        obj => obj.AfterMap((src, des) =>
+                        {
+                            for (int i = 0; i < src.Count; i++)
+                            {
+                                des[i].WaitForAccept = bookingDetailRepository.IsBookingWaitForAccept(src[i].BookingId).Result;
+                            }
+                        }));
 
                         var hour = new HourDto() { Hour = booking.BookingTime.ToString("hh:tt"), BookingListForStaffResponseDtos = listDto };
 
@@ -1845,7 +1871,8 @@ namespace GraduationThesis_CarServices.Services.Service
                     Pending = count.Item1,
                     Canceled = count.Item2,
                     CheckIn = count.Item3,
-                    Completed = count.Item4
+                    Completed = count.Item4,
+                    Warranty = count.Item5
                 };
 
                 return countDto;
@@ -1999,19 +2026,41 @@ namespace GraduationThesis_CarServices.Services.Service
                 {
                     bookingDetail!.IsAccepted = true;
 
-                    var bookingDetailOld = list.Where(b =>
-                    b.BookingId == bookingDetail.BookingId &&
-                    b.ServiceDetailId == bookingDetail.ServiceDetailId &&
-                    b.IsAccepted == true).FirstOrDefault();
-                    bookingDetailOld!.IsNew = false;
-
                     bookingDetailList.Add(bookingDetail);
-                    bookingDetailList.Add(bookingDetailOld);
                     await bookingDetailRepository.Update(bookingDetailList);
                 }
                 else
                 {
+                    var bookingDetailOld = list.Where(b =>
+                    b.BookingId == bookingDetail!.BookingId &&
+                    b.ServiceDetailId == bookingDetail.ServiceDetailId &&
+                    b.IsAccepted == true).FirstOrDefault();
+                    bookingDetailOld!.IsNew = true;
+                    
+                    bookingDetailList.Add(bookingDetailOld);
+
                     await bookingDetailRepository.Delete(bookingDetail!);
+
+                    decimal originalPrice = 0, totalPrice = 0, finalPrice = 0;
+
+                    var bookingDetail_ = await bookingDetailRepository.FilterAllBookingDetailByBooking((int)bookingDetailOld.BookingId!);
+
+                    foreach (var item in
+                    bookingDetail_!.Where(b => b.IsNew == true))
+                    {
+                        originalPrice += item.ProductPrice + item.ServicePrice;
+                    }
+
+                    var booking = await bookingRepository.Detail((int)bookingDetailOld.BookingId!);
+
+                    totalPrice = originalPrice - booking!.DiscountPrice;
+                    finalPrice = totalPrice - 100;
+
+                    booking.OriginalPrice = originalPrice;
+                    booking.TotalPrice = totalPrice;
+                    booking.FinalPrice = finalPrice;
+
+                    await bookingRepository.Update(booking);
                 }
             }
             catch (Exception e)
@@ -2044,9 +2093,9 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 switch (false)
                 {
-                    case var isFalse when isFalse == (initialBooking!.BookingStatus != BookingStatus.Completed):
+                    case var isFalse when isFalse == (initialBooking!.BookingStatus == BookingStatus.Completed):
                         throw new MyException("Đơn hàng gốc của khách hàng phải hoàn thành trước khi bảo hành.", 404);
-                    case var isFalse when isFalse == (initialBooking!.PaymentStatus != PaymentStatus.Paid):
+                    case var isFalse when isFalse == (initialBooking!.PaymentStatus == PaymentStatus.Paid):
                         throw new MyException("Đơn hàng gốc của khách hàng chưa được thanh toán.", 404);
                 }
 
@@ -2082,6 +2131,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     {
                         item.BookingId = duplicateBookingId;
                         item.IsAccepted = true;
+                        item.BookingServiceStatus = BookingServiceStatus.NotStart;
                     }
                 }));
 

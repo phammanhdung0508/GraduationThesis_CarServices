@@ -34,7 +34,7 @@ namespace GraduationThesis_CarServices.Notification
                 {
                     Data = new Dictionary<string, string>
                     {
-                        {"BookingId", bookingId.ToString()}
+                        {"BookingId", bookingId != 0 ? bookingId.ToString() : "0"}
                     },
                     Notification = new FirebaseAdmin.Messaging.Notification()
                     {

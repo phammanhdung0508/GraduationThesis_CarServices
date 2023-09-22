@@ -11,6 +11,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<int> Create(Booking booking);
         Task Update(Booking booking);
         Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId);
+        Task<List<Booking>?> FilterBookingByDateCheck(DateTime dateSelect, int garageId);
         Task<int> CountBookingByTimePerDay(DateTime dateTime, int garageId);
         Task<bool> IsBookingExist(int bookingId);
         Task<(List<Booking>, int count)> FilterBookingByGarage(int garageId, PageDto page);
@@ -23,7 +24,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<Booking> DetailBookingForCustomer(int bookingId);
         Task<List<Booking>> FilterBookingByGarage(int garageId);
         Task<List<Booking>> FilterListBookingByGarageAndDate(int garageId, DateTime date);
-        Task<(int, int, int, int)> CountBookingPerStatus(int? garageId);
+        Task<(int, int, int, int, int)> CountBookingPerStatus(int? garageId);
         Task ConfirmBookingArePaid(int bookingId);
         Task<int?> GetRole(int userId);
         Task<List<Booking>> GetBookingByGarageCalendar(int? garageId);

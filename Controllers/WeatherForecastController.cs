@@ -26,7 +26,7 @@ public class WeatherForecastController : ControllerBase
     {
         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
         (request.DeviceToken, "Thông báo:",
-        $"Đơn hàng {request.BookingId}");
+        $"Đơn hàng {request.BookingId}", request.BookingId);
         throw new MyException("Thành công.", 200);
     }
 

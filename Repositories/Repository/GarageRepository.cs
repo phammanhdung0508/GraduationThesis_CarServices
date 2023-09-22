@@ -40,7 +40,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var totalServices = query.SelectMany(g => g.GarageDetails).Select(g => g.Service).Count();
 
-                var totalOrders = query.SelectMany(g => g.Bookings).Count();
+                var totalOrders = query.SelectMany(g => g.Bookings).Where(b => b.IsAccepted == true).Count();
 
                 return (totalServices, totalOrders);
             }

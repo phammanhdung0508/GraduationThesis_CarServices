@@ -30,7 +30,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<ServiceDetail> ServiceDetails { get; set; }
         public DbSet<BookingMechanic> BookingMechanics { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Warranty> Warranties { get; set; }
+        //public DbSet<Warranty> Warranties { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

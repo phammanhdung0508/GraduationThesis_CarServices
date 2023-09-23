@@ -28,5 +28,8 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task ConfirmBookingArePaid(int bookingId);
         Task<int?> GetRole(int userId);
         Task<List<Booking>> GetBookingByGarageCalendar(int? garageId);
+        Task<Garage?> GetGarage(string bookingCode);
+        Task<string?> GetBookingCodeByBookingId(int bookingId);
+        Task<List<Booking>> GetBookingByBookingCode(string bookingCode);
     }
 }

@@ -120,6 +120,16 @@ namespace GraduationThesis_CarServices.Mapping
 
 
             //Garage
+            CreateMap<Garage, BookingDetailWarrantyDto>()
+                .ForMember(des => des.GarageName, obj => obj.MapFrom(src => src.GarageName))
+                .ForMember(des => des.GarageImage, obj => obj.MapFrom(src => src.GarageImage))
+                .ForMember(des => des.FullAddress, obj => obj.MapFrom(src => src.GarageAddress + ", " + src.GarageWard + ", " + src.GarageDistrict + ", " + src.GarageCity))
+                .ForMember(des => des.GarageStatus, obj => obj.MapFrom(src => src.GarageStatus))
+                .ForMember(des => des.FullName, obj => obj.MapFrom(src => src.Bookings.First().Car.Customer.User.UserFirstName 
+                + " " + src.Bookings.First().Car.Customer.User.UserLastName))
+                .ForMember(des => des.UserEmail, obj => obj.MapFrom(src => Base64Decode(src.Bookings.First().Car.Customer.User.UserEmail)))
+                .ForMember(des => des.UserPhone, obj => obj.MapFrom(src => src.Bookings.First().Car.Customer.User.UserPhone))
+                .ForMember(des => des.UserImage, obj => obj.MapFrom(src => src.Bookings.First().Car.Customer.User.UserImage));
             CreateMap<Garage, GetIdAndNameDto>()
                 .ForMember(des => des.Id, obj => obj.MapFrom(src => src.GarageId))
                 .ForMember(des => des.Name, obj => obj.MapFrom(src => src.GarageName + ". " + src.GarageAddress));
@@ -494,13 +504,31 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.WorkingDate, obj => obj.MapFrom(src => DateTime.Now));
 
             //Booking
+            CreateMap<Booking, BookingDetailList>()
+                .ForMember(des => des.BookingTime, obj => obj.MapFrom(src => src.BookingTime.ToString("dd/MM/yyyy h:mm tt")))
+                .ForMember(des => des.OriginalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.OriginalPrice) + " VND"))
+                .ForMember(des => des.DiscountPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.DiscountPrice) + " VND"))
+                .ForMember(des => des.TotalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.TotalPrice) + " VND"))
+                .ForMember(des => des.FinalPrice, obj => obj.MapFrom(src => FormatCurrency.FormatNumber(src.FinalPrice) + " VND"))
+                .ForMember(des => des.BookingDetailDtos, obj => obj.MapFrom(src => src.BookingDetails));
             CreateMap<Booking, BookingListByCalenderResponseDto>()
                 .ForMember(des => des.Id, obj => obj.MapFrom(src => src.BookingId))
                 .ForMember(des => des.Title, obj => obj.MapFrom(src => src.CustomerName + ", "
                 + src.Car.CarLicensePlate))
                 .ForMember(des => des.Start, obj => obj.MapFrom(src => src.BookingTime.ToString("yyyy-MM-dd HH:mm:ss")))
                 .ForMember(des => des.End, obj => obj.MapFrom(src => src.BookingTime
-                .AddHours(src.CustomersCanReceiveTheCarTime).ToString("yyyy-MM-dd HH:mm:ss")));
+                .AddHours(src.CustomersCanReceiveTheCarTime).ToString("yyyy-MM-dd HH:mm:ss")))
+                .ForMember(des => des.Color, obj => obj.MapFrom((src, des) => {
+                    switch (src.BookingStatus)
+                    {
+                        case BookingStatus.CheckIn:
+                            return "#fada5f";
+                        case BookingStatus.Warranty:
+                            return "#00c9db";
+                        default:
+                            return "ffa500";
+                    }
+                }));
             CreateMap<Booking, BookingMechanicCurrentWorkingOn>()
                 .ForMember(des => des.BookingTime, obj => obj.MapFrom(src => src.BookingTime.ToString("dd/MM/yyyy h:mm tt")))
                 .ForMember(des => des.CarInfo, obj => obj.MapFrom(src => src.Car.CarBrand))

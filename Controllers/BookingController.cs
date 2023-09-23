@@ -398,5 +398,13 @@ namespace GraduationThesis_bookingServices.Controllers
             await bookingService.CreateWarrantyForBooking(requestDto);
             throw new MyException("Thành công.", 200);
         }
+
+        //[Authorize(Roles = "Manager, Admin")]
+        [HttpGet("get-booking-detail/{bookingId}")]
+        public async Task<IActionResult> GetBookingByBookingId(int bookingId)
+        {
+            var garage = await bookingService.GetBookingByBookingId(bookingId);
+            return Ok(garage);
+        }
     }
 }

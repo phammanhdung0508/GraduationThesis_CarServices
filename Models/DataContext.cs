@@ -30,7 +30,7 @@ namespace GraduationThesis_CarServices.Models
         public DbSet<ServiceDetail> ServiceDetails { get; set; }
         public DbSet<BookingMechanic> BookingMechanics { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Warranty> Warranties { get; set; }
+        //public DbSet<Warranty> Warranties { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -426,60 +426,6 @@ namespace GraduationThesis_CarServices.Models
                     ProductWarrantyPeriod = 0,
                     ServiceId=8, CategoryId=1},
                 
-                new Product{ProductId = 15, ProductName="Sonax (Nước rửa xe đậm đặc) 1l",
-                    ProductImage="https://tamsonshop.vn/wp-content/uploads/2023/02/nuoc-rua-xe-sonax-gloss-shampoo-314300-1l-p167-1.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=143, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=1, CategoryId=1},
-                
-                new Product{ProductId = 16, ProductName="Sonax Gloss shampoo (Nước rửa xe đậm đặc) 5l",
-                    ProductImage="https://tamsonshop.vn/wp-content/uploads/2019/12/nuoc-rua-xe-sonax-314500-5l-gloss-shampoo-p164-1-510x510.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=580, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=1, CategoryId=1},
-                
-                new Product{ProductId = 17, ProductName="3M General Purpose Adhesive Cleaner (Dung dịch tẩy keo, nhựa đường) 425g",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/Dung-Dich-Tay-Keo-Nhua-Duong-3M-08987-425g-jpeg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=160, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=2, CategoryId=1},
-                
-                new Product{ProductId = 18, ProductName="3M General Purpose Adhesive Cleaner (Dung dịch tẩy keo, nhựa đường) 300g",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/Dung-Dich-Tay-Keo-Nhua-Duong-3M-08987-425g-jpeg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=120, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=2, CategoryId=1},
-                
-                new Product{ProductId = 19, ProductName="3M General Purpose Adhesive Cleaner (Dung dịch tẩy keo, nhựa đường) 525g",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/Dung-Dich-Tay-Keo-Nhua-Duong-3M-08987-425g-jpeg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=190, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=2, CategoryId=1},
-                
-                new Product{ProductId = 20, ProductName="3M Glass Cleaner (Nước rửa kính) 538g",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/Nuoc-lau-kinh-o-to-3M-08888-Glass-Cleaner-538g-3.jpg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=120, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=3, CategoryId=1},
-                
-                new Product{ProductId = 21, ProductName="Glaco de cleaner (Chai xịt vệ sinh kính ô tô) 328g",
-                    ProductImage="https://down-vn.img.susercontent.com/file/3d214249a227c70832607478a7eed690",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=220, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=3, CategoryId=2},
-                
-                new Product{ProductId = 22, ProductName="3M Leather & Vinyl Restorer (Chai xịt bảo vệ nội thất) 400ml",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/bao-duong-noi-that-xe-oto-3m-39040lt-p349.jpg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=180, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=5, CategoryId=1},
-                
-                new Product{ProductId = 23, ProductName="3M Leather & Vinyl Restorer (Chai xịt bảo vệ nội thất) 500ml",
-                    ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/bao-duong-noi-that-xe-oto-3m-39040lt-p349.jpg.webp",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=225, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=5, CategoryId=1},
-                
                 new Product{ProductId = 24, ProductName="Liqui Moly A/C System cleaner (Chai xịt vệ sinh giàn lạnh) 250ml",
                     ProductImage="https://vesinhoto3m.com/wp-content/uploads/2023/04/bao-duong-noi-that-xe-oto-3m-39040lt-p349.jpg.webp",
                     ProductUnit=ProductUnit.Bottle, ProductPrice=299, ProductStatus=Status.Activate, 
@@ -491,24 +437,6 @@ namespace GraduationThesis_CarServices.Models
                     ProductUnit=ProductUnit.Bottle, ProductPrice=1300, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 0,
                     ServiceId=6, CategoryId=1},
-                
-                new Product{ProductId = 26, ProductName="3M Disinfectant Formaldehyde Removal Spray (Diệt khuẩn khử mùi nội thất) 200ml",
-                    ProductImage="https://tamsonshop.vn/wp-content/uploads/2022/04/khu-mui-noi-that-xe-oto-3m-38660-p901-1.jpg",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=250, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=10, CategoryId=1},
-                
-                new Product{ProductId = 27, ProductName="Carwaxx (Diệt khuẩn khử mùi nội thất) 150ml",
-                    ProductImage="https://cdn.tatmart.com/images/detailed/72/H%C3%ACnh_cover_carwaxx.png",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=204, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=10, CategoryId=1},
-
-                new Product{ProductId = 28, ProductName="Liqui Moly Radiator Cleaner (Vệ sinh két nước) 300ml",
-                    ProductImage="https://down-vn.img.susercontent.com/file/f39188de4790586fabfbf64fb6d00e0b",
-                    ProductUnit=ProductUnit.Bottle, ProductPrice=170, ProductStatus=Status.Activate, 
-                    ProductWarrantyPeriod = 0,
-                    ServiceId=11, CategoryId=1},
                 
                 new Product{ProductId = 29, ProductName="MaxClean Fuel System Cleaner Senfineco (Vệ Sinh Kim Phun Buồng Đốt) 300ml",
                     ProductImage="https://trang.store/wp-content/uploads/2023/07/ve-sinh-kim-phun-buong-dot-may-xang-senfineco-9997-3-500x500.jpg",

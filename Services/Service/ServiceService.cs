@@ -15,12 +15,14 @@ namespace GraduationThesis_CarServices.Services.Service
     public class ServiceService : IServiceService
     {
         private readonly IServiceRepository serviceRepository;
+        private readonly IProductRepository productRepository;
 
         private readonly IMapper mapper;
-        public ServiceService(IServiceRepository serviceRepository, IMapper mapper)
+        public ServiceService(IServiceRepository serviceRepository, IMapper mapper, IProductRepository productRepository)
         {
             this.mapper = mapper;
             this.serviceRepository = serviceRepository;
+            this.productRepository = productRepository;
         }
 
         public async Task<GenericObject<List<ServiceListResponseDto>>> View(PageDto page)
@@ -80,9 +82,28 @@ namespace GraduationThesis_CarServices.Services.Service
                         {
                             for (int i = 0; i < src.Count; i++)
                             {
-                                var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
-                                des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
-                                des[i].ServicePrice = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
+                                if (src[i].Products.Count != 0)
+                                {
+                                    var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
+                                    var product = productRepository.GetDefaultProduct(serviceDetail.ServiceDetailId);
+
+                                    var serviceName = serviceDetail.Service.ServiceName + ",@Sản phẩm đi kèm: " + product.ProductName;
+                                    serviceName = serviceName.Replace("@", System.Environment.NewLine);
+                                    var price = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND" + "@"
+                                    + FormatCurrency.FormatNumber(product.ProductPrice) + " VND";
+                                    price = price.Replace("@", System.Environment.NewLine);
+
+                                    des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
+                                    des[i].ServiceName = serviceName;
+                                    des[i].ServicePrice = price;
+                                    //FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
+                                }
+                                else
+                                {
+                                    var serviceDetail = src[i].ServiceDetails.FirstOrDefault(s => s.MinNumberOfCarLot <= carType && s.MaxNumberOfCarLot >= carType)!;
+                                    des[i].ServiceDetailId = serviceDetail.ServiceDetailId;
+                                    des[i].ServicePrice = FormatCurrency.FormatNumber(serviceDetail.ServicePrice) + " VND";
+                                }
                             }
                         }));
 

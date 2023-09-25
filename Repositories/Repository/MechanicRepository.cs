@@ -258,7 +258,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             try
             {
                 var count = await context.BookingMechanics
-                .Include(b => b.Mechanic).Where(b => b.Mechanic.UserId == userId).CountAsync();
+                .Include(b => b.Mechanic).Where(b => b.Mechanic.UserId == userId
+                && b.Booking.IsAccepted == true).CountAsync();
 
                 return count;
             }
@@ -277,7 +278,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 .ThenInclude(c => c.Customer).ThenInclude(c => c.User)
                 .Include(b => b.Booking).ThenInclude(g => g.Garage)
                 .Include(b => b.Mechanic)
-                .Where(b => b.Mechanic.UserId == userId).Select(b => b.Booking).AsQueryable();
+                .Where(b => b.Mechanic.UserId == userId 
+                && b.Booking.IsAccepted == true).Select(b => b.Booking).AsQueryable();
 
                 var count = await query.CountAsync();
 

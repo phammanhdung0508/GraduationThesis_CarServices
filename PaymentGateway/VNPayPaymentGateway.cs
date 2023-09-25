@@ -174,7 +174,7 @@ namespace GraduationThesis_CarServices.PaymentGateway
                         .Select(c => c.User.DeviceToken).FirstOrDefaultAsync();
 
                         await fCMSendNotificationMobile.SendMessagesToSpecificDevices
-                        (deviceToken!, "Thông báo quan trọng:.", "Bạn đã hoàn thành đặt đơn hàng thành công.");
+                        (deviceToken!, "Thông báo quan trọng:.", "Bạn đã hoàn thành đặt đơn hàng thành công.", 0);
 
                         isSuccess = true;
                     }

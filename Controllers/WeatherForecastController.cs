@@ -1,3 +1,5 @@
+using GraduationThesis_CarServices.Models.DTO.Exception;
+using GraduationThesis_CarServices.Notification;
 using Microsoft.AspNetCore.Mvc;
 namespace project.Controllers;
 
@@ -11,10 +13,21 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly FCMSendNotificationMobile fCMSendNotificationMobile;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, FCMSendNotificationMobile fCMSendNotificationMobile)
     {
         _logger = logger;
+        this.fCMSendNotificationMobile = fCMSendNotificationMobile;
+    }
+
+    [HttpPost("test-notifi")]
+    public async Task<IActionResult> DetailBooking(TestNotifi request)
+    {
+        await fCMSendNotificationMobile.SendMessagesToSpecificDevices
+        (request.DeviceToken, "Thông báo:",
+        $"Đơn hàng {request.BookingId}", request.BookingId);
+        throw new MyException("Thành công.", 200);
     }
 
     // [HttpGet(Name = "GetWeatherForecast")]

@@ -205,6 +205,7 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var services = await context.GarageDetails
                 .Include(g => g.Service).ThenInclude(s => s.ServiceDetails)
+                .Include(g => g.Service).ThenInclude(s => s.Products)
                 .Where(g => g.GarageId == garageId &&
                 g.Service.ServiceStatus.Equals(Status.Activate))
                 .Select(g => g.Service).ToListAsync();
@@ -223,7 +224,9 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             {
                 var list = await context.BookingDetails
                 .Include(b => b.ServiceDetail).ThenInclude(s => s.Service).ThenInclude(s => s.Products)
-                .Where(b => b.BookingId == bookingId && b.IsAccepted == true).ToListAsync();
+                .Where(b => b.BookingId == bookingId 
+                //&& b.IsAccepted == true
+                ).ToListAsync();
 
                 return list;
             }

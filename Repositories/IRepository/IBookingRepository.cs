@@ -1,4 +1,5 @@
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 
@@ -7,10 +8,12 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IBookingRepository
     {
         Task<(List<Booking>?, int count)> View(PageDto page);
+        Task<(List<Booking>?, int count)> ViewAndFilter(ViewAllAndFilterBooking page);
         Task<Booking?> Detail(int id);
         Task<int> Create(Booking booking);
         Task Update(Booking booking);
         Task<List<Booking>?> FilterBookingByDate(DateTime dateSelect, int garageId);
+        Task<List<Booking>?> FilterBookingByDateCheck(DateTime dateSelect, int garageId);
         Task<int> CountBookingByTimePerDay(DateTime dateTime, int garageId);
         Task<bool> IsBookingExist(int bookingId);
         Task<(List<Booking>, int count)> FilterBookingByGarage(int garageId, PageDto page);
@@ -23,9 +26,12 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<Booking> DetailBookingForCustomer(int bookingId);
         Task<List<Booking>> FilterBookingByGarage(int garageId);
         Task<List<Booking>> FilterListBookingByGarageAndDate(int garageId, DateTime date);
-        Task<(int, int, int, int)> CountBookingPerStatus(int? garageId);
+        Task<(int, int, int, int, int)> CountBookingPerStatus(int? garageId);
         Task ConfirmBookingArePaid(int bookingId);
         Task<int?> GetRole(int userId);
-        Task<List<Booking>> GetBookingByGarageCalendar(int garageId);
+        Task<List<Booking>> GetBookingByGarageCalendar(int? garageId);
+        Task<Garage?> GetGarage(string bookingCode);
+        Task<string?> GetBookingCodeByBookingId(int bookingId);
+        Task<List<Booking>> GetBookingByBookingCode(string bookingCode);
     }
 }

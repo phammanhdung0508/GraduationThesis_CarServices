@@ -10,3 +10,9 @@ public class WeatherForecast
 
     public string? Summary { get; set; }
 }
+
+public class TestNotifi
+{
+    public int BookingId {get; set;}
+    public string DeviceToken {get; set;} = string.Empty;
+}

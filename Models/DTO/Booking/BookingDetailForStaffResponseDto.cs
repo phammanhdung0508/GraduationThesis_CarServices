@@ -5,6 +5,7 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string CustomerName { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = string.Empty;
         public string CustomerAddress {get; set;} = string.Empty;
+        public bool WaitForAccept { get; set; }
         public string DeviceToken { get; set; } = string.Empty;
         public string PickUpTime { get; set; } = string.Empty;
         public string DeliveryTime { get; set; } = string.Empty;

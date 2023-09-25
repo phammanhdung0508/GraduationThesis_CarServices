@@ -1,4 +1,5 @@
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 
@@ -7,6 +8,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
     public interface IBookingRepository
     {
         Task<(List<Booking>?, int count)> View(PageDto page);
+        Task<(List<Booking>?, int count)> ViewAndFilter(ViewAllAndFilterBooking page);
         Task<Booking?> Detail(int id);
         Task<int> Create(Booking booking);
         Task Update(Booking booking);
@@ -28,5 +30,8 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task ConfirmBookingArePaid(int bookingId);
         Task<int?> GetRole(int userId);
         Task<List<Booking>> GetBookingByGarageCalendar(int? garageId);
+        Task<Garage?> GetGarage(string bookingCode);
+        Task<string?> GetBookingCodeByBookingId(int bookingId);
+        Task<List<Booking>> GetBookingByBookingCode(string bookingCode);
     }
 }

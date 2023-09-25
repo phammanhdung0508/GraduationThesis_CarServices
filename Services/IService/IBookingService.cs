@@ -9,6 +9,7 @@ namespace GraduationThesis_CarServices.Services.IService
     public interface IBookingService
     {
         Task<GenericObject<List<BookingListResponseDto>>> View(PageDto page);
+        Task<GenericObject<List<BookingListResponseDto>>> ViewAndFilter(ViewAllAndFilterBooking page);
         Task<List<BookingPerHour>> IsBookingAvailable(BookingCheckRequestDto requestDto);
         Task<BookingDetailResponseDto?> Detail(int id);
         /*Task CreateForManager(BookingCreateForManagerRequestDto requestDto);*/
@@ -34,5 +35,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<BookingListByCalenderResponseDto>> GetBookingByGarageCalendar(int? garageId);
         Task ConfirmChangeInBookingDetail(int bookingId, bool isAccepted);
         Task CreateWarrantyForBooking(BookingCreateWarrantyRequestDto requestDto);
+        Task<BookingDetailWarrantyDto> GetBookingByBookingId(int bookingId);
     }
 }

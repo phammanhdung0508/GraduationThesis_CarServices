@@ -1,5 +1,6 @@
 using GraduationThesis_CarServices.Enum;
 using GraduationThesis_CarServices.Models;
+using GraduationThesis_CarServices.Models.DTO.Booking;
 using GraduationThesis_CarServices.Models.DTO.Page;
 using GraduationThesis_CarServices.Models.Entity;
 using GraduationThesis_CarServices.Paging;
@@ -511,10 +512,102 @@ namespace GraduationThesis_CarServices.Repositories.Repository
                 b.IsAccepted == true &&
                 (b.BookingStatus.Equals(BookingStatus.Pending) ||
                 b.BookingStatus.Equals(BookingStatus.CheckIn) ||
-                b.BookingStatus.Equals(BookingStatus.Processing) || 
+                b.BookingStatus.Equals(BookingStatus.Processing) ||
                 b.BookingStatus.Equals(BookingStatus.Warranty))).ToListAsync();
 
                 return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Garage?> GetGarage(string bookingCode)
+        {
+            try
+            {
+                var garage = await context.Garages
+                .Include(b => b.Bookings).ThenInclude(b => b.Car)
+                .ThenInclude(c => c.Customer).ThenInclude(m => m.User)
+                .Where(g => g.Bookings.Any(b => b.BookingCode.Equals(bookingCode)))
+                .FirstOrDefaultAsync();
+
+                return garage;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Booking>> GetBookingByBookingCode(string bookingCode)
+        {
+            try
+            {
+                var list = await context.Bookings
+                .Include(b => b.BookingDetails)
+                .ThenInclude(d => d.ServiceDetail).ThenInclude(s => s.Service)
+                .Include(b => b.BookingDetails).ThenInclude(d => d.Product)
+                .Where(b => b.BookingCode.Equals(bookingCode)).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<string?> GetBookingCodeByBookingId(int bookingId)
+        {
+            try
+            {
+                var bookingCode = await context.Bookings
+                .Where(b => b.BookingId == bookingId)
+                .Select(b => b.BookingCode).FirstOrDefaultAsync();
+
+                return bookingCode;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Booking>?, int count)> ViewAndFilter(ViewAllAndFilterBooking page)
+        {
+            try
+            {
+                IQueryable<Booking>? query = null;
+
+                if (page.BookingStatus is null && page.GarageId is null)
+                {
+                    query = context.Bookings.Where(b => b.IsAccepted == true);
+                }
+                else if (page.BookingStatus is null && page.GarageId is not null)
+                {
+                    query = context.Bookings.Where(b => b.IsAccepted == true
+                    && b.GarageId == page.GarageId);
+                }
+                else if (page.BookingStatus is not null && page.GarageId is null)
+                {
+                    query = context.Bookings.Where(b => b.IsAccepted == true
+                    && (int)b.BookingStatus == page.BookingStatus);
+                }
+                else
+                {
+                    query = context.Bookings.Where(b => b.IsAccepted == true
+                    && b.GarageId == page.GarageId
+                    && (int)b.BookingStatus == page.BookingStatus);
+                }
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration2<Booking>.Get(query.Include(b => b.Car)
+                .ThenInclude(c => c.Customer).ThenInclude(c => c.User).Include(b => b.Garage), page);
+
+                return (list.OrderByDescending(b => b.BookingId).ToList(), count);
             }
             catch (System.Exception)
             {

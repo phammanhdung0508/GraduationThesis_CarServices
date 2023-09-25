@@ -8,5 +8,6 @@ namespace GraduationThesis_CarServices.Models.DTO.Booking
         public string Start { get; set; } = string.Empty;
         public string End { get; set; } = string.Empty;
         public string BookingStatus { get; set; } = string.Empty;
+        public string Color { get; set; } = string.Empty;
     }
 }

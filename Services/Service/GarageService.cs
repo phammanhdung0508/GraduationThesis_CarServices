@@ -423,12 +423,12 @@ namespace GraduationThesis_CarServices.Services.Service
                     };
 
                     //Remove garage which is full on select date
-                    var isFalse = bookingService.IsBookingAvailable(checkBooking).Result.All(g => g.IsAvailable is false);
+                    /*var isFalse = bookingService.IsBookingAvailable(checkBooking).Result.All(g => g.IsAvailable is false);
 
                     if (isFalse)
                     {
                         filteredGaragesByService!.Remove(garage);
-                    }
+                    }*/
                 }
 
                 var filteredGarages = new List<Garage>();

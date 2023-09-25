@@ -406,7 +406,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     if (des.BookingDetailDtos!.Any(b => b.ProductBookingDetailDto!.ProductId == 0))
                     {
                         des!.BookingDetailDtos!.Where(b => b.ProductBookingDetailDto!.ProductId == 0)
-                        .Select(b => {b.ProductBookingDetailDto = null; return b;}).ToList();
+                        .Select(b => { b.ProductBookingDetailDto = null; return b; }).ToList();
                     }
                 }));
 
@@ -502,7 +502,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private static int GetMinEstimatedTime(int i, List<Booking> listBooking)
         {
             var minEstimatedTimePerHour = listBooking!.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i))
-            .Min(l => /*l.TotalEstimatedCompletionTime*/ l.CustomersCanReceiveTheCarTime);
+            .Min(l => /*l.BookingDuration*/ l.BookingDuration);
 
             return minEstimatedTimePerHour;
         }
@@ -510,7 +510,7 @@ namespace GraduationThesis_CarServices.Services.Service
         private static (int? bookingInFirstHourCount, int? bookingInNextHourCount) CountBookingPerHour(int num, int i, List<Booking> listBooking)
         {
             var bookingInFirstHourCount = listBooking?
-            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).Count();
+            .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) && /*b.BookingDuration*/ b.BookingDuration > 1).Count();
             var bookingInNextHourCount = listBooking?
             .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + num)).Count();
 
@@ -599,7 +599,7 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 var bookingInOneHours = listBooking?
                 .Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) &&
-                /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime == 1).Count();
+                /*b.BookingDuration*/ b.BookingDuration == 1).Count();
 
                 var test5 = i - current.Hour;
 
@@ -643,7 +643,7 @@ namespace GraduationThesis_CarServices.Services.Service
                             if (bookingInFirstHourCout + bookingInNextHourCout == lotCount && minEstimatedTimePerHour > 1)
                             {
                                 var durationFirstHour = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i) &&
-                                 /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).FirstOrDefault()!./*TotalEstimatedCompletionTime*/CustomersCanReceiveTheCarTime;
+                                 /*b.BookingDuration*/ b.BookingDuration > 1).FirstOrDefault()!./*BookingDuration*/BookingDuration;
                                 if (durationFirstHour > 1)
                                 {
                                     for (int b = i + 1; b < i + durationFirstHour; b++)
@@ -652,7 +652,7 @@ namespace GraduationThesis_CarServices.Services.Service
                                     }
                                     z = (int)durationFirstHour;
                                     i = i + z - 1;
-                                    var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && /*b.TotalEstimatedCompletionTime*/ b.CustomersCanReceiveTheCarTime > 1).Count();
+                                    var isBookin = listBooking?.Where(b => b.BookingTime.TimeOfDay.Hours.Equals(i + 1) && /*b.BookingDuration*/ b.BookingDuration > 1).Count();
                                     if (isBookin + (int)bookingInFirstHourCout! == lotCount)
                                     {
                                         UpdateListHours(i + 1, listHours);
@@ -805,8 +805,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.DiscountPrice = discountedPrice;
                 booking.TotalPrice = totalPrice;
                 booking.FinalPrice = totalPrice;
-                booking.TotalEstimatedCompletionTime = totalEstimated;
-                booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
+                booking.BookingDuration = totalEstimated;
+                booking.BookingDuration = totalEstimated + 1;
 
                 //await GenerateQRCode(booking);
             }
@@ -969,8 +969,8 @@ namespace GraduationThesis_CarServices.Services.Service
                 booking.DiscountPrice = checkOut.Item2;
                 booking.TotalPrice = checkOut.Item3;
                 booking.FinalPrice = checkOut.Item3 - 100;
-                booking.TotalEstimatedCompletionTime = totalEstimated;
-                booking.CustomersCanReceiveTheCarTime = totalEstimated + 1;
+                //booking.BookingDuration = totalEstimated;
+                booking.BookingDuration = totalEstimated + 1;
 
                 //await GenerateQRCode(booking);
 
@@ -1290,14 +1290,14 @@ namespace GraduationThesis_CarServices.Services.Service
 
                         var bookingDetails = await bookingDetailRepository.FilterBookingDetailByBookingId(bookingId);
 
-                        foreach (var bookingDetail in bookingDetails)
+                        /*foreach (var bookingDetail in bookingDetails)
                         {
                             if (bookingDetail.BookingServiceStatus == BookingServiceStatus.Error &&
                             !bookingDetails.Any(b => b.BookingServiceStatus == BookingServiceStatus.NotStart))
                             {
                                 booking!.FinalPrice -= bookingDetail.ServicePrice;
                             }
-                        }
+                        }*/
 
                         var car = await carRepository.Detail(booking.Car.CarId);
 
@@ -1397,7 +1397,8 @@ namespace GraduationThesis_CarServices.Services.Service
 
             var mechanicList = await mechanicRepository.FilterMechanicsAvailableByGarage((int)booking.GarageId!, false);
 
-            var numService = booking.BookingDetails.Count;
+            var numService = booking.BookingDetails
+            .Count(b => b.IsNew == true && b.IsAccepted == true);
 
             //var testOnly = mechanicList.OrderBy(m => m.BookingMechanics.Count).ToList();
 
@@ -1918,6 +1919,10 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 if (status == 2)
                 {
+                    booking!.FinalPrice -= bookingDetail.ServicePrice;
+
+                    await bookingRepository.Update(booking);
+
                     await fCMSendNotificationMobile.SendMessagesToSpecificDevices
                         (booking.Car.Customer.User.DeviceToken, "Thông báo:",
                         $"Đơn của bạn đã xảy ra lỗi ở {bookingDetail.ServiceDetail.Service.ServiceName}.", 0);
@@ -2036,7 +2041,7 @@ namespace GraduationThesis_CarServices.Services.Service
                     b.ServiceDetailId == bookingDetail.ServiceDetailId &&
                     b.IsAccepted == true).FirstOrDefault();
                     bookingDetailOld!.IsNew = true;
-                    
+
                     bookingDetailList.Add(bookingDetailOld);
 
                     await bookingDetailRepository.Delete(bookingDetail!);
@@ -2110,16 +2115,26 @@ namespace GraduationThesis_CarServices.Services.Service
                 otp => otp.AfterMap((src, des) =>
                 {
                     var totalEstimated = 0;
+                    decimal price = 0;
                     for (int i = 0; i < bookingDetailList.Count; i++)
                     {
                         var serviceDuration = bookingDetailList[i]
                         .ServiceDetail.Service.ServiceDuration;
                         totalEstimated += serviceDuration;
+
+                        if (bookingDetailList[i].ProductWarrantyEndDate < warrantyTime)
+                        {
+                            price += bookingDetailList[i].ProductPrice;
+                        }
                     }
 
+                    des.OriginalPrice = price;
+                    des.TotalPrice = price;
+                    des.FinalPrice = price;
                     des.BookingTime = warrantyTime;
-                    des.TotalEstimatedCompletionTime = totalEstimated;
-                    des.CustomersCanReceiveTheCarTime = totalEstimated + 1;
+                    //des.BookingDuration = totalEstimated;
+                    des.BookingDuration = totalEstimated + 1;
+                    des.WarrantyReason = requestDto.Reason;
                 }));
 
                 var duplicateBookingId = await bookingRepository.Create(duplicateBooking);
@@ -2143,10 +2158,105 @@ namespace GraduationThesis_CarServices.Services.Service
 
                 /*bookingDetailList.ForEach(b => b.BookingId = duplicateBookingId);*/
                 await bookingDetailRepository.Create(bookingDetailNew);
+
+                var getWarrantyBooking = await bookingRepository.Detail(duplicateBookingId);
+
+                await UpdateLotStatus(LotStatus.Assigned, getWarrantyBooking!);
             }
-            catch (System.Exception)
+            catch (Exception e)
             {
-                throw;
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<BookingDetailWarrantyDto> GetBookingByBookingId(int bookingId)
+        {
+            try
+            {
+                var bookingCode = await bookingRepository.GetBookingCodeByBookingId(bookingId);
+
+                var garage = await bookingRepository.GetGarage(bookingCode!);
+
+                var listBookingDto = mapper.Map<List<Booking>, List<BookingDetailList>>(
+                await bookingRepository.GetBookingByBookingCode(bookingCode!),
+                otp => otp.AfterMap((src, des) =>
+                {
+                    foreach (var item in des)
+                    {
+                        if (item.BookingDetailDtos!.Any(b => b.ProductBookingDetailDto!.ProductId == 0))
+                        {
+                            item!.BookingDetailDtos!.Where(b => b.ProductBookingDetailDto!.ProductId == 0)
+                            .Select(b => { b.ProductBookingDetailDto = null; return b; }).ToList();
+                        }
+                    }
+                }));
+
+                var garageDto = mapper.Map<BookingDetailWarrantyDto>(garage);
+
+                garageDto.BookingDetailLists = listBookingDto;
+
+                return garageDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
+        public async Task<GenericObject<List<BookingListResponseDto>>> ViewAndFilter(ViewAllAndFilterBooking page)
+        {
+            try
+            {
+                (var listObj, var count) = await bookingRepository.ViewAndFilter(page);
+
+                var listDto = mapper.Map<List<BookingListResponseDto>>(listObj);
+
+                var list = new GenericObject<List<BookingListResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
             }
         }
     }

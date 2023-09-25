@@ -23,8 +23,9 @@ namespace GraduationThesis_CarServices.Models.Entity
         [Column(TypeName = "decimal(10,3)")]
         public decimal FinalPrice { get; set; }
         public bool? IsAccepted {get; set;}
-        public int TotalEstimatedCompletionTime { get; set; }
-        public int CustomersCanReceiveTheCarTime { get; set; }
+        public string WarrantyReason {get; set;}
+        public int BookingDuration { get; set; }
+        //public int CustomersCanReceiveTheCarTime { get; set; }
         [Column(TypeName = "tinyint")]
         public PaymentStatus PaymentStatus { get; set; }
         [Column(TypeName = "tinyint")]

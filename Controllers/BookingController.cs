@@ -406,5 +406,13 @@ namespace GraduationThesis_bookingServices.Controllers
             var garage = await bookingService.GetBookingByBookingId(bookingId);
             return Ok(garage);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("filter-all-booking")]
+        public async Task<IActionResult> View(ViewAllAndFilterBooking page)
+        {
+            var list = await bookingService.ViewAndFilter(page)!;
+            return Ok(list);
+        }
     }
 }

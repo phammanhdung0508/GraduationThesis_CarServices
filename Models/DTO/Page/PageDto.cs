@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel;
 
 namespace GraduationThesis_CarServices.Models.DTO.Page

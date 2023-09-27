@@ -18,5 +18,6 @@ namespace GraduationThesis_CarServices.Services.IService
         Task<List<ServiceSelectResponseDto>> GetServiceByServiceGroup(int garageId, int carType);
         Task<List<GetIdAndNameDto>> GetNotSelectedServiceByGarage(int garageId);
         Task<List<GetIdAndNameDto>> GetALLIdAndNameByGarage();
+        Task<List<ServiceDetailForWarrantyDto>> GetServiceDetailByBookingId(int bookingId);
     }
 }

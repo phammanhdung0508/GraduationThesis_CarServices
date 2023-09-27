@@ -48,6 +48,11 @@ namespace GraduationThesis_CarServices.Controllers
             var list = await serviceService.GetAll();
             return Ok(list);
         }
+        [HttpGet("get-service-detail-by-booking/{bookingId}")]
+        public async Task<IActionResult> GetServiceDetailByBookingId(int bookingId){
+            var list = await serviceService.GetServiceDetailByBookingId(bookingId);
+            return Ok(list);
+        }
 
         /// <summary>
         /// View all services. [Admin]

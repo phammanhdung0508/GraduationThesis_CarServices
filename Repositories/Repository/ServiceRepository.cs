@@ -5,6 +5,7 @@ using GraduationThesis_CarServices.Paging;
 using Microsoft.EntityFrameworkCore;
 using GraduationThesis_CarServices.Repositories.IRepository;
 using GraduationThesis_CarServices.Enum;
+using GraduationThesis_CarServices.Models.DTO.Service;
 
 namespace GraduationThesis_CarServices.Repositories.Repository
 {
@@ -269,6 +270,24 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             catch (System.Exception)
             {
                 
+                throw;
+            }
+        }
+
+        public async Task<List<BookingDetail>> GetServiceDetailByBookingId(int bookingId)
+        {
+            try
+            {
+                var list = await context.BookingDetails
+                .Include(b => b.ServiceDetail).ThenInclude(s => s.Service)
+                .Where(b => b.BookingId == bookingId 
+                //&& b.IsAccepted == true
+                ).ToListAsync();
+
+                return list;
+            }
+            catch (System.Exception)
+            {
                 throw;
             }
         }

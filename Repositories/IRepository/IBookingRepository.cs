@@ -18,6 +18,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<bool> IsBookingExist(int bookingId);
         Task<(List<Booking>, int count)> FilterBookingByGarage(int garageId, PageDto page);
         Task<(List<Booking>?, int count)> FilterBookingByCustomer(int userId, PageDto page);
+        Task<(List<Booking>?, int count)> FilterWarrantyByCustomer(int userId, PageDto page);
         Task<(List<Booking>?, int count)> SearchByBookingCode(int userId, string search, PageDto page);
         Task<(List<Booking>?, int count)> FilterBookingByStatus(BookingStatus? status, PageDto page, int? garageId);
         Task<(List<Booking>?, int count)> FilterBookingStatusAndDate(DateTime? dateFrom, DateTime? dateTo, BookingStatus? status, PageDto page);

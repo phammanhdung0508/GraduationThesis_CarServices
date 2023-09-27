@@ -12,6 +12,7 @@ namespace GraduationThesis_CarServices.Models.DTO.User
         public string UserPhone { get; set; } = string.Empty;
         public string UserImage { get; set; } = string.Empty;
         public string MechanicStatus { get; set; } = string.Empty;
+        public string MechanicLevel { get; set; } = string.Empty;
         public string UserStatus { get; set; } = string.Empty;
         public RoleDto? RoleDto { get; set; }
     }

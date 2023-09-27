@@ -17,6 +17,7 @@ namespace GraduationThesis_CarServices.Services.IService
         Task UpdateStatus(int bookingId, BookingStatus bookingStatus, int userId);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByGarageId(PagingBookingPerGarageRequestDto requestDto);
         Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterBoookingByCustomer(FilterByCustomerRequestDto requestDto);
+        Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterWarrantyByCustomer(FilterByCustomerRequestDto requestDto);
         Task<BookingDetailForStaffResponseDto> RunQRCode(int bookingId, int garageId);
         Task<GenericObject<List<BookingListResponseDto>>> SearchByBookingCode(SearchBookingByUserRequestDto requestDto);
         Task<GenericObject<List<BookingListResponseDto>>> FilterBookingByStatus(FilterByStatusRequestDto requestDto);

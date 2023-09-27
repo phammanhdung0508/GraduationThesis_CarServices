@@ -99,6 +99,28 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<GenericObject<List<CustomerListResponseDto>>> FilterCustomerBookingAtGarage(PageDto page, int garageId)
+        {
+            (var listObj, var count) = await userRepository.FilterCustomerBookingAtGarage(page, garageId);
+
+            var listDto = mapper.Map<List<User>, List<CustomerListResponseDto>>(listObj!,
+            otp => otp.AfterMap((src, des) =>
+            {
+                if (src.Any())
+                {
+                    for (int i = 0; i < src.Count; i++)
+                    {
+                        des[i].FullName = src[i].UserFirstName + " " + src[i].UserLastName;
+                        des[i].TotalBooking = userRepository.TotalBooking(src[i].UserId);
+                    }
+                }
+            }));
+
+            var list = new GenericObject<List<CustomerListResponseDto>>(listDto, count);
+
+            return list;
+        }
+
         public async Task<GenericObject<List<CustomerListResponseDto>>> FilterCustomer(PageDto page)
         {
             try

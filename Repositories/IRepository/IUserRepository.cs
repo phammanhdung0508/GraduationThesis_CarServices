@@ -11,6 +11,7 @@ namespace GraduationThesis_CarServices.Repositories.IRepository
         Task<User?> Detail(int id);
         Task<int> Create(User user);
         Task Update(User user);
+        Task<(List<User>?, int)> FilterCustomerBookingAtGarage(PageDto page, int garageId);
         Task<(List<User>?, int)> FilterByRole(PageDto page, int roleId, int garageId);
         int TotalBooking(int customerId);
         Task<bool> IsUserPhoneExist(string userPhone);

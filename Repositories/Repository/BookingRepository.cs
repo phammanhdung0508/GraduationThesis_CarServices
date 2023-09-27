@@ -21,7 +21,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Bookings.Where(b => b.IsAccepted == true);
+                var query = context.Bookings.Where(b => b.IsAccepted == true &&
+                string.IsNullOrEmpty(b.WarrantyReason) == true);
 
                 var count = await query.CountAsync();
 
@@ -40,30 +41,44 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
+                IQueryable<Booking>? query = null;
+
                 if (garageId is null)
                 {
-                    var query = context.Bookings.Where(b => b.BookingStatus == status
-                    && b.IsAccepted == true).AsQueryable();
-
-                    var count = await query.CountAsync();
-
-                    var list = await PagingConfiguration<Booking>.Get(query.Include(b => b.Car).ThenInclude(c => c.Customer)
-                    .ThenInclude(c => c.User).Include(b => b.Garage), page);
-
-                    return (list.OrderByDescending(b => b.BookingId).ToList(), count);
+                    if (status != BookingStatus.Completed)
+                    {
+                        query = context.Bookings.Where(b => b.BookingStatus == status
+                        && b.IsAccepted == true).AsQueryable();
+                    }
+                    else
+                    {
+                        query = context.Bookings.Where(b => b.BookingStatus == status
+                        && b.IsAccepted == true &&
+                        string.IsNullOrEmpty(b.WarrantyReason) == true).AsQueryable();
+                    }
                 }
                 else
                 {
-                    var query = context.Bookings.Where(b => b.BookingStatus == status &&
-                    b.GarageId == garageId).AsQueryable();
-
-                    var count = await query.CountAsync();
-
-                    var list = await PagingConfiguration<Booking>.Get(query.Include(b => b.Car).ThenInclude(c => c.Customer)
-                    .ThenInclude(c => c.User).Include(b => b.Garage), page);
-
-                    return (list, count);
+                    if (status != BookingStatus.Completed)
+                    {
+                        query = context.Bookings.Where(b => b.BookingStatus == status &&
+                        b.GarageId == garageId
+                        && b.IsAccepted == true).AsQueryable();
+                    }
+                    else
+                    {
+                        query = context.Bookings.Where(b => b.BookingStatus == status &&
+                        b.GarageId == garageId &&
+                        string.IsNullOrEmpty(b.WarrantyReason) == true
+                        && b.IsAccepted == true).AsQueryable();
+                    }
                 }
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Booking>.Get(query.Include(b => b.Car).ThenInclude(c => c.Customer)
+                .ThenInclude(c => c.User).Include(b => b.Garage), page);
+
+                return (list.OrderByDescending(b => b.BookingId).ToList(), count);
             }
             catch (System.Exception)
             {
@@ -244,7 +259,35 @@ namespace GraduationThesis_CarServices.Repositories.Repository
         {
             try
             {
-                var query = context.Users.Where(u => u.UserId == userId).Select(u => u.Customer).SelectMany(c => c.Cars).SelectMany(c => c.Bookings).AsQueryable();
+                var query = context.Users.Where(u => u.UserId == userId)
+                .Select(u => u.Customer).SelectMany(c => c.Cars)
+                .SelectMany(c => c.Bookings)
+                .Where(b => b.IsAccepted == true &&
+                b.BookingStatus != BookingStatus.Warranty &&
+                string.IsNullOrEmpty(b.WarrantyReason) == true)
+                .AsQueryable();
+
+                var count = await query.CountAsync();
+
+                var list = await PagingConfiguration<Booking>.Get(query, page);
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(List<Booking>?, int count)> FilterWarrantyByCustomer(int userId, PageDto page)
+        {
+            try
+            {
+                var query = context.Users.Where(u => u.UserId == userId)
+                .Select(u => u.Customer).SelectMany(c => c.Cars)
+                .SelectMany(c => c.Bookings)
+                .Where(b => string.IsNullOrEmpty(b.WarrantyReason) == false)
+                .AsQueryable();
 
                 var count = await query.CountAsync();
 
@@ -318,11 +361,13 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var serviceEarned = await query.SelectMany(b => b.BookingDetails)
                 .Where(s => s.BookingServiceStatus.Equals(BookingServiceStatus.Done)
+                && string.IsNullOrEmpty(s.Booking.WarrantyReason)
                 && s.Booking.IsAccepted == true)
                 .SumAsync(d => d.ServicePrice);
 
                 var productEarned = await query.SelectMany(b => b.BookingDetails)
                 .Where(s => s.BookingServiceStatus.Equals(BookingServiceStatus.Done)
+                && s.Booking.OriginalPrice != 0
                 && s.Booking.IsAccepted == true)
                 .SumAsync(d => d.ProductPrice);
 
@@ -376,7 +421,8 @@ namespace GraduationThesis_CarServices.Repositories.Repository
 
                 var checkin = await query.Where(b => b.BookingStatus.Equals(BookingStatus.CheckIn)).CountAsync();
 
-                var completed = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Completed)).CountAsync();
+                var completed = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Completed) &&
+                string.IsNullOrEmpty(b.WarrantyReason) == true).CountAsync();
 
                 var warranty = await query.Where(b => b.BookingStatus.Equals(BookingStatus.Warranty)).CountAsync();
 

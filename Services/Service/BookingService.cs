@@ -376,6 +376,43 @@ namespace GraduationThesis_CarServices.Services.Service
             }
         }
 
+        public async Task<GenericObject<List<FilterByCustomerResponseDto>>> FilterWarrantyByCustomer(FilterByCustomerRequestDto requestDto)
+        {
+            try
+            {
+                var page = new PageDto
+                {
+                    PageIndex = requestDto.PageIndex,
+                    PageSize = requestDto.PageSize
+                };
+
+                (var listObj, var count) = await bookingRepository.FilterWarrantyByCustomer(requestDto.UserId, page);
+
+                var listDto = mapper.Map<List<FilterByCustomerResponseDto>>(listObj);
+
+                var list = new GenericObject<List<FilterByCustomerResponseDto>>(listDto, count);
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
+
         public async Task<BookingDetailResponseDto?> Detail(int id)
         {
             try
@@ -519,10 +556,14 @@ namespace GraduationThesis_CarServices.Services.Service
 
         private static void UpdateListHours(int num, List<BookingPerHour> listHours)
         {
-            listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
+            if (listHours.Any(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num)))
+            {
+                listHours.FirstOrDefault(l => DateTime.Parse(l.Hour).TimeOfDay.Hours.Equals(num))!.IsAvailable = false;
+            }
         }
 
-        private static void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength, List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
+        private static void EstimatedTimeCanBeBook(int from, int to, int estimatedTime, int sequenceLength,
+        List<int> isAvailableList, List<BookingPerHour> listHours, int totalEstimatedTimeServicesTake)
         {
             if (sequenceLength > 1)
             {
@@ -553,6 +594,8 @@ namespace GraduationThesis_CarServices.Services.Service
             var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             var current = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
+            isAvailableList.AddRange(new int[] { 18, 19, 20, 21, 22, 23, 24 });
+
             for (int i = 0; i <= isAvailableList.Count - 1; i++)
             {
                 if (current.Hour != 13 &&
@@ -570,7 +613,14 @@ namespace GraduationThesis_CarServices.Services.Service
                         UpdateListHours(isAvailableList[i], listHours);
                     }
 
-                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 1, isAvailableList[i] + 1, isAvailableList[i] + 1, sequenceLength, isAvailableList, listHours, totalEstimatedTimeServicesTake);
+                    EstimatedTimeCanBeBook(
+                        isAvailableList[i] - sequenceLength + 1,
+                        isAvailableList[i] + 1,
+                        isAvailableList[i] + 1,
+                        sequenceLength,
+                        isAvailableList,
+                        listHours,
+                        totalEstimatedTimeServicesTake);
 
                     sequenceLength = 1;
                 }
@@ -578,7 +628,14 @@ namespace GraduationThesis_CarServices.Services.Service
                 if (current.Hour != 13 &&
                 isAvailableList[i + 1].Equals(isAvailableList.Last()))
                 {
-                    EstimatedTimeCanBeBook(isAvailableList[i] - sequenceLength + 2, isAvailableList[i] + 1, isAvailableList[i] + 2, sequenceLength, isAvailableList, listHours, totalEstimatedTimeServicesTake);
+                    EstimatedTimeCanBeBook(
+                        isAvailableList[i] - sequenceLength + 2,
+                        isAvailableList[i] + 1,
+                        isAvailableList[i] + 2,
+                        sequenceLength,
+                        isAvailableList,
+                        listHours,
+                        totalEstimatedTimeServicesTake);
                     break;
                 }
             }
@@ -2102,6 +2159,20 @@ namespace GraduationThesis_CarServices.Services.Service
                         throw new MyException("Đơn hàng gốc của khách hàng phải hoàn thành trước khi bảo hành.", 404);
                     case var isFalse when isFalse == (initialBooking!.PaymentStatus == PaymentStatus.Paid):
                         throw new MyException("Đơn hàng gốc của khách hàng chưa được thanh toán.", 404);
+                    case var isFalse when isFalse == (string.IsNullOrEmpty(requestDto.Reason)):
+                        throw new MyException("Lý do bảo hành đơn hàng không được để trống.", 404);
+                }
+
+                var isCarAvalible = await carRepository.IsCarAvalible((int)initialBooking.CarId!);
+                if (isCarAvalible == true)
+                {
+                    var car = await carRepository.Detail((int)initialBooking.CarId);
+                    car!.CarBookingStatus = CarStatus.NotAvailable;
+                    await carRepository.Update(car);
+                }
+                else
+                {
+                    throw new MyException("Xin lỗi xe của bạn không khả dụng.", 404);
                 }
 
                 var bookingDetailList = initialBooking!.BookingDetails
@@ -2128,6 +2199,11 @@ namespace GraduationThesis_CarServices.Services.Service
                         }
                     }
 
+                    if (price != 0)
+                    {
+                        des.PaymentStatus = PaymentStatus.Unpaid;
+                    }
+
                     des.OriginalPrice = price;
                     des.TotalPrice = price;
                     des.FinalPrice = price;
@@ -2149,12 +2225,6 @@ namespace GraduationThesis_CarServices.Services.Service
                         item.BookingServiceStatus = BookingServiceStatus.NotStart;
                     }
                 }));
-
-                var car = await carRepository.Detail((int)initialBooking.CarId!);
-
-                car!.CarBookingStatus = CarStatus.NotAvailable;
-
-                await carRepository.Update(car);
 
                 /*bookingDetailList.ForEach(b => b.BookingId = duplicateBookingId);*/
                 await bookingDetailRepository.Create(bookingDetailNew);

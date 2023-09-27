@@ -175,13 +175,24 @@ namespace GraduationThesis_bookingServices.Controllers
         }
 
         /// <summary>
-        /// Filter Bookings by specific Customer. [Admin]
+        /// Filter Bookings by specific Customer. [Admin, Manager]
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpPost("filter-booking-by-customer")]
         public async Task<IActionResult> FilterBookingByCustomer(FilterByCustomerRequestDto requestDto)
         {
             var list = await bookingService.FilterBoookingByCustomer(requestDto);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Filter Warranty by specific Customer. [Admin, Manager]
+        /// </summary>
+        [Authorize(Roles = "Admin, Manager")]
+        [HttpPost("filter-warranty-by-customer")]
+        public async Task<IActionResult> FilterWarrantyByCustomer(FilterByCustomerRequestDto requestDto)
+        {
+            var list = await bookingService.FilterWarrantyByCustomer(requestDto);
             return Ok(list);
         }
 

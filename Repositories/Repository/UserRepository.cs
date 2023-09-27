@@ -224,6 +224,29 @@ namespace GraduationThesis_CarServices.Repositories.Repository
             }
         }
 
+        public async Task<(List<User>?, int)> FilterCustomerBookingAtGarage(PageDto page, int garageId)
+        {
+            try
+            {
+                var query = context.Bookings
+                .Where(c => c.GarageId == garageId)
+                .Select(b => b.Car).Select(c => c.Customer)
+                .Select(c => c.User)
+                .Distinct().AsQueryable();
+            
+                var list = await PagingConfiguration<User>.Get(query, page);
+
+                var count = await query.CountAsync();
+
+                return (list, count);
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+
         public async Task<(List<User>?, int)> FilterByRole(PageDto page, int roleId, int garageId)
         {
             try

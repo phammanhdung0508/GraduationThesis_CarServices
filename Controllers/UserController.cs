@@ -33,7 +33,7 @@ namespace GraduationThesis_CarServices.Controllers
         /// <summary>
         /// View detail a specific Customer.
         /// </summary>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet("detail-customer/{userId}")]
         public async Task<IActionResult> CustomerDetail(int userId)
         {
@@ -98,8 +98,16 @@ namespace GraduationThesis_CarServices.Controllers
             switch (roleId)
             {
                 case 1:
-                    var listCustomer = await userService.FilterCustomer(page);
-                    return Ok(listCustomer);
+                    if (garageId == 0)
+                    {
+                        var listCustomer = await userService.FilterCustomer(page);
+                        return Ok(listCustomer);
+                    }
+                    else
+                    {
+                        var listCustomer = await userService.FilterCustomerBookingAtGarage(page, garageId);
+                        return Ok(listCustomer);
+                    }
                 default:
                     var listUser = await userService.FilterUser(page, roleId, garageId);
                     return Ok(listUser);

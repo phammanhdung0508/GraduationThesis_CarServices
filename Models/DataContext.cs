@@ -275,13 +275,13 @@ namespace GraduationThesis_CarServices.Models
                 new Service{ServiceId=25, ServiceName="Kiểm tra hệ thống điện, phanh, treo",
                     ServiceImage="https://thanhphongauto.com/wp-content/uploads/2020/03/hu-hong-cua-he-thong-treo.jpg",
                     ServiceDetailDescription="Kiểm tra hệ thống điện, phanh, treo là quá trình kiểm tra các bộ phận quan trọng trên ôtô để đảm bảo sự an toàn và hoạt động hiệu quả của xe.", ServiceDuration=2,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 12,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 new Service{ServiceId=26, ServiceName="Kiểm tra và thay bình ắc quy, bạc đạn, dây đai",
                     ServiceImage="https://danchoioto.vn/wp-content/uploads/2021/05/neu-dien-ap-binh-ac-quy-do-duoc-bang-hoac-lon-hon-12v-nghia-la-ac-quy-dang-binh-thuong.jpeg",
                     ServiceDetailDescription="Kiểm tra và thay bình ắc quy là quá trình kiểm tra tình trạng hoạt động của bình ắc quy và thay thế nếu cần.", ServiceDuration=3,
-                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack, ServiceWarrantyPeriod = 12,
+                    ServiceGroup = ServiceGroup.PackageExterior.ToString(), ServiceUnit = ServiceUnit.Pack,
                     ServiceStatus=Status.Activate, CreatedAt=now},
 
                 //GÓI DỊCH VỤ NỘI THẤT
@@ -563,13 +563,13 @@ namespace GraduationThesis_CarServices.Models
                     ProductUnit=ProductUnit.Bottle, ProductPrice=1450, ProductStatus=Status.Activate, 
                     ServiceId=24, CategoryId=1},
                 
-                new Product{ProductId = 42, ProductName="Bọc ghế da Simili xe Honda City",
+                new Product{ProductId = 42, ProductName="Bọc ghế da Simili màu đen",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/06/boc-ghe-da-simili-xe-honda-city-1-1.jpg",
                     ProductUnit=ProductUnit.Other, ProductPrice=3500, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 12,
                     ServiceId=27, CategoryId=1},
                 
-                new Product{ProductId = 43, ProductName="Bọc ghế da Simili xe Hyundai Accent",
+                new Product{ProductId = 43, ProductName="Bọc ghế da Simili màu đen trắng",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/06/boc-ghe-da-simili-xe-hyundai-accent-4.jpg",
                     ProductUnit=ProductUnit.Other, ProductPrice=3500, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 12,
@@ -581,7 +581,7 @@ namespace GraduationThesis_CarServices.Models
                     ProductWarrantyPeriod = 18,
                     ServiceId=28, CategoryId=2},
                 
-                new Product{ProductId = 45, ProductName="Thảm lót sàn xe ô tô Hyundai Stargazer",
+                new Product{ProductId = 45, ProductName="Thảm lót sàn xe ô tô",
                     ProductImage="https://salt.tikicdn.com/cache/750x750/ts/product/16/e7/45/148a5aab6ec34770615c62cc284ba4bf.jpg.webp",
                     ProductUnit=ProductUnit.Carpet, ProductPrice=2520, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 18,
@@ -599,32 +599,33 @@ namespace GraduationThesis_CarServices.Models
                     ProductWarrantyPeriod = 12,
                     ServiceId=29, CategoryId=1},
                 
-                new Product{ProductId = 48, ProductName="Bọc trần da 5D xe Ford EcoSport",
+                new Product{ProductId = 48, ProductName="Bọc trần da 5D",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/07/boc-tran-da-5d-xe-ford-ecosport-17-510x510.jpg",
                     ProductUnit=ProductUnit.Other, ProductPrice=1600, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 12,
                     ServiceId=30, CategoryId=1},
                 
-                new Product{ProductId = 49, ProductName="Bạt phủ xe ô tô tráng nhôm phản quang",
-                    ProductImage="https://phukienxedep.com/wp-content/uploads/2017/06/bat-phu-xe-o-to-ca-xe-tai-phukienxedep.jpg",
-                    ProductUnit=ProductUnit.Other, ProductPrice=550, ProductStatus=Status.Activate, 
+                new Product{ProductId = 49, ProductName="Bọc trần nilon ô tô",
+                    ProductImage="https://aztuning.vn/wp-content/uploads/2021/05/boc-tran-nilon-oto-aztuning.vn-.jpg",
+                    ProductUnit=ProductUnit.Other, ProductPrice=550, ProductStatus=Status.Activate,
+                    ProductWarrantyPeriod = 12, 
                     ServiceId=30, CategoryId=1},
                 
-                new Product{ProductId = 50, ProductName="Bọc ghế da Nappa xe Toyota Fortuner",
+                new Product{ProductId = 50, ProductName="Bọc ghế da Nappa màu cam nhạt",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/05/boc-ghe-da-nappa-xe-toyota-fortuner-3-510x510.jpg",
-                    ProductUnit=ProductUnit.Other, ProductPrice=14000, ProductStatus=Status.Activate, 
+                    ProductUnit=ProductUnit.Other, ProductPrice=12000, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 60,
                     ServiceId=31, CategoryId=1},
                 
-                new Product{ProductId = 51, ProductName="Bọc ghế da Nappa xe Toyota Innova",
+                new Product{ProductId = 51, ProductName="Bọc ghế da Nappa màu đen",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/05/boc-ghe-da-nappa-xe-toyota-innova-1-1-510x510.jpg",
-                    ProductUnit=ProductUnit.Other, ProductPrice=14000, ProductStatus=Status.Activate, 
+                    ProductUnit=ProductUnit.Other, ProductPrice=12000, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 60,
                     ServiceId=31, CategoryId=1},
                 
                 new Product{ProductId = 52, ProductName="SpeedMap M1 (Camera hành trình)",
                     ProductImage="https://orokingauto.com/wp-content/uploads/2023/05/camera-hanh-trinh-vietmap-speedmap-m1-canh-bao-toc-do-1-510x680.jpg",
-                    ProductUnit=ProductUnit.Other, ProductPrice=5000, ProductStatus=Status.Activate, 
+                    ProductUnit=ProductUnit.Other, ProductPrice=1390, ProductStatus=Status.Activate, 
                     ProductWarrantyPeriod = 24,
                     ServiceId=32, CategoryId=1},
                 

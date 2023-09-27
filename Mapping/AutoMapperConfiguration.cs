@@ -409,6 +409,7 @@ namespace GraduationThesis_CarServices.Mapping
                 .ForMember(des => des.UpdatedAt, des => des.MapFrom(src => DateTime.Now))
                 .ForMember(des => des.ServiceId, obj => obj.Ignore());
             CreateMap<Service, ServiceStatusRequestDto>().ForMember(des => des.ServiceId, obj => obj.Ignore()).ReverseMap();
+
             //CreateMap<Service, DeleteServiceDto>().ReverseMap();
 
             //Report
@@ -483,6 +484,10 @@ namespace GraduationThesis_CarServices.Mapping
             CreateMap<Product, ProductStatusRequestDto>().ForMember(des => des.ProductId, obj => obj.Ignore()).ReverseMap();
 
             //ServiceBooking
+            CreateMap<BookingDetail, ServiceDetailForWarrantyDto>()
+                .ForMember(des => des.ServiceDetailId, obj => obj.MapFrom(src => src.ServiceDetailId))
+                .ForMember(des => des.ServiceName, obj => obj.MapFrom(src => src.ServiceDetail.Service.ServiceName));
+                
             CreateMap<BookingDetail, ServiceStatusForStaffDto>()
                 .ForMember(des => des.ServiceName, obj => obj.MapFrom(src => src.ServiceDetail.Service.ServiceName));
             CreateMap<BookingDetail, BookingDetailStatusForBookingResponseDto>()

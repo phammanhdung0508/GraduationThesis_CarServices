@@ -450,5 +450,34 @@ namespace GraduationThesis_CarServices.Services.Service
                 }
             }
         }
+
+        public async Task<List<ServiceDetailForWarrantyDto>> GetServiceDetailByBookingId(int bookingId)
+        {
+            try
+            {
+                var listObj = await serviceRepository.GetServiceDetailByBookingId(bookingId);
+
+                var listDto = mapper.Map<List<ServiceDetailForWarrantyDto>>(listObj);
+
+                return listDto;
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case MyException:
+                        throw;
+                    default:
+                        var inner = e.InnerException;
+                        while (inner != null)
+                        {
+                            Console.WriteLine(inner.StackTrace);
+                            inner = inner.InnerException;
+                        }
+                        Debug.WriteLine(e.Message + "\r\n" + e.StackTrace + "\r\n" + inner);
+                        throw;
+                }
+            }
+        }
     }
 }
